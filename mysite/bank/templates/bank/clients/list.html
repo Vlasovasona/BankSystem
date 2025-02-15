@@ -1,0 +1,12 @@
+{% extends "bank/base.html" %}
+{% block title %}My bank{% endblock %}
+{% block content %}
+    <h1>Мой банк</h1>
+    {% for client in clients %}
+        <h2>
+            <a href="{{ Clients.get_absolute_url }}">{{ client.otchestvo }}</a>
+        </h2>
+        <p class="date">Фамилия {{client.familia}} Имя {{client.name}}</p>
+        {{ client.body|truncatewords:30|linebreaks }}
+    {% endfor %}
+{% endblock %}

@@ -8,6 +8,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.urls import reverse
 
 
 class AuthGroup(models.Model):
@@ -92,6 +93,9 @@ class Clients(models.Model):
     presence_absence_of_real_estate = models.IntegerField(db_column='Presence_absence_of_real_estate', blank=True, null=True)  # Field name made lowercase.
     month_income = models.IntegerField(db_column='Month_income', blank=True, null=True)  # Field name made lowercase.
 
+    def get_absolute_url(self):
+        return reverse('bank:client_detail', args=[self.client_code])
+
     class Meta:
         managed = False
         db_table = 'clients'
@@ -110,7 +114,6 @@ class CreditStatement(models.Model):
     class Meta:
         managed = False
         db_table = 'credit_statement'
-        ordering = 'loan_repayment_number'
 
 
 class CreditType(models.Model):

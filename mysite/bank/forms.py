@@ -10,4 +10,4 @@ otchestvo = forms.CharField(max_length=25)
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Clients
-        fields = ('familia', 'name', 'age')
+        exclude = ('client_code',)

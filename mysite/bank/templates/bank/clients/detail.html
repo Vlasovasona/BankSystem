@@ -6,12 +6,31 @@
 </head>
 <body>
     {% extends "bank/base.html" %}
-    {% block title %}{{ client.familia }}{% endblock %}
     {% block content %}
-        <h1>{{ client.familia }}{{ client.name }}{{ client.otchestvo }}</h1>
-        <p>Адрес {{ client.adress }} Номер мобильного телефона {{ client.phone_number }} Возраст {{ client.age }}</p>
-        {{ client.body|linebreaks }}
+    <h1>Редактирование клиента</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_familia">Фамилия:</label>
+        <input type="text" name="my_field_familia" id="id_familia" value="{{ client.familia }}" required><br>
+        <br />
+
+        <label for="id_name">Имя:</label>
+        <input type="text" name="my_field_name" id="id_name" value="{{ client.name }}" required><br>
+        <br />
+
+        <label for="id_adress">Адрес:</label>
+        <input type="text" name="my_field_adress" id="id_adress" value="{{ client.adress }}" required><br>
+        <br />
+
+        <label for="id_age">Возраст:</label>
+        <input type="text" name="my_field_age" id="id_age" value="{{ client.age }}" required><br>
+
+        <button type="submit">Сохранить изменения</button>
+    </form>
     {% endblock %}
+
 </body>
 </html>
+
+
 

@@ -1,7 +1,6 @@
 {% extends "bank/base.html" %}
 {% block title %}My bank{% endblock %}
 {% block content %}
-    <h1>Мой банк</h1>
     {% for client in clients %}
         <h2>
             <a href="{{ client.get_absolute_url }}">{{ client.otchestvo }}</a>

@@ -2,16 +2,53 @@
 {% load static %}
 <html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    <link href="{% static 'css/bank.css' %}" rel="stylesheet">
+    <link href="{% static 'bank/mainpage.css' %}" rel="stylesheet">
 </head>
 <body>
-    <div id="content">
+    <header class="site-header">
+    <div class="container">
+        <div class="header-content"> <!-- Общий контейнер для заголовка и навигации -->
+            <div class="title_line_search">
+                <h1>Мой банк</h1>
+            <div class="vertical-line"></div>
+
+            <search class="search-string">
+              <form>
+                <input type="search" placeholder="Поиск клиента">
+                <button>Найти</button>
+              </form>
+            </search>
+            </div>
+
+            <nav> <!-- Навигация -->
+                <ul>
+                    <li><a href="#">Главная</a></li>
+                    <li><a href="#">Услуги</a></li>
+                    <li><a href="#">Контакты</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    </header>
+
+    <div class="wrapper">
+    <aside class="side-menu">
+        <ul>
+            <li><a href="#">Главная</a></li>
+            <li><a href="#">Заявки</a></li>
+            <li><a href="#">Личный кабинет</a></li>
+            <li><a href="#">Отчеты</a></li>
+        </ul>
+    </aside>
+
+        <main class="content">
+        <div id="content">
         {% block content %}{% endblock %}
+        </div>
+    </main>
     </div>
-    <div id="sidebar">
-        <h2>Мой банк</h2>
-        <p>Здесь могла бы быть ваша реклама, но вы жадная жопа</p>
-    </div>
+
 </body>
 </html>

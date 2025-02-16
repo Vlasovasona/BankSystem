@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import pymysql
+import os
 
 pymysql.install_as_MySQLdb()
 
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles', # фреймворк управления статическими файлами
     'bank.apps.BankConfig'
 ]
+
 
 # подлежащие исполнению промежуточные программные компоненты
 MIDDLEWARE = [
@@ -130,6 +132,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+TATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'bank/static')
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -1,0 +1,140 @@
+body {
+    background-color: #f0f0f0; /* серый фон */
+}
+
+/* шапка - верхнее меню. начало */
+.site-header {
+    background-color: #000080;
+    padding: 10px 0;
+    text-align: center;
+    color: white;
+}
+
+.title_line_search {
+    display: flex;
+    gap: 10px;       /* Расстояние между элементами */
+    align-items: center;
+}
+
+.site-header h1 {
+    color: #FFFFFF;
+    margin: 5px;
+    font-size: 24px;
+    text-align: left;
+    padding-left: 25px;
+}
+
+.site-header nav ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 70px;
+    margin-top: 15px;
+    padding-right: 25px;
+}
+
+.site-header nav a {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.site-header nav a:hover {
+    text-decoration: underline;
+}
+
+.header-content {
+    display: flex;             /* Включаем Flexbox */
+    align-items: center;       /* Выровняем элементы по вертикальной оси */
+    justify-content: space-between; /* Разместим элементы по краям контейнера */
+    align-items: center;
+}
+
+.vertical-line {
+    height: 50px; /* высота горизонтальной линии */
+    width: 1px; /* толщина линии */
+    background-color: white; /* цвет линии */
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+/* Общие стили для формы поиска */
+.search-string form {
+    display: inline-block; /* Формирует форму как блочный элемент, но позволяет ей располагаться в одной строке с другими элементами */
+    border: 1px solid #ccc; /* Создает тонкую границу светло-серого цвета вокруг формы */
+    border-radius: 3px; /* Скругляет углы границы формы */
+    overflow: hidden; /* Обрезает любой контент, выходящий за пределы формы */
+    background-color: #fff; /* Устанавливает белый цвет фона формы */
+    gap: 5px;
+}
+
+/* Стили для поля ввода */
+.search-string input[type="search"] {
+    width: 150px; /* Устанавливает фиксированную ширину поля ввода */
+    padding: 10px; /* Добавляет внутренние отступы по всем сторонам поля ввода */
+    border: none; /* Убирает стандартные рамки вокруг поля ввода */
+    outline: none; /* Убирает выделение вокруг поля ввода при фокусировке */
+    font-size: 16px; /* Устанавливает размер шрифта для текста в поле ввода */
+}
+
+/* Стили для кнопки поиска */
+.search-string button {
+    padding: 10px 15px; /* Добавляет внутренние отступы сверху/снизу - 10px, слева/справа - 15px */
+    background-color: #4169E1; /* Устанавливает синий цвет фона для кнопки */
+    color: white; /* Делает текст на кнопке белым */
+    border-radius: 3px; /* Убирает рамку вокруг кнопки */
+    cursor: pointer; /* Меняет указатель мыши на руку при наведении на кнопку */
+    transition: background-color 0.3s ease; /* Анимируем изменение цвета фона кнопки при наведении */
+    border: 1px solid #4169E1;
+}
+
+/* Изменение стиля кнопки при наведении курсора */
+.search-string button:hover {
+    background-color: #0056b3; /* Меняет цвет фона кнопки на более темный оттенок синего при наведении */
+}
+
+/* шапка - верхнее меню. окончание */
+
+/*  боковое меню. начало */
+
+.wrapper {
+    display: flex;
+    align-items: left;
+}
+
+.side-menu {
+    width: 120px;
+    background-color: #000080;
+    padding: 20px;
+}
+
+.side-menu ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.side-menu li {
+    margin-bottom: 50px;
+}
+
+.side-menu a {
+    text-decoration: none;
+    color: #FFFFFF;
+    cursor: pointer;
+
+}
+
+.side-menu a:hover {
+    text-decoration: underline;
+}
+
+/*  боковое меню. конец */
+
+/*  основной контент страницы. начало */
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/*  основной контент страницы. конец */

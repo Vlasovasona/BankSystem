@@ -5,6 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-
+    {% extends "bank/base.html" %}
+    {% block title %}{{ client.familia }}{% endblock %}
+    {% block content %}
+        <h1>{{ client.familia }}{{ client.name }}{{ client.otchestvo }}</h1>
+        <p>Адрес {{ client.adress }} Номер мобильного телефона {{ client.phone_number }} Возраст {{ client.age }}</p>
+        {{ client.body|linebreaks }}
+    {% endblock %}
 </body>
 </html>
+

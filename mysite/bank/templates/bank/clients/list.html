@@ -4,9 +4,12 @@
     <h1>Мой банк</h1>
     {% for client in clients %}
         <h2>
-            <a href="{{ Clients.get_absolute_url }}">{{ client.otchestvo }}</a>
+            <a href="{{ client.get_absolute_url }}">{{ client.otchestvo }}</a>
         </h2>
         <p class="date">Фамилия {{client.familia}} Имя {{client.name}}</p>
         {{ client.body|truncatewords:30|linebreaks }}
     {% endfor %}
+    {% if is_paginated %}
+        {% include "pagination.html" with page=page_obj %}
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,40 @@
+.adress-label{
+    width: 50%;
+}
+
+.save_button{
+    border-radius: 5%;
+    background-color: #ADD8E6;
+    border-color: #ADD8E6;
+    border-width: 1px;
+    font-size: 16px;
+    color: black;
+    margin: 5px;
+}
+
+.search-client-statement{
+    border-radius: 5%;
+    background-color: #ADD8E6;
+    border-color: #ADD8E6;
+    border-width: 1px;
+    font-size: 16px;
+    color: black;
+    margin: 5px;
+}
+
+.button-group{
+    display: flex;
+    align-items: right;
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+.delete-client{
+    border-radius: 5%;
+    font-size: 16px;
+    color: black;
+    border-width: 1px;
+    background-color: #FF6347;
+    border-color: #FF6347;
+    margin: 5px;
+}

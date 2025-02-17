@@ -2,10 +2,10 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Client</title>
+    <title>{% block title %}Client{% endblock %}</title>
     {% block extra_styles %}
         <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
     {% endblock %}
@@ -23,7 +23,7 @@
         <br />
 
         <label for="id_adress">Адрес:</label>
-        <input type="text" name="my_field_adress" id="id_adress" value="{{ client.adress }}" required><br>
+        <input type="text" class="adress-label" name="my_field_adress" id="id_adress" value="{{ client.adress }}" required><br>
         <br />
 
         <label for="id_phone">Номер телефона:</label>
@@ -48,7 +48,12 @@
         <input type="text" name="my_field_month_income" id="id_month_income" value="{{ client.month_income }}" required><br>
         <br />
 
-        <button type="submit">Сохранить изменения</button>
+        <div class="button-group">
+            <button type="submit" class="save_button">Сохранить изменения</button>
+            <button type="submit" class="search-client-statement">Найти данные по вкладам и кредитам</button>
+            <button type="submit" class="delete-client">Удалить запись</button>
+        </div>
+
     </form>
     {% endblock %}
 

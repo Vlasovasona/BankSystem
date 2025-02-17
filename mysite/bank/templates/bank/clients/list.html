@@ -17,10 +17,16 @@
                 <button class="add-button" type="submit">Добавить запись</button>
                 <button class="delete-button" type="submit">Удалить запись</button>
             </div>
-            <select class="select-tables">
-                <option class="tables-list">
+            <script src="{% static 'js/script.js' %}"></script>
+            <select class="select-table" onchange="handleChange(this)">
+                <option value="{% url 'bank:clients_list_select' %}">Clients</option>
+                <option value="CreditStatement">CreditStatement</option>
+                <option value="CreditType">CreditType</option>
 
-                </option>
+                <option value="{% url 'bank:credit_list' %}">Credits</option>
+                <option value="DepositTypes">DepositTypes</option>
+                <option value="Deposits">Deposits</option>
+                <option value="StatementOfDeposits">StatementOfDeposits</option>
             </select>
         </div>
         <table class="clients-table">
@@ -38,7 +44,6 @@
             </thead>
             <tbody class="table-body">
                 {% for client in clients %}
-
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
                         <td><a href="{{ client.get_absolute_url }}">{{ client.familia }} {{ client.name }} {{ client.otchestvo }}</a></td>

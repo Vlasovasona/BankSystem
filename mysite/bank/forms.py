@@ -1,13 +1,14 @@
 from django import forms
 from .models import Clients
-
-familia = forms.CharField(max_length=25)
-name = forms.CharField(max_length=25)
-otchestvo = forms.CharField(max_length=25)
-
+from .models import Credits
 
 
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Clients
         exclude = ('client_code',)
+
+class CreditsForm(forms.ModelForm):
+    class Meta:
+        model = Credits
+        exclude = ('credit_code',)

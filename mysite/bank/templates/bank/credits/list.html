@@ -1,0 +1,63 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My bank{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/list.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+        <div class="buttons-table-choose">
+            <div class="buttons">
+                <button class="add-button" type="submit">Добавить запись</button>
+                <button class="delete-button" type="submit">Удалить запись</button>
+            </div>
+            <select class="select-tables">
+                <option value="Credits">Credits</option>
+                <option value="Clients">Clients</option>
+                <option value="CreditStatement">CreditStatement</option>
+                <option value="CreditType">CreditType</option>
+                <option value="DepositTypes">DepositTypes</option>
+                <option value="Deposits">Deposits</option>
+                <option value="StatementOfDeposits">StatementOfDeposits</option>
+            </select>
+        </div>
+        <table class="clients-table">
+            <thead class="table-thead">
+                <tr>
+                    <th>Выбрать</th>
+                    <th>Сумма кредита</th>
+                    <th>Срок</th>
+                    <th>Сумма ежемесячного платежа</th>
+                </tr>
+            </thead>
+            <tbody class="table-body">
+                {% for credit in credits %}
+                    <tr>
+                        <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
+                        <td><a href="{{ credit.get_absolute_url }}">{{ credit.credit_amount }}</a></td>
+                        <td>{{ credit.term_month }}</td>
+                        <td align="center">{{ credit.monthly_payment_amount }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Нет данных о кредитах.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            {% include "pagination.html" with page=page_obj %}
+        {% endif %}
+    {% endblock %}
+</body>
+</html>
+
+
+
+

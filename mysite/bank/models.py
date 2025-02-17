@@ -136,6 +136,9 @@ class Credits(models.Model):
         managed = False
         db_table = 'credits'
 
+    def get_absolute_url(self):
+        return reverse('bank:credit_detail', args=[self.credit_code])
+
 
 class DepositTypes(models.Model):
     deposit_type_code = models.IntegerField(db_column='Deposit_type_code', primary_key=True)  # Field name made lowercase.

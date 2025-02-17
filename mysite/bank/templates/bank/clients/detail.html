@@ -1,13 +1,17 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Client</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
+    {% endblock %}
 </head>
 <body>
-    {% extends "bank/base.html" %}
     {% block content %}
-    <h1>Редактирование клиента</h1>
     <form method="post">
         {% csrf_token %}
         <label for="id_familia">Фамилия:</label>
@@ -22,8 +26,27 @@
         <input type="text" name="my_field_adress" id="id_adress" value="{{ client.adress }}" required><br>
         <br />
 
+        <label for="id_phone">Номер телефона:</label>
+        <input type="text" name="my_field_phone" id="id_phone" value="{{ client.phone_number }}" required><br>
+        <br />
+
         <label for="id_age">Возраст:</label>
         <input type="text" name="my_field_age" id="id_age" value="{{ client.age }}" required><br>
+        <br />
+
+        <label for="id_presence_absence_of_a_car">Наличие автомобиля:</label>
+        <input type="text" name="my_field_presence_absence_of_a_car" id="id_presence_absence_of_a_car"
+               value="{{ client.presence_absence_of_a_car }}" required><br>
+        <br />
+
+        <label for="id_presence_absence_of_real_estate">Наличие недвижимости:</label>
+        <input type="text" name="my_field_presence_absence_of_real_estate" id="id_presence_absence_of_real_estate"
+               value="{{ client.presence_absence_of_real_estate }}" required><br>
+        <br />
+
+        <label for="id_month_income">Доход в месяц:</label>
+        <input type="text" name="my_field_month_income" id="id_month_income" value="{{ client.month_income }}" required><br>
+        <br />
 
         <button type="submit">Сохранить изменения</button>
     </form>

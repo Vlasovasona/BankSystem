@@ -3,8 +3,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}My bank{% endblock %}</title>
     <link href="{% static 'bank/mainpage.css' %}" rel="stylesheet">
+    {% block extra_styles %}{% endblock %}
 </head>
 <body>
     <header class="site-header">
@@ -12,7 +13,7 @@
         <div class="header-content"> <!-- Общий контейнер для заголовка и навигации -->
             <div class="title_line_search">
                 <h1>Мой банк</h1>
-            <div class="vertical-line"></div>
+                <div class="vertical-line"></div>
 
             <search class="search-string">
               <form>
@@ -24,9 +25,9 @@
 
             <nav> <!-- Навигация -->
                 <ul>
-                    <li><a href="#">Главная</a></li>
-                    <li><a href="#">Услуги</a></li>
-                    <li><a href="#">Контакты</a></li>
+                    <li><a href="#">О приложении</a></li>
+                    <li><a href="#">Помощь</a></li>
+                    <li><a href="#">Личный кабинет</a></li>
                 </ul>
             </nav>
         </div>
@@ -34,21 +35,21 @@
     </header>
 
     <div class="wrapper">
-    <aside class="side-menu">
-        <ul>
-            <li><a href="#">Главная</a></li>
-            <li><a href="#">Заявки</a></li>
-            <li><a href="#">Личный кабинет</a></li>
-            <li><a href="#">Отчеты</a></li>
-        </ul>
-    </aside>
+        <aside class="side-menu">
+            <ul>
+                <li><a href="#">Главная</a></li>
+                <li><a href="#">Заявки</a></li>
+                <li><a href="#">Личный кабинет</a></li>
+                <li><a href="#">Отчеты</a></li>
+            </ul>
+        </aside>
 
         <main class="content">
-        <div id="content">
-        {% block content %}{% endblock %}
-        </div>
-    </main>
-    </div>
 
+            <div id="content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
 </body>
 </html>

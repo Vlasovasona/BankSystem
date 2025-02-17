@@ -1,0 +1,62 @@
+/* таблица - начало */
+
+.clients-table {
+    border-collapse: collapse;
+    border: 1px solid #000;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+
+
+/* таблица - конец */
+
+
+/* шапка таблицы - начало */
+
+.buttons-table-choose{
+    display: flex;
+    align-items: right;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.add-button{
+    border-radius: 5%;
+    background-color: #32CD32;
+    border-color: #32CD32;
+    border-width: 1px;
+    font-size: 16px;
+    color: black;
+}
+
+.delete-button{
+    border-radius: 5%;
+    font-size: 16px;
+    color: black;
+    border-width: 1px;
+    background-color: #FF6347;
+    border-color: #FF6347;
+}
+
+/* шапка таблицы - конец */
+
+
+/* тело таблицы - начало */
+
+/* Граница вокруг каждой ячейки */
+
+td, th {
+    border: 1px solid #00008B;
+    padding: 10px; /* Добавляем отступы внутри ячеек */
+    background-color: white;
+}
+
+th {
+    border: 1px solid #00008B;
+    padding: 10px;
+    background-color: #ADD8E6;
+
+}
+
+/* тело таблицы - конец */

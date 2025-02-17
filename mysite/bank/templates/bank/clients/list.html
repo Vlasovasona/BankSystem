@@ -1,14 +1,80 @@
 {% extends "bank/base.html" %}
-{% block title %}My bank{% endblock %}
-{% block content %}
-    {% for client in clients %}
-        <h2>
-            <a href="{{ client.get_absolute_url }}">{{ client.otchestvo }}</a>
-        </h2>
-        <p class="date">Фамилия {{client.familia}} Имя {{client.name}}</p>
-        {{ client.body|truncatewords:30|linebreaks }}
-    {% endfor %}
-    {% if is_paginated %}
-        {% include "pagination.html" with page=page_obj %}
-    {% endif %}
-{% endblock %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My bank{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/list.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+        <div class="buttons-table-choose">
+            <div class="buttons">
+                <button class="add-button">Добавить запись</button>
+                <button class="delete-button">Удалить запись</button>
+            </div>
+            <select class="select-tables">
+                <option class="tables-list">
+
+                </option>
+            </select>
+        </div>
+        <table class="clients-table">
+            <thead class="table-thead">
+                <tr>
+                    <th>Выбрать</th>
+                    <th>ФИО</th>
+                    <th>Адрес</th>
+                    <th>Номер телефона</th>
+                    <th>Возраст</th>
+                    <th>Наличие автомобиля</th>
+                    <th>Наличие недвижимости</th>
+                    <th>Доход в месяц</th>
+                </tr>
+            </thead>
+            <tbody class="table-body">
+                {% for client in clients %}
+
+                    <tr>
+                        <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
+                        <td><a href="{{ client.get_absolute_url }}">{{ client.familia }} {{ client.name }} {{ client.otchestvo }}</a></td>
+                        <td>{{ client.adress }}</td>
+                        <td align="center">{{ client.phone_number }}</td>
+                        <td align="center">{{ client.age }}</td>
+                        <td align="center">
+                            {% if client.presence_absence_of_a_car == 1 %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+                        <td align="center">
+                            {% if client.presence_absence_of_real_estate == 1 %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+                        <td align="center">{{ client.month_income }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Нет данных о клиентах.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            {% include "pagination.html" with page=page_obj %}
+        {% endif %}
+    {% endblock %}
+</body>
+</html>
+
+
+
+

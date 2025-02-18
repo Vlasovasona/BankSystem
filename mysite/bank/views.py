@@ -1,7 +1,7 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
 
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Clients, CreditStatement, Credits, CreditType, Deposits
+from .models import Clients, CreditStatement, Credits, CreditType, Deposits, DepositTypes
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, TemplateView
 
@@ -79,3 +79,21 @@ def deposit_detail(request, deposit_code):
         'deposit': deposit,
     }
     return render(request, 'bank/deposits/detail.html', context)
+
+class DepositTypesListView(ListView):
+    queryset = DepositTypes.objects.all()
+    context_object_name = 'deposit_types'
+    paginate_by = 3
+    template_name = 'bank/depositTypes/list.html'
+
+# Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
+def deposit_type_detail(request, deposit_type_code):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :param deposit_type_code: Код типа вклада.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    deposit_type = get_object_or_404(DepositTypes, deposit_type_code=deposit_type_code)
+    context = {
+        'deposit_type': deposit_type,
+    }
+    return render(request, 'bank/depositTypes/detail.html', context)

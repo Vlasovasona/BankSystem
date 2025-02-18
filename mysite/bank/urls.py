@@ -18,4 +18,7 @@ urlpatterns = [
 
     path('deposits/<int:deposit_code>/', views.deposit_detail, name='deposit_detail'),
     path('deposits/', views.DepositsListView.as_view(), name='deposit_list'),
+
+    path('deposit_types/<int:deposit_type_code>/', views.deposit_type_detail, name='deposit_type_detail'),
+    path('deposit_types/', views.DepositTypesListView.as_view(), name='deposit_types_list'),
 ]

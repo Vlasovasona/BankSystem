@@ -150,6 +150,9 @@ class DepositTypes(models.Model):
     name_of_deposit_type = models.TextField(db_column='Name_of_deposit_type', blank=True, null=True)  # Field name made lowercase.
     deposit_percent = models.DecimalField(db_column='Deposit_percent', max_digits=5, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
 
+    def get_absolute_url(self):
+        return reverse('bank:deposit_type_detail', args=[self.deposit_type_code])
+
     class Meta:
         managed = False
         db_table = 'deposit_types'

@@ -26,26 +26,6 @@ def client_detail(request, client_code):
     }
     return render(request, 'bank/clients/detail.html', context)
 
-from .forms import ClientForm
-
-# def edit_client(request, client_code):
-#     client = get_object_or_404(Clients, client_code=client_code)
-#     if request.method == 'POST':
-#         form = ClientForm(request.POST, instance=client)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('client_detail', client_code=client_code)  # Переходим обратно на страницу клиента
-#     else:
-#         form = ClientForm(instance=client)
-#
-#     context = {
-#         'form': form,
-#         'client': client,
-#     }
-#     return render(request, 'bank/clients/edit_client.html', context)
-
-# Методы для работы с таблицей Credits
-
 class CreditsListView(ListView):
     queryset = Credits.objects.all()
     context_object_name = 'credits'
@@ -58,7 +38,7 @@ def credit_detail(request, credit_code):
     :param request: HTTP-запрос.
     :param credit_code: Код кредита.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали клиента. """
-    client = get_object_or_404(Clients, credit_code=credit_code)
+    credit = get_object_or_404(Credits, credit_code=credit_code)
     context = {
         'credit': credit,
     }

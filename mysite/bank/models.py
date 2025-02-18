@@ -127,17 +127,19 @@ class CreditType(models.Model):
 
 
 class Credits(models.Model):
-    credit_code = models.IntegerField(db_column='Credit_code', primary_key=True)  # Field name made lowercase.
-    credit_amount = models.DecimalField(db_column='Credit_amount', max_digits=20, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    term_month = models.IntegerField(db_column='Term_month', blank=True, null=True)  # Field name made lowercase.
-    monthly_payment_amount = models.DecimalField(db_column='Monthly_payment_amount', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
+    credit_code = models.IntegerField(db_column='Credit_code', primary_key=True)
+    credit_amount = models.DecimalField(db_column='Credit_amount', max_digits=20, decimal_places=2, blank=True, null=True)
+    term_month = models.IntegerField(db_column='Term_month', blank=True, null=True)
+    monthly_payment_amount = models.DecimalField(db_column='Monthly_payment_amount', max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def get_absolute_url(self):
+        return reverse('bank:credit_detail', args=[self.credit_code])
 
     class Meta:
         managed = False
         db_table = 'credits'
 
-    def get_absolute_url(self):
-        return reverse('bank:credit_detail', args=[self.credit_code])
+
 
 
 class DepositTypes(models.Model):

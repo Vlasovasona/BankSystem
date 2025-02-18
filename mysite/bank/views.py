@@ -1,7 +1,7 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
 
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Clients, CreditStatement, Credits, CreditType, Deposits, DepositTypes
+from .models import Clients, CreditStatement, Credits, CreditType, Deposits, DepositTypes, StatementOfDeposits
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, TemplateView
 
@@ -97,3 +97,39 @@ def deposit_type_detail(request, deposit_type_code):
         'deposit_type': deposit_type,
     }
     return render(request, 'bank/depositTypes/detail.html', context)
+
+class StatementOfDepositsListView(ListView):
+    queryset = StatementOfDeposits.objects.all()
+    context_object_name = 'statement_of_deposits'
+    paginate_by = 3
+    template_name = 'bank/statementOfDeposits/list.html'
+
+# Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
+def statement_of_deposits_detail(request, deposit_closing_number):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :param deposit_closing_number: Код типа вклада.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    statement_item = get_object_or_404(StatementOfDeposits, deposit_closing_number=deposit_closing_number)
+    context = {
+        'statement_item': statement_item,
+    }
+    return render(request, 'bank/statementOfDeposits/detail.html', context)
+
+class CreditStatementListView(ListView):
+    queryset = CreditStatement.objects.all()
+    context_object_name = 'credit_statement'
+    paginate_by = 3
+    template_name = 'bank/creditStatement/list.html'
+
+# Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
+def credit_statement_detail(request, loan_repayment_number):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :param loan_repayment_number: Код типа вклада.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    credit_statement_item = get_object_or_404(CreditStatement, loan_repayment_number=loan_repayment_number)
+    context = {
+        'credit_statement_item': credit_statement_item,
+    }
+    return render(request, 'bank/creditStatement/detail.html', context)

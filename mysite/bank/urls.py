@@ -21,4 +21,10 @@ urlpatterns = [
 
     path('deposit_types/<int:deposit_type_code>/', views.deposit_type_detail, name='deposit_type_detail'),
     path('deposit_types/', views.DepositTypesListView.as_view(), name='deposit_types_list'),
+
+    path('statement_of_deposits/<int:deposit_closing_number>/', views.statement_of_deposits_detail, name='statement_of_deposits_detail'),
+    path('statement_of_deposits/', views.StatementOfDepositsListView.as_view(), name='statement_of_deposits_list'),
+
+    path('credit_statement/<int:loan_repayment_number>/', views.credit_statement_detail, name='credit_statement_detail'),
+    path('credit_statement/', views.CreditStatementListView.as_view(), name='credit_statement_list'),
 ]

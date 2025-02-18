@@ -19,35 +19,43 @@
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">
+                <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
+                <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
+                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
                 <option value="{% url 'bank:credit_list' %}">Credits</option>
                 <option value="{% url 'bank:clients_list_select' %}">Clients</option>
                 <option value="{% url 'bank:credit_statement_list' %}">CreditStatement</option>
-                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
-                <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
                 <option value="{% url 'bank:deposit_list' %}">Deposits</option>
-                <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
             </select>
         </div>
         <table class="clients-table">
             <thead class="table-thead">
                 <tr>
                     <th>Выбрать</th>
-                    <th>Сумма кредита</th>
-                    <th>Срок</th>
-                    <th>Сумма ежемесячного платежа</th>
+                    <th>Номер закрытия вклада</th>
+                    <th>Дата открытия вклада</th>
+                    <th>Дата закрытия вклада</th>
+                    <th>Статус закрытия вклада</th>
+                    <th>Код клиента</th>
+                    <th>Код вклада</th>
+                    <th>Код типа вклада</th>
                 </tr>
             </thead>
             <tbody class="table-body">
-                {% for credit in credits %}
+                {% for statement_item in statement_of_deposits %}
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
-                        <td align="center"><a href="{{ credit.get_absolute_url }}">{{ credit.credit_amount }}</a></td>
-                        <td align="center">{{ credit.term_month }}</td>
-                        <td align="center">{{ credit.monthly_payment_amount }}</td>
+                        <td align="center"><a href="{{ statement_item.get_absolute_url }}">{{ statement_item.deposit_closing_number }}</a></td>
+                        <td align="center">{{ statement_item.deposit_opening_date }}</td>
+                        <td align="center">{{ statement_item.deposit_ending_date }}</td>
+                        <td align="center">{{ statement_item.deposit_closing_status }}</td>
+                        <td align="center">{{ statement_item.client_code.client_code }}</td>
+                        <td align="center">{{ statement_item.deposit_code.deposit_code }}</td>
+                        <td align="center">{{ statement_item.deposit_type_code.deposit_type_code }}</td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="2">Нет данных о кредитах.</td>
+                        <td colspan="2">Нет данных о ведомости по вкладам.</td>
                     </tr>
                 {% endfor %}
             </tbody>

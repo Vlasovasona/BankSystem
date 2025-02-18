@@ -111,6 +111,9 @@ class CreditStatement(models.Model):
     credit_type_code = models.ForeignKey('CreditType', models.DO_NOTHING, db_column='Credit_type_code', blank=True, null=True)  # Field name made lowercase.
     client_code = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Client_code', blank=True, null=True)  # Field name made lowercase.
 
+    def get_absolute_url(self):
+        return reverse('bank:credit_statement_detail', args=[self.loan_repayment_number])
+
     class Meta:
         managed = False
         db_table = 'credit_statement'
@@ -141,8 +144,6 @@ class Credits(models.Model):
     class Meta:
         managed = False
         db_table = 'credits'
-
-
 
 
 class DepositTypes(models.Model):
@@ -235,6 +236,9 @@ class StatementOfDeposits(models.Model):
     client_code = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Client_code', blank=True, null=True)  # Field name made lowercase.
     deposit_code = models.ForeignKey(Deposits, models.DO_NOTHING, db_column='Deposit_code', blank=True, null=True)  # Field name made lowercase.
     deposit_type_code = models.ForeignKey(DepositTypes, models.DO_NOTHING, db_column='Deposit_type_code', blank=True, null=True)  # Field name made lowercase.
+
+    def get_absolute_url(self):
+        return reverse('bank:statement_of_deposits_detail', args=[self.deposit_closing_number])
 
     class Meta:
         managed = False

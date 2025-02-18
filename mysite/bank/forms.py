@@ -1,6 +1,6 @@
 from django import forms
 from .models import Clients
-from .models import Credits
+from .models import Credits, CreditType, Deposits
 
 
 class ClientForm(forms.ModelForm):
@@ -12,3 +12,13 @@ class CreditsForm(forms.ModelForm):
     class Meta:
         model = Credits
         exclude = ('credit_code',)
+
+class CreditTypesForm(forms.ModelForm):
+    class Meta:
+        model = CreditType
+        exclude = ('credit_type_code',)
+
+class DepositsForm(forms.ModelForm):
+    class Meta:
+        model = Deposits
+        exclude = ('deposit_code',)

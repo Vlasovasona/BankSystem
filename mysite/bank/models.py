@@ -121,6 +121,9 @@ class CreditType(models.Model):
     credit_type_name = models.TextField(db_column='Credit_type_name', blank=True, null=True)  # Field name made lowercase.
     credit_percent = models.DecimalField(db_column='Credit_percent', max_digits=5, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
 
+    def get_absolute_url(self):
+        return reverse('bank:credit_type_detail', args=[self.credit_type_code])
+
     class Meta:
         managed = False
         db_table = 'credit_type'
@@ -155,6 +158,9 @@ class DepositTypes(models.Model):
 class Deposits(models.Model):
     deposit_code = models.IntegerField(db_column='Deposit_code', primary_key=True)  # Field name made lowercase.
     deposit_amount = models.DecimalField(db_column='Deposit_amount', max_digits=20, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
+
+    def get_absolute_url(self):
+        return reverse('bank:deposit_detail', args=[self.deposit_code])
 
     class Meta:
         managed = False

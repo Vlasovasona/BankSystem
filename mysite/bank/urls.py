@@ -12,4 +12,10 @@ urlpatterns = [
 
     path('credits/<int:credit_code>/', views.credit_detail, name='credit_detail'),
     path('credits/', views.CreditsListView.as_view(), name='credit_list'),
+
+    path('credit_types/<int:credit_type_code>/', views.credit_type_detail, name='credit_type_detail'),
+    path('credit_types/', views.CreditTypesListView.as_view(), name='credit_types_list'),
+
+    path('deposits/<int:deposit_code>/', views.deposit_detail, name='deposit_detail'),
+    path('deposits/', views.DepositsListView.as_view(), name='deposit_list'),
 ]

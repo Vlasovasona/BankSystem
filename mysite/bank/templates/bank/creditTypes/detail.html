@@ -14,17 +14,17 @@
     {% block content %}
     <form method="post">
         {% csrf_token %}
-        <label for="id_credit_amount">Величина кредита:</label>
-        <input type="text" name="my_field_credit_amount" id="id_credit_amount" value="{{ credit.credit_amount }}" required><br>
+        <label for="id_credit_type_code">Код типа кредита:</label>
+        <input type="text" name="my_field_credit_type_code" id="id_credit_type_code" value="{{ credit_type.credit_type_code }}" required><br>
         <br />
 
-        <label for="id_term_month">Срок кредита (мес.):</label>
-        <input type="text" name="my_field_term_month" id="id_term_month" value="{{ credit.term_month }}" required><br>
+        <label for="id_credit_type_name">Название:</label>
+        <input type="text" name="my_field_credit_type_name" id="id_credit_type_name" value="{{ credit_type.credit_type_name }}" required><br>
         <br />
 
-        <label for="id_monthly_payment_amount">Ежемесячная плата:</label>
-        <input type="text" class="adress-monthly_payment_amount" name="my_field_monthly_payment_amount"
-               id="id_monthly_payment_amount" value="{{ credit.monthly_payment_amount }}" required><br>
+        <label for="id_credit_percent">Процентная ставка:</label>
+        <input type="text" name="my_field_credit_percent"
+               id="id_credit_percent" value="{{ credit_type.credit_percent }}" required><br>
         <br />
 
 
@@ -38,6 +38,3 @@
 
 </body>
 </html>
-
-
-

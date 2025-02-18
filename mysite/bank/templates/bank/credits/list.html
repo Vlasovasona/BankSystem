@@ -22,9 +22,9 @@
                 <option value="{% url 'bank:credit_list' %}">Credits</option>
                 <option value="{% url 'bank:clients_list_select' %}">Clients</option>
                 <option value="CreditStatement">CreditStatement</option>
-                <option value="CreditType">CreditType</option>
+                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
                 <option value="DepositTypes">DepositTypes</option>
-                <option value="Deposits">Deposits</option>
+                <option value="{% url 'bank:deposit_list' %}">Deposits</option>
                 <option value="StatementOfDeposits">StatementOfDeposits</option>
             </select>
         </div>

@@ -4,3 +4,4 @@ function handleChange(select) {
         window.location.href = url; // Переходим по выбранной ссылке
     }
 }
+

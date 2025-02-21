@@ -27,4 +27,8 @@ urlpatterns = [
 
     path('credit_statement/<int:loan_repayment_number>/', views.credit_statement_detail, name='credit_statement_detail'),
     path('credit_statement/', views.CreditStatementListView.as_view(), name='credit_statement_list'),
+
+
+    path('clients/search', views.search_clients, name='search_clients'),
 ]
+

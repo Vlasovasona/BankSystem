@@ -15,12 +15,13 @@
                 <h1>Мой банк</h1>
                 <div class="vertical-line"></div>
 
-            <search class="search-string">
-              <form>
-                <input type="search" placeholder="Поиск клиента">
-                <button>Найти</button>
-              </form>
-            </search>
+                <search class="search-string">
+                    <form method="post" action="{% url 'bank:search_clients' %}" id="search-form">
+                        {% csrf_token %}
+                        <input type="search" name="search_query" placeholder="Имя клиента">
+                        <button type="submit">Найти</button>
+                    </form>
+                </search>
             </div>
 
             <nav> <!-- Навигация -->

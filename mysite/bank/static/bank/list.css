@@ -7,14 +7,13 @@
     margin-bottom: 20px;
 }
 
-
-
 /* таблица - конец */
 
 
 /* шапка таблицы - начало */
 
 .buttons-table-choose{
+    margin-top: 5px;
     display: flex;
     align-items: right;
     justify-content: space-between;

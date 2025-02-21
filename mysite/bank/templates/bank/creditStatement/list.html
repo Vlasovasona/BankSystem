@@ -19,13 +19,13 @@
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">
+                <option value="{% url 'bank:deposit_list' %}">CreditStatement</option>
                 <option value="{% url 'bank:credit_statement_list' %}">Deposits</option>
                 <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
                 <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
                 <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
                 <option value="{% url 'bank:credit_list' %}">Credits</option>
                 <option value="{% url 'bank:clients_list_select' %}">Clients</option>
-                <option value="{% url 'bank:deposit_list' %}">CreditStatement</option>
             </select>
         </div>
         <table class="clients-table">

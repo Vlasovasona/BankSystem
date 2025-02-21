@@ -5,29 +5,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}My bank{% endblock %}</title>
+    <title>{% block title %}Результат поиска клиентов{% endblock %}</title>
     {% block extra_styles %}
         <link href="{% static 'bank/list.css' %}" rel="stylesheet">
     {% endblock %}
 </head>
 <body>
     {% block content %}
-        <div class="buttons-table-choose">
-            <div class="buttons">
-                <button class="add-button" type="submit">Добавить запись</button>
-                <button class="delete-button" type="submit">Удалить запись</button>
-            </div>
-            <script src="{% static 'js/script.js' %}"></script>
-            <select class="select-table" onchange="handleChange(this)">
-                <option value="{% url 'bank:clients_list_select' %}">Clients</option>
-                <option value="{% url 'bank:credit_statement_list' %}">CreditStatement</option>
-                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
-                <option value="{% url 'bank:credit_list' %}">Credits</option>
-                <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
-                <option value="{% url 'bank:deposit_list' %}">Deposits</option>
-                <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
-            </select>
-        </div>
+        <button onclick="window.history.back()" class="back-button">Назад</button>
         <table class="clients-table">
             <thead class="table-thead">
                 <tr>
@@ -69,7 +54,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="2">Нет данных о клиентах.</td>
+                        <td colspan="2">По вашему запросу ничего не найдено.</td>
                     </tr>
                 {% endfor %}
             </tbody>

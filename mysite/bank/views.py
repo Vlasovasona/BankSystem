@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Clients, CreditStatement, Credits, CreditType, Deposits, DepositTypes, StatementOfDeposits
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, TemplateView
+from django.db.models import Q
 
 
 # Методы для работы с таблицей Clients
@@ -133,3 +134,12 @@ def credit_statement_detail(request, loan_repayment_number):
         'credit_statement_item': credit_statement_item,
     }
     return render(request, 'bank/creditStatement/detail.html', context)
+
+def search_clients(request):
+    if request.method == 'POST':
+        query = request.POST.get('search_query')
+        clients = Clients.objects.filter(Q(name__icontains=query) | Q(familia__icontains=query) | Q(otchestvo__icontains=query))
+        context = {'clients': clients}
+        return render(request, 'bank/SQL-questions/clientsSearch.html', context)
+    else:
+        return render(request, 'bank/clients/list.html')

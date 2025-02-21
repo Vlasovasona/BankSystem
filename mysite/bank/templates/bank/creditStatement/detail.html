@@ -16,7 +16,7 @@
         {% csrf_token %}
         <label for="id_loan_repayment_number">Номер закрытия вклада:</label>
         <input type="text" name="my_field_loan_repayment_number" id="id_loan_repayment_number"
-               value="{{ credit_statement_item.loan_repayment_number }}" required><br>
+               value="{{ credit_statement_item.loan_repayment_number }}" readonly required><br>
         <br />
 
         <label for="id_loan_issuance_date">Дата открытия вклада:</label>

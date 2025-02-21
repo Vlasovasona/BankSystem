@@ -14,6 +14,11 @@
     {% block content %}
     <form method="post">
         {% csrf_token %}
+
+        <label for="id_client_code">Код клиента:</label>
+        <input type="text" name="my_field_client_code" id="id_client_code" value="{{ client.client_code }}" readonly required><br>
+        <br />
+
         <label for="id_familia">Фамилия:</label>
         <input type="text" name="my_field_familia" id="id_familia" value="{{ client.familia }}" required><br>
         <br />

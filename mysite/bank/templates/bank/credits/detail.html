@@ -14,6 +14,10 @@
     {% block content %}
     <form method="post">
         {% csrf_token %}
+        <label for="id_credit_code">Код кредита:</label>
+        <input type="text" name="my_field_credit_code" id="id_credit_code" value="{{ credit.credit_code }}" readonly required><br>
+        <br />
+
         <label for="id_credit_amount">Величина кредита:</label>
         <input type="text" name="my_field_credit_amount" id="id_credit_amount" value="{{ credit.credit_amount }}" required><br>
         <br />

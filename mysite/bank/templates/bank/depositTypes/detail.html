@@ -16,7 +16,7 @@
         {% csrf_token %}
         <label for="id_deposit_type_code">Код типа вклада:</label>
         <input type="text" name="my_field_deposit_type_code" id="id_deposit_type_code"
-               value="{{ deposit_type.deposit_type_code }}" required><br>
+               value="{{ deposit_type.deposit_type_code }}" readonly required><br>
         <br />
 
         <label for="id_name_of_deposit_type">Название:</label>

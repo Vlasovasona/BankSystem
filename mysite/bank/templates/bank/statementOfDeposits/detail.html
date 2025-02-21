@@ -16,7 +16,7 @@
         {% csrf_token %}
         <label for="id_deposit_closing_number">Номер закрытия вклада:</label>
         <input type="text" name="my_field_deposit_closing_number" id="id_deposit_closing_number"
-               value="{{ statement_item.deposit_closing_number }}" required><br>
+               value="{{ statement_item.deposit_closing_number }}" readonly required><br>
         <br />
 
         <label for="id_deposit_opening_date">Дата открытия вклада:</label>

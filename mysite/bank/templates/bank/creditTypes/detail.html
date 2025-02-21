@@ -15,11 +15,13 @@
     <form method="post">
         {% csrf_token %}
         <label for="id_credit_type_code">Код типа кредита:</label>
-        <input type="text" name="my_field_credit_type_code" id="id_credit_type_code" value="{{ credit_type.credit_type_code }}" required><br>
+        <input type="text" name="my_field_credit_type_code" id="id_credit_type_code"
+               value="{{ credit_type.credit_type_code }}" readonly required><br>
         <br />
 
         <label for="id_credit_type_name">Название:</label>
-        <input type="text" name="my_field_credit_type_name" id="id_credit_type_name" value="{{ credit_type.credit_type_name }}" required><br>
+        <input type="text" name="my_field_credit_type_name" id="id_credit_type_name"
+               value="{{ credit_type.credit_type_name }}" required><br>
         <br />
 
         <label for="id_credit_percent">Процентная ставка:</label>

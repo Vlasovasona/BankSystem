@@ -88,11 +88,14 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bank',
+        'NAME': 'my_bank',
         'USER': 'root',
         'PASSWORD': 'new_password',
         'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'sql_mode': 'STRICT_TRANS_TABLES',
+        },
     }
 }
 
@@ -133,10 +136,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-TATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'bank/static')
-]
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# TATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'bank/static')
+# ]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'bank/static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

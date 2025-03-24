@@ -1,5 +1,3 @@
-# модели данных приложения.
-
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
@@ -8,7 +6,6 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-from django.urls import reverse
 
 
 class AuthGroup(models.Model):
@@ -81,106 +78,40 @@ class AuthUserUserPermissions(models.Model):
 
 
 class Clients(models.Model):
-    client_code = models.IntegerField(db_column='Client_code', primary_key=True)  # Field name made lowercase.
-    familia = models.TextField(db_column='Familia', blank=True, null=True)  # Field name made lowercase.
-    name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
-    otchestvo = models.TextField(db_column='Otchestvo', blank=True, null=True)  # Field name made lowercase.
-    adress = models.TextField(db_column='Adress', blank=True, null=True)  # Field name made lowercase.
-    phone_number = models.CharField(db_column='Phone_number', max_length=15, blank=True, null=True)  # Field name made lowercase.
-    age = models.IntegerField(db_column='Age', blank=True, null=True)  # Field name made lowercase.
-    gender = models.TextField(db_column='Gender', blank=True, null=True)  # Field name made lowercase.
-    presence_absence_of_a_car = models.IntegerField(db_column='Presence_absence_of_a_car', blank=True, null=True)  # Field name made lowercase.
-    presence_absence_of_real_estate = models.IntegerField(db_column='Presence_absence_of_real_estate', blank=True, null=True)  # Field name made lowercase.
-    month_income = models.IntegerField(db_column='Month_income', blank=True, null=True)  # Field name made lowercase.
-
-    def get_absolute_url(self):
-        return reverse('bank:client_detail', args=[self.client_code])
+    id = models.BigAutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    surname = models.TextField()
+    name = models.TextField()
+    patronymic = models.TextField()
+    adress = models.TextField(blank=True, null=True)
+    phone_number = models.BigIntegerField(blank=True, null=True)
+    age = models.IntegerField()
+    sex = models.TextField(blank=True, null=True)
+    flag_own_car = models.IntegerField(blank=True, null=True)
+    flag_own_property = models.IntegerField(blank=True, null=True)
+    month_income = models.IntegerField()
+    count_children = models.IntegerField()
+    education_type = models.TextField(blank=True, null=True)
+    passport_serial_number = models.BigIntegerField(unique=True)
 
     class Meta:
         managed = False
         db_table = 'clients'
-        ordering = ['familia', 'name', 'otchestvo']
 
 
 class CreditStatement(models.Model):
-    loan_repayment_number = models.IntegerField(db_column='Loan_repayment_number', primary_key=True)  # Field name made lowercase.
-    loan_issuance_date = models.DateField(db_column='Loan_issuance_date', blank=True, null=True)  # Field name made lowercase.
-    loan_repayment_date = models.DateField(db_column='Loan_Repayment_Date', blank=True, null=True)  # Field name made lowercase.
-    redemption_status = models.IntegerField(db_column='Redemption_status', blank=True, null=True)  # Field name made lowercase.
-    credit_code = models.ForeignKey('Credits', models.DO_NOTHING, db_column='Credit_code', blank=True, null=True)  # Field name made lowercase.
-    credit_type_code = models.ForeignKey('CreditType', models.DO_NOTHING, db_column='Credit_type_code', blank=True, null=True)  # Field name made lowercase.
-    client_code = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Client_code', blank=True, null=True)  # Field name made lowercase.
-
-    def get_absolute_url(self):
-        return reverse('bank:credit_statement_detail', args=[self.loan_repayment_number])
+    id = models.BigAutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    number_of_the_loan_agreement = models.IntegerField(unique=True)
+    credit_amount = models.IntegerField()
+    term_month = models.IntegerField()
+    monthly_payment = models.IntegerField()
+    loan_opening_date = models.DateField(blank=True, null=True)
+    repayment_status = models.IntegerField(blank=True, null=True)
+    loan_type = models.ForeignKey('LoanTypes', models.DO_NOTHING, db_column='loan_type', blank=True, null=True)
+    client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='client', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'credit_statement'
-
-
-class CreditType(models.Model):
-    credit_type_code = models.IntegerField(db_column='Credit_type_code', primary_key=True)  # Field name made lowercase.
-    credit_type_name = models.TextField(db_column='Credit_type_name', blank=True, null=True)  # Field name made lowercase.
-    credit_percent = models.DecimalField(db_column='Credit_percent', max_digits=5, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-
-    def get_absolute_url(self):
-        return reverse('bank:credit_type_detail', args=[self.credit_type_code])
-
-    class Meta:
-        managed = False
-        db_table = 'credit_type'
-
-
-class Credits(models.Model):
-    credit_code = models.IntegerField(db_column='Credit_code', primary_key=True)
-    credit_amount = models.DecimalField(db_column='Credit_amount', max_digits=20, decimal_places=2, blank=True, null=True)
-    term_month = models.IntegerField(db_column='Term_month', blank=True, null=True)
-    monthly_payment_amount = models.DecimalField(db_column='Monthly_payment_amount', max_digits=10, decimal_places=2, blank=True, null=True)
-
-    def get_absolute_url(self):
-        return reverse('bank:credit_detail', args=[self.credit_code])
-
-    class Meta:
-        managed = False
-        db_table = 'credits'
-
-
-class DepositTypes(models.Model):
-    deposit_type_code = models.IntegerField(db_column='Deposit_type_code', primary_key=True)  # Field name made lowercase.
-    name_of_deposit_type = models.TextField(db_column='Name_of_deposit_type', blank=True, null=True)  # Field name made lowercase.
-    deposit_percent = models.DecimalField(db_column='Deposit_percent', max_digits=5, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-
-    def get_absolute_url(self):
-        return reverse('bank:deposit_type_detail', args=[self.deposit_type_code])
-
-    class Meta:
-        managed = False
-        db_table = 'deposit_types'
-
-
-class Deposits(models.Model):
-    deposit_code = models.IntegerField(db_column='Deposit_code', primary_key=True)  # Field name made lowercase.
-    deposit_amount = models.DecimalField(db_column='Deposit_amount', max_digits=20, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-
-    def get_absolute_url(self):
-        return reverse('bank:deposit_detail', args=[self.deposit_code])
-
-    class Meta:
-        managed = False
-        db_table = 'deposits'
-
-
-class DescriptiveStatistics(models.Model):
-    calculation_date = models.DateField(db_column='Calculation_date', blank=True, null=True)  # Field name made lowercase.
-    average_value = models.DecimalField(db_column='Average_value', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    total_sum = models.DecimalField(db_column='Total_sum', max_digits=20, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    maximum_value = models.DecimalField(db_column='Maximum_value', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    minimum_value = models.DecimalField(db_column='Minimum_value', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'descriptive_statistics'
 
 
 class DjangoAdminLog(models.Model):
@@ -228,28 +159,23 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 
-class StatementOfDeposits(models.Model):
-    deposit_closing_number = models.IntegerField(db_column='Deposit_closing_number', primary_key=True)  # Field name made lowercase.
-    deposit_opening_date = models.DateField(db_column='Deposit_opening_date', blank=True, null=True)  # Field name made lowercase.
-    deposit_ending_date = models.DateField(db_column='Deposit_ending_date', blank=True, null=True)  # Field name made lowercase.
-    deposit_closing_status = models.IntegerField(db_column='Deposit_Closing_Status', blank=True, null=True)  # Field name made lowercase.
-    client_code = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Client_code', blank=True, null=True)  # Field name made lowercase.
-    deposit_code = models.ForeignKey(Deposits, models.DO_NOTHING, db_column='Deposit_code', blank=True, null=True)  # Field name made lowercase.
-    deposit_type_code = models.ForeignKey(DepositTypes, models.DO_NOTHING, db_column='Deposit_type_code', blank=True, null=True)  # Field name made lowercase.
-
-    def get_absolute_url(self):
-        return reverse('bank:statement_of_deposits_detail', args=[self.deposit_closing_number])
+class LoanTypes(models.Model):
+    id = models.BigAutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    registration_number = models.IntegerField(unique=True)
+    name_of_the_type = models.TextField()
+    interest_rate = models.FloatField()
 
     class Meta:
         managed = False
-        db_table = 'statement_of_deposits'
+        db_table = 'loan_types'
 
 
-class Statistics(models.Model):
-    open_deposits = models.IntegerField(blank=True, null=True)
-    closed_deposits = models.IntegerField(blank=True, null=True)
+class Payroll(models.Model):
+    id = models.BigAutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    loan = models.ForeignKey(CreditStatement, models.DO_NOTHING, db_column='loan', blank=True, null=True)
+    payment_date = models.DateField()
+    payment_status = models.TextField()
 
     class Meta:
         managed = False
-        db_table = 'statistics'
-
+        db_table = 'payroll'

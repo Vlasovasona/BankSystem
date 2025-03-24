@@ -1,7 +1,7 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
 
 from django.shortcuts import render, get_object_or_404, redirect
-# from .models import Clients, CreditStatement, Credits, CreditType, Deposits, DepositTypes, StatementOfDeposits
+from .models import Clients, CreditStatement, LoanTypes, Payroll
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, TemplateView
 from django.db.models import Q
@@ -10,7 +10,7 @@ from django.db.models import Q
 # Методы для работы с таблицей Clients
 
 class ClientListView(ListView):
-    # queryset = Clients.objects.all()
+    queryset = Clients.objects.all()
     context_object_name = 'clients'
     paginate_by = 3
     template_name = 'bank/clients/list.html'
@@ -21,12 +21,12 @@ def client_detail(request, client_code):
     :param request: HTTP-запрос.
     :param client_code: Код клиента.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали клиента. """
-    # client = get_object_or_404(Clients, client_code=client_code)
-    # context = {
-    #     'client': client,
-    # }
+    client = get_object_or_404(Clients, client_code=client_code)
+    context = {
+        'client': client,
+    }
     return render(request, 'bank/clients/detail.html', context)
-#
+
 # class CreditsListView(ListView):
 #     queryset = Credits.objects.all()
 #     context_object_name = 'credits'

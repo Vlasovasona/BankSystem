@@ -13,10 +13,10 @@ admin.site.register(AuthPermission)
 admin.site.register(AuthUser)
 admin.site.register(AuthUserGroups)
 admin.site.register(AuthUserUserPermissions)
-admin.site.register(Clients)
-admin.site.register(CreditStatement)
-admin.site.register(LoanTypes)
-admin.site.register(Payroll)
+# admin.site.register(Clients)
+# admin.site.register(CreditStatement)
+# admin.site.register(LoanTypes)
+# admin.site.register(Payroll)
 admin.site.register(DjangoAdminLog)
 admin.site.register(DjangoContentType)
 admin.site.register(DjangoMigrations)
@@ -33,7 +33,7 @@ class ClientsAdmin(admin.ModelAdmin):
                     'education_type', 'passport_serial_number'
                     )
 
-    list_filter = ('gender', 'flag_own_car',
+    list_filter = ('sex', 'flag_own_car',
                    'flag_own_property', 'month_income')
 
     ordering = ('surname', 'name', 'patronymic')
@@ -46,7 +46,7 @@ class CreditStatementAdmin(admin.ModelAdmin):
                     'term_month', 'monthly_payment', 'loan_opening_date',
                     'repayment_status', 'loan_type', 'client')
 
-    list_filter = ('redemption_status', 'credit_type_code')
+    list_filter = ('repayment_status', 'loan_type')
 
 
 @admin.register(LoanTypes)

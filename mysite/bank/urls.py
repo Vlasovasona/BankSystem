@@ -10,7 +10,11 @@ urlpatterns = [
     path('clients/<int:client_code>/', views.client_detail, name='client_detail'),
     path('clients/', views.ClientListView.as_view(), name='clients_list_select'),
 
-    # path('credits/<int:credit_code>/', views.credit_detail, name='credit_detail'),
+    path('clients/search', views.search_clients, name='search_clients'),
+]
+
+
+# path('credits/<int:credit_code>/', views.credit_detail, name='credit_detail'),
     # path('credits/', views.CreditsListView.as_view(), name='credit_list'),
     #
     # path('credit_types/<int:credit_type_code>/', views.credit_type_detail, name='credit_type_detail'),
@@ -29,6 +33,4 @@ urlpatterns = [
     # path('credit_statement/', views.CreditStatementListView.as_view(), name='credit_statement_list'),
     #
     #
-    # path('clients/search', views.search_clients, name='search_clients'),
-]
 

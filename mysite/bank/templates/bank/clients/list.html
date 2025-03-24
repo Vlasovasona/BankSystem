@@ -20,12 +20,6 @@
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">
                 <option value="{% url 'bank:clients_list_select' %}">Clients</option>
-                <option value="{% url 'bank:credit_statement_list' %}">CreditStatement</option>
-                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
-                <option value="{% url 'bank:credit_list' %}">Credits</option>
-                <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
-                <option value="{% url 'bank:deposit_list' %}">Deposits</option>
-                <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
             </select>
         </div>
         <table class="clients-table">
@@ -46,20 +40,20 @@
                 {% for client in clients %}
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
-                        <td align="center"><a href="{{ client.get_absolute_url }}">{{ client.client_code }}</a></td>
-                        <td>{{ client.familia }} {{ client.name }} {{ client.otchestvo }}</td>
+                        <td align="center"><a href="{{ client.get_absolute_url }}">{{ client.ID }}</a></td>
+                        <td>{{ client.surname }} {{ client.name }} {{ client.patronymic }}</td>
                         <td>{{ client.adress }}</td>
                         <td align="center">{{ client.phone_number }}</td>
                         <td align="center">{{ client.age }}</td>
                         <td align="center">
-                            {% if client.presence_absence_of_a_car == 1 %}
+                            {% if client.flag_own_car == 1 %}
                                 Да
                             {% else %}
                                 Нет
                             {% endif %}
                         </td>
                         <td align="center">
-                            {% if client.presence_absence_of_real_estate == 1 %}
+                            {% if client.flag_own_property == 1 %}
                                 Да
                             {% else %}
                                 Нет

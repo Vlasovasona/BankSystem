@@ -16,12 +16,12 @@ class ClientListView(ListView):
     template_name = 'bank/clients/list.html'
 
 # Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
-def client_detail(request, ID):
+def client_detail(request, id):
     """Представление подробной информации о конкретном клиенте.
     :param request: HTTP-запрос.
     :param ID: Код клиента.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали клиента. """
-    client = get_object_or_404(Clients, client_code=ID)
+    client = get_object_or_404(Clients, client_code=id)
     context = {
         'client': client,
     }
@@ -135,11 +135,13 @@ def client_detail(request, ID):
 #     }
 #     return render(request, 'bank/creditStatement/detail.html', context)
 #
+
 def search_clients(request):
     if request.method == 'POST':
         query = request.POST.get('search_query')
-        clients = Clients.objects.filter(Q(name__icontains=query) | Q(familia__icontains=query) | Q(otchestvo__icontains=query))
+        clients = Clients.objects.filter(Q(passport_serial_number__icontains=query))
         context = {'clients': clients}
         return render(request, 'bank/SQL-questions/clientsSearch.html', context)
     else:
         return render(request, 'bank/clients/list.html')
+

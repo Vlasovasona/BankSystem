@@ -7,9 +7,8 @@ app_name = 'bank'
 
 urlpatterns = [
     path('', views.ClientListView.as_view(), name='clients_list'),
-    path('clients/<int:client_code>/', views.client_detail, name='client_detail'),
+    path('clients/<int:id>/', views.client_detail, name='client_detail'),
     path('clients/', views.ClientListView.as_view(), name='clients_list_select'),
-
     path('clients/search', views.search_clients, name='search_clients'),
 ]
 

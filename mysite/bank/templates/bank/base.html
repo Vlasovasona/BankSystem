@@ -18,7 +18,7 @@
                 <search class="search-string">
                     <form method="post" action="{% url 'bank:search_clients' %}" id="search-form">
                         {% csrf_token %}
-                        <input type="search" name="search_query" placeholder="Имя клиента">
+                        <input type="search" name="search_query" placeholder="Паспорт клиента">
                         <button type="submit">Найти</button>
                     </form>
                 </search>

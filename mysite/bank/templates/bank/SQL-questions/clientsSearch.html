@@ -17,40 +17,46 @@
             <thead class="table-thead">
                 <tr>
                     <th>Выбрать</th>
-                    <th>Номер клиента</th>
+                    <th>Паспортные данные</th>
                     <th>ФИО</th>
                     <th>Адрес</th>
                     <th>Номер телефона</th>
                     <th>Возраст</th>
+                    <th>Пол</th>
                     <th>Наличие автомобиля</th>
                     <th>Наличие недвижимости</th>
                     <th>Доход в месяц</th>
+                    <th>Кол-во детей</th>
+                    <th>Образование</th>
                 </tr>
             </thead>
             <tbody class="table-body">
                 {% for client in clients %}
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
-                        <td align="center"><a href="{{ client.get_absolute_url }}">{{ client.client_code }}</a></td>
-                        <td>{{ client.familia }} {{ client.name }} {{ client.otchestvo }}</td>
+                        <td align="center"><a href="{{ client.get_absolute_url }}">{{ client.passport_serial_number }}</a></td>
+                        <td>{{ client.surname }} {{ client.name }} {{ client.patronymic }}</td>
                         <td>{{ client.adress }}</td>
                         <td align="center">{{ client.phone_number }}</td>
                         <td align="center">{{ client.age }}</td>
+                        <td align="center">{{ client.sex }}</td>
                         <td align="center">
-                            {% if client.presence_absence_of_a_car == 1 %}
+                            {% if client.flag_own_car == 1 %}
                                 Да
                             {% else %}
                                 Нет
                             {% endif %}
                         </td>
                         <td align="center">
-                            {% if client.presence_absence_of_real_estate == 1 %}
+                            {% if client.flag_own_property == 1 %}
                                 Да
                             {% else %}
                                 Нет
                             {% endif %}
                         </td>
                         <td align="center">{{ client.month_income }}</td>
+                        <td align="center">{{ client.count_children }}</td>
+                        <td align="center">{{ client.education_type }}</td>
                     </tr>
                 {% empty %}
                     <tr>

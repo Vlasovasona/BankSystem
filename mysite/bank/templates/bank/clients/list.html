@@ -19,7 +19,10 @@
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">
-                <option value="{% url 'bank:clients_list_select' %}">Clients</option>
+                <option value="{% url 'bank:clients_list_select' %}">Клиенты</option>
+                <option value="{% url 'bank:credit_statement_list' %}">Кредитная ведомость</option>
+                <option value="{% url 'bank:credit_types_list' %}">Типы кредитов</option>
+                <option value="{% url 'bank:clients_list_select' %}">Платежная ведомость</option>
             </select>
         </div>
         <table class="clients-table">

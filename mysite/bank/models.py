@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.urls import reverse
 
 
 class AuthGroup(models.Model):
@@ -93,6 +94,10 @@ class Clients(models.Model):
     education_type = models.TextField(blank=True, null=True)
     passport_serial_number = models.BigIntegerField(unique=True)
 
+    def get_absolute_url(self):
+        return reverse('bank:client_detail', args=[self.id])
+
+
     class Meta:
         managed = False
         db_table = 'clients'
@@ -108,6 +113,9 @@ class CreditStatement(models.Model):
     repayment_status = models.IntegerField(blank=True, null=True)
     loan_type = models.ForeignKey('LoanTypes', models.DO_NOTHING, db_column='loan_type', blank=True, null=True)
     client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='client', blank=True, null=True)
+
+    def get_absolute_url(self):
+        return reverse('bank:credit_statement_detail', args=[self.id])
 
     class Meta:
         managed = False
@@ -165,6 +173,9 @@ class LoanTypes(models.Model):
     name_of_the_type = models.TextField()
     interest_rate = models.FloatField()
 
+    def get_absolute_url(self):
+        return reverse('bank:credit_type_detail', args=[self.id])
+
     class Meta:
         managed = False
         db_table = 'loan_types'
@@ -175,6 +186,9 @@ class Payroll(models.Model):
     loan = models.ForeignKey(CreditStatement, models.DO_NOTHING, db_column='loan', blank=True, null=True)
     payment_date = models.DateField()
     payment_status = models.TextField()
+
+    def get_absolute_url(self):
+        return reverse('bank:credit_type_detail', args=[self.id])
 
     class Meta:
         managed = False

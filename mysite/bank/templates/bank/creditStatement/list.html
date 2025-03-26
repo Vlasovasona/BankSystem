@@ -19,13 +19,10 @@
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">
-                <option value="{% url 'bank:deposit_list' %}">CreditStatement</option>
-                <option value="{% url 'bank:credit_statement_list' %}">Deposits</option>
-                <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
-                <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
-                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
-                <option value="{% url 'bank:credit_list' %}">Credits</option>
-                <option value="{% url 'bank:clients_list_select' %}">Clients</option>
+                <option value="{% url 'bank:credit_statement_list' %}">Кредитная ведомость</option>
+                <option value="{% url 'bank:credit_types_list' %}">Типы кредитов</option>
+                <option value="{% url 'bank:clients_list_select' %}">Клиенты</option>
+                <option value="{% url 'bank:clients_list_select' %}">Платежная ведомость</option>
             </select>
         </div>
         <table class="clients-table">
@@ -33,25 +30,27 @@
                 <tr>
                     <th>Выбрать</th>
                     <th>Номер погашения кредита</th>
-                    <th>Дата выдачи кредита</th>
-                    <th>Дата погашения кредита</th>
+                    <th>Сумма кредита</th>
+                    <th>Срок погашения (мес.)</th>
+                    <th>Ежемесячный платеж</th>
+                    <th>Дата открытия кредита</th>
                     <th>Статус погашения</th>
-                    <th>Код клиента</th>
-                    <th>Код кредита</th>
-                    <th>Код типа кредита</th>
+                    <th>Тип кредита</th>
+                    <th>Паспортные данные клиента</th>
                 </tr>
             </thead>
             <tbody class="table-body">
                 {% for credit_statement_item in credit_statement %}
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
-                        <td align="center"><a href="{{ credit_statement_item.get_absolute_url }}">{{ credit_statement_item.loan_repayment_number }}</a></td>
-                        <td align="center">{{ credit_statement_item.loan_issuance_date }}</td>
-                        <td align="center">{{ credit_statement_item.loan_repayment_date }}</td>
-                        <td align="center">{{ credit_statement_item.redemption_status }}</td>
-                        <td align="center">{{ credit_statement_item.client_code.client_code }}</td>
-                        <td align="center">{{ credit_statement_item.credit_code.credit_code }}</td>
-                        <td align="center">{{ credit_statement_item.credit_type_code.credit_type_code }}</td>
+                        <td align="center"><a href="{{ credit_statement_item.get_absolute_url }}">{{ credit_statement_item.number_of_the_loan_agreement }}</a></td>
+                        <td align="center">{{ credit_statement_item.credit_amount }}</td>
+                        <td align="center">{{ credit_statement_item.term_month }}</td>
+                        <td align="center">{{ credit_statement_item.monthly_payment }}</td>
+                        <td align="center">{{ credit_statement_item.loan_opening_date }}</td>
+                        <td align="center">{{ credit_statement_item.repayment_status }}</td>
+                        <td align="center"><a href="{{ credit_statement_item.loan_type.get_absolute_url }}">{{ credit_statement_item.loan_type.registration_number }}</a></td>
+                        <td align="center"><a href="{{ credit_statement_item.client.get_absolute_url }}">{{ credit_statement_item.client.passport_serial_number }}</a></td>
                     </tr>
                 {% empty %}
                     <tr>

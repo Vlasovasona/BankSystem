@@ -48,7 +48,7 @@
             <tbody class="table-body">
                 {% for client in clients %}
                     <tr>
-                        <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
+                        <td align="center"><input type="checkbox" name="table-checkbox" value="{{ client.id }}"></td>
                         <td align="center"><a href="{{ client.get_absolute_url }}">{{ client.passport_serial_number }}</a></td>
                         <td>{{ client.surname }} {{ client.name }} {{ client.patronymic }}</td>
                         <td>{{ client.adress }}</td>

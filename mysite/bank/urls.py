@@ -18,7 +18,7 @@ urlpatterns = [
     path('credit_statement/', views.CreditStatementListView.as_view(), name='credit_statement_list'),
 
     path('payroll/<int:id>/', views.payroll_detail, name='payroll_detail'),
-    path('deposits/', views.PayrollListView.as_view(), name='payroll_list'),
+    path('payroll/', views.PayrollListView.as_view(), name='payroll_list'),
 ]
 
 

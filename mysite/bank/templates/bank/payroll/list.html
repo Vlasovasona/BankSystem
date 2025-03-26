@@ -19,33 +19,28 @@
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">
-                <option value="{% url 'bank:credit_list' %}">Credits</option>
-                <option value="{% url 'bank:clients_list_select' %}">Clients</option>
-                <option value="{% url 'bank:credit_statement_list' %}">CreditStatement</option>
-                <option value="{% url 'bank:credit_types_list' %}">CreditType</option>
-                <option value="{% url 'bank:deposit_types_list' %}">DepositTypes</option>
-                <option value="{% url 'bank:deposit_list' %}">Deposits</option>
-                <option value="{% url 'bank:statement_of_deposits_list' %}">StatementOfDeposits</option>
+                <option value="{% url 'bank:payroll_list' %}">Платежная ведомость</option>
+                <option value="{% url 'bank:credit_types_list' %}">Типы кредитов</option>
+                <option value="{% url 'bank:clients_list_select' %}">Клиенты</option>
+                <option value="{% url 'bank:credit_statement_list' %}">Кредитная ведомость</option>
             </select>
         </div>
         <table class="clients-table">
             <thead class="table-thead">
                 <tr>
                     <th>Выбрать</th>
-                    <th>Номер кредита</th>
-                    <th>Сумма кредита</th>
-                    <th>Срок</th>
-                    <th>Сумма ежемесячного платежа</th>
+                    <th>Кредит</th>
+                    <th>Дата платежа</th>
+                    <th>Статус платежа</th>
                 </tr>
             </thead>
             <tbody class="table-body">
-                {% for credit in credits %}
+                {% for pay in payroll %}
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
-                        <td align="center"><a href="{{ credit.get_absolute_url }}">{{ credit.credit_code }}</a></td>
-                        <td align="center">{{ credit.credit_amount }}</td>
-                        <td align="center">{{ credit.term_month }}</td>
-                        <td align="center">{{ credit.monthly_payment_amount }}</td>
+                        <td align="center"><a href="{{ pay.loan.get_absolute_url }}">{{ pay.loan.number_of_the_loan_agreement }}</a></td>
+                        <td align="center">{{ pay.payment_date }}</td>
+                        <td align="center">{{ pay.payment_status }}</td>
                     </tr>
                 {% empty %}
                     <tr>

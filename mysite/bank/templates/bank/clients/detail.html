@@ -15,16 +15,20 @@
     <form method="post">
         {% csrf_token %}
 
-        <label for="id_client_code">Код клиента:</label>
-        <input type="text" name="my_field_client_code" id="id_client_code" value="{{ client.client_code }}" readonly required><br>
+        <label for="my_field_passport">Серия и номер паспорта клиента:</label>
+        <input type="text" name="my_field_passport" id="my_field_passport" value="{{ client.passport_serial_number }}"><br>
         <br />
 
-        <label for="id_familia">Фамилия:</label>
-        <input type="text" name="my_field_familia" id="id_familia" value="{{ client.familia }}" required><br>
+        <label for="id_surname">Фамилия:</label>
+        <input type="text" name="my_field_surname" id="id_surname" value="{{ client.surname }}" required><br>
         <br />
 
         <label for="id_name">Имя:</label>
         <input type="text" name="my_field_name" id="id_name" value="{{ client.name }}" required><br>
+        <br />
+
+        <label for="id_patronymic">Имя:</label>
+        <input type="text" name="my_field_patronymic" id="id_patronymic" value="{{ client.patronymic }}" required><br>
         <br />
 
         <label for="id_adress">Адрес:</label>
@@ -39,18 +43,30 @@
         <input type="text" name="my_field_age" id="id_age" value="{{ client.age }}" required><br>
         <br />
 
-        <label for="id_presence_absence_of_a_car">Наличие автомобиля:</label>
-        <input type="text" name="my_field_presence_absence_of_a_car" id="id_presence_absence_of_a_car"
-               value="{{ client.presence_absence_of_a_car }}" required><br>
+        <label for="id_sex">Пол:</label>
+        <input type="text" name="my_field_sex" id="id_sex" value="{{ client.sex }}" required><br>
         <br />
 
-        <label for="id_presence_absence_of_real_estate">Наличие недвижимости:</label>
-        <input type="text" name="my_field_presence_absence_of_real_estate" id="id_presence_absence_of_real_estate"
-               value="{{ client.presence_absence_of_real_estate }}" required><br>
+        <label for="id_flag_own_car">Наличие автомобиля:</label>
+        <input type="text" name="my_field_flag_own_car" id="id_flag_own_car"
+               value="{{ client.flag_own_car|yesno:"Да,Нет" }}" required><br>
+        <br />
+
+        <label for="id_flag_own_property">Наличие недвижимости:</label>
+        <input type="text" name="my_flag_own_property" id="id_flag_own_property"
+               value="{{ client.flag_own_property|yesno:"Да,Нет" }}" required><br>
         <br />
 
         <label for="id_month_income">Доход в месяц:</label>
         <input type="text" name="my_field_month_income" id="id_month_income" value="{{ client.month_income }}" required><br>
+        <br />
+
+        <label for="id_month_income">Количество детей:</label>
+        <input type="text" name="my_field_count_children" id="id_count_children" value="{{ client.count_children }}" required><br>
+        <br />
+
+        <label for="id_education_type">Количество детей:</label>
+        <input type="text" name="my_field_education_type" id="id_education_type" value="{{ client.education_type }}" required><br>
         <br />
 
         <div class="button-group">

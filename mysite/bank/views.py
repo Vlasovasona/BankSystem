@@ -21,7 +21,7 @@ def client_detail(request, id):
     :param request: HTTP-запрос.
     :param ID: Код клиента.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали клиента. """
-    client = get_object_or_404(Clients, client_code=id)
+    client = get_object_or_404(Clients, id=id)
     context = {
         'client': client,
     }

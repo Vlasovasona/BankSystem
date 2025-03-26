@@ -4,12 +4,13 @@
 
 .save_button{
     border-radius: 5%;
-    background-color: #ADD8E6;
-    border-color: #ADD8E6;
+    background-color: #FF8C00;
+    border-color: #FF8C00;
     border-width: 1px;
     font-size: 16px;
     color: black;
     margin: 5px;
+    font-style: italic;
 }
 
 .search-client-statement{
@@ -20,6 +21,7 @@
     font-size: 16px;
     color: black;
     margin: 5px;
+    font-style: italic;
 }
 
 .button-group{
@@ -34,7 +36,8 @@
     font-size: 16px;
     color: black;
     border-width: 1px;
-    background-color: #FF6347;
-    border-color: #FF6347;
+    background-color: #FF4500;
+    border-color: #FF4500;
     margin: 5px;
+    font-style: italic;
 }

@@ -19,6 +19,8 @@ urlpatterns = [
 
     path('payroll/<int:id>/', views.payroll_detail, name='payroll_detail'),
     path('payroll/', views.PayrollListView.as_view(), name='payroll_list'),
+
+    path('delete-clients/', views.delete_clients, name='delete_clients'),
 ]
 
 

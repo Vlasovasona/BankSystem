@@ -5,6 +5,10 @@ from .models import Clients, CreditStatement, LoanTypes, Payroll
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, TemplateView
 from django.db.models import Q
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect
+
+
 
 
 # Методы для работы с таблицей Clients
@@ -93,3 +97,31 @@ def search_clients(request):
     else:
         return render(request, 'bank/clients/list.html')
 
+
+def delete_clients(request):
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids[]')
+
+        # Удаляем записи из базы данных
+        Clients.objects.filter(id__in=ids).delete()
+
+        return JsonResponse({'success': True})
+
+
+# def delete_clients(request):
+#     if request.method == 'POST':
+#         client_id = request.POST.get('id')
+#
+#         if client_id:
+#             try:
+#                 # Удаляем запись из базы данных
+#                 client = Clients.objects.get(pk=client_id)
+#                 client.delete()
+#
+#                 return JsonResponse({'success': True})
+#             except Clients.DoesNotExist:
+#                 return JsonResponse({'error': f'Клиента с идентификатором {client_id} не существует.'}, status=404)
+#             except Exception as e:
+#                 return JsonResponse({'error': str(e)}, status=500)
+#         else:
+#             return JsonResponse({'error': 'Не передан идентификатор клиента.'}, status=400)

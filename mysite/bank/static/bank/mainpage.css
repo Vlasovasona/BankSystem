@@ -1,12 +1,14 @@
 body {
-    background-color: #f0f0f0; /* серый фон */
+    background-color: #FFFFFF; /* серый фон */
 }
 
 /* шапка - верхнее меню. начало */
+
 .site-header {
-    background-color: #ADD8E6;
+    background-color: #6495ED;
     padding: 10px 0;
     text-align: center;
+    font-weight: bold;
 }
 
 .title_line_search {
@@ -78,8 +80,8 @@ body {
 
 /* Стили для кнопки поиска */
 .search-string button {
-    padding: 10px 15px; /* Добавляет внутренние отступы сверху/снизу - 10px, слева/справа - 15px */
-    background-color: #4169E1; /* Устанавливает синий цвет фона для кнопки */
+    padding: 10px 10px; /* Добавляет внутренние отступы сверху/снизу - 10px, слева/справа - 15px */
+    background-color: #000080; /* Устанавливает синий цвет фона для кнопки */
     color: white; /* Делает текст на кнопке белым */
     border-radius: 3px; /* Убирает рамку вокруг кнопки */
     cursor: pointer; /* Меняет указатель мыши на руку при наведении на кнопку */
@@ -105,7 +107,7 @@ body {
 
 .side-menu {
     width: 120px;
-    background-color: #ADD8E6;
+    background-color: #6495ED;
     padding: 20px;
 }
 
@@ -116,6 +118,7 @@ body {
 
 .side-menu li {
     margin-bottom: 50px;
+    font-weight: bold;
 }
 
 .side-menu a {

@@ -12,7 +12,7 @@ from django.db.models import Q
 class ClientListView(ListView):
     queryset = Clients.objects.all()
     context_object_name = 'clients'
-    paginate_by = 3
+    paginate_by = 25
     template_name = 'bank/clients/list.html'
 
 # Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)

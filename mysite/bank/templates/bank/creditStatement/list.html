@@ -12,7 +12,10 @@
 </head>
 <body>
     {% block content %}
+    <div data-delete-url="{% url 'bank:delete_clients' %}"></div>
         <div class="buttons-table-choose">
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/checkboxes.js' %}"></script>
             <div class="buttons">
                 <button class="add-button" type="submit">Добавить запись</button>
                 <button class="delete-button" type="submit">Удалить запись</button>
@@ -42,7 +45,7 @@
             <tbody class="table-body">
                 {% for credit_statement_item in credit_statement %}
                     <tr>
-                        <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
+                        <td align="center"><input type="checkbox" name="table-checkbox" value="{{ credit_statement_item.id }}"></td>
                         <td align="center"><a href="{{ credit_statement_item.get_absolute_url }}">{{ credit_statement_item.number_of_the_loan_agreement }}</a></td>
                         <td align="center">{{ credit_statement_item.credit_amount }}</td>
                         <td align="center">{{ credit_statement_item.term_month }}</td>

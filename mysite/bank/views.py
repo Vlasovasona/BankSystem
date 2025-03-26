@@ -107,21 +107,31 @@ def delete_clients(request):
 
         return JsonResponse({'success': True})
 
+def delete_credit_type(request):
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids[]')
 
-# def delete_clients(request):
-#     if request.method == 'POST':
-#         client_id = request.POST.get('id')
-#
-#         if client_id:
-#             try:
-#                 # Удаляем запись из базы данных
-#                 client = Clients.objects.get(pk=client_id)
-#                 client.delete()
-#
-#                 return JsonResponse({'success': True})
-#             except Clients.DoesNotExist:
-#                 return JsonResponse({'error': f'Клиента с идентификатором {client_id} не существует.'}, status=404)
-#             except Exception as e:
-#                 return JsonResponse({'error': str(e)}, status=500)
-#         else:
-#             return JsonResponse({'error': 'Не передан идентификатор клиента.'}, status=400)
+        # Удаляем записи из базы данных
+        LoanTypes.objects.filter(id__in=ids).delete()
+
+        return JsonResponse({'success': True})
+
+def delete_credit_statement(request):
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids[]')
+
+        # Удаляем записи из базы данных
+        CreditStatement.objects.filter(id__in=ids).delete()
+
+        return JsonResponse({'success': True})
+
+def delete_payroll(request):
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids[]')
+
+        # Удаляем записи из базы данных
+        Payroll.objects.filter(id__in=ids).delete()
+
+        return JsonResponse({'success': True})
+
+

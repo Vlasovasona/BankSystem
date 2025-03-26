@@ -12,7 +12,10 @@
 </head>
 <body>
     {% block content %}
+    <div data-delete-url="{% url 'bank:delete_clients' %}"></div>
         <div class="buttons-table-choose">
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/checkboxes.js' %}"></script>
             <div class="buttons">
                 <button class="add-button" type="submit">Добавить запись</button>
                 <button class="delete-button" type="submit">Удалить запись</button>
@@ -37,7 +40,7 @@
             <tbody class="table-body">
                 {% for pay in payroll %}
                     <tr>
-                        <td align="center"><input type="checkbox" name="table-checkbox" value=""></td>
+                        <td align="center"><input type="checkbox" name="table-checkbox" value="{{ pay.id }}"></td>
                         <td align="center"><a href="{{ pay.loan.get_absolute_url }}">{{ pay.loan.number_of_the_loan_agreement }}</a></td>
                         <td align="center">{{ pay.payment_date }}</td>
                         <td align="center">{{ pay.payment_status }}</td>

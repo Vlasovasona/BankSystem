@@ -48,7 +48,13 @@
                         <td align="center">{{ credit_statement_item.term_month }}</td>
                         <td align="center">{{ credit_statement_item.monthly_payment }}</td>
                         <td align="center">{{ credit_statement_item.loan_opening_date }}</td>
-                        <td align="center">{{ credit_statement_item.repayment_status }}</td>
+                        <td align="center">
+                            {% if credit_statement_item.repayment_status == 1 %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
                         <td align="center"><a href="{{ credit_statement_item.loan_type.get_absolute_url }}">{{ credit_statement_item.loan_type.registration_number }}</a></td>
                         <td align="center"><a href="{{ credit_statement_item.client.get_absolute_url }}">{{ credit_statement_item.client.passport_serial_number }}</a></td>
                     </tr>

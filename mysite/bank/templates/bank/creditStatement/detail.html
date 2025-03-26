@@ -41,7 +41,7 @@
 
         <label for="id_repayment_status">Статус погашения кредита:</label>
         <input type="text" name="my_field_repayment_status" id="id_repayment_status"
-               value="{{ credit_statement_item.repayment_status }}" required><br>
+               value="{{ credit_statement_item.repayment_status|yesno:"Да,Нет" }}" required><br>
         <br />
 
         <label for="id_loan_type">Тип кредита:</label>

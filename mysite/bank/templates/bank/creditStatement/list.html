@@ -12,13 +12,13 @@
 </head>
 <body>
     {% block content %}
-    <div data-delete-url="{% url 'bank:delete_clients' %}"></div>
+    <div data-delete-url="{% url 'bank:delete-credit-statement' %}"></div>
         <div class="buttons-table-choose">
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="{% static 'js/checkboxes.js' %}"></script>
             <div class="buttons">
                 <button class="add-button" type="submit">Добавить запись</button>
-                <button class="delete-button" type="submit">Удалить запись</button>
+                <button class="delete-button" type="submit">Удалить выбранное</button>
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">

@@ -5,8 +5,9 @@ from .models import Clients, CreditStatement, LoanTypes, Payroll
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, TemplateView
 from django.db.models import Q
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
+from django.http import JsonResponse
+import json
 
 
 
@@ -100,36 +101,77 @@ def search_clients(request):
 
 def delete_clients(request):
     if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
+        # Получение списка идентификаторов из POST-запроса
+        ids_json = request.POST.get('ids', None)
 
-        # Удаляем записи из базы данных
+        # Преобразование JSON-строки в список идентификаторов
+        if ids_json:
+            try:
+                ids = json.loads(ids_json)
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+
+        # Удаление записей из базы данных
         Clients.objects.filter(id__in=ids).delete()
 
         return JsonResponse({'success': True})
 
 def delete_credit_type(request):
     if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
+        # Получение списка идентификаторов из POST-запроса
+        ids_json = request.POST.get('ids', None)
 
-        # Удаляем записи из базы данных
+        # Преобразование JSON-строки в список идентификаторов
+        if ids_json:
+            try:
+                ids = json.loads(ids_json)
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+
+        # Удаление записей из базы данных
         LoanTypes.objects.filter(id__in=ids).delete()
 
         return JsonResponse({'success': True})
 
 def delete_credit_statement(request):
     if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
+        # Получение списка идентификаторов из POST-запроса
+        ids_json = request.POST.get('ids', None)
 
-        # Удаляем записи из базы данных
+        # Преобразование JSON-строки в список идентификаторов
+        if ids_json:
+            try:
+                ids = json.loads(ids_json)
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+
+        # Удаление записей из базы данных
         CreditStatement.objects.filter(id__in=ids).delete()
 
         return JsonResponse({'success': True})
 
+
 def delete_payroll(request):
     if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
+        # Получение списка идентификаторов из POST-запроса
+        ids_json = request.POST.get('ids', None)
 
-        # Удаляем записи из базы данных
+        # Преобразование JSON-строки в список идентификаторов
+        if ids_json:
+            try:
+                ids = json.loads(ids_json)
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+
+        # Удаление записей из базы данных
         Payroll.objects.filter(id__in=ids).delete()
 
         return JsonResponse({'success': True})

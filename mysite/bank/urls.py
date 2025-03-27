@@ -21,6 +21,9 @@ urlpatterns = [
     path('payroll/', views.PayrollListView.as_view(), name='payroll_list'),
 
     path('delete-clients/', views.delete_clients, name='delete_clients'),
+    path('delete-credit-type/', views.delete_credit_type, name='delete-credit-type'),
+    path('delete-payroll/', views.delete_payroll, name='delete-payroll'),
+    path('delete-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
 ]
 
 

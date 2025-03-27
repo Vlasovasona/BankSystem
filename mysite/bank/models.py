@@ -188,7 +188,7 @@ class Payroll(models.Model):
     payment_status = models.TextField()
 
     def get_absolute_url(self):
-        return reverse('bank:credit_type_detail', args=[self.id])
+        return reverse('bank:payroll_detail', args=[self.id])
 
     class Meta:
         managed = False

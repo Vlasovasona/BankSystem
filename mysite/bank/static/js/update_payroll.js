@@ -5,81 +5,55 @@ $(document).ready(function() {
 
     function validateForm() {
         let isValid = true;
-        console.log("Скрипт выполняется");
 
-        const clientId = document.getElementById('client_id');
-        const surnameInput = document.getElementById('id_surname');
-        if (!surnameInput.value.match(/^[А-ЯЁа-яё ]+$/u)) {
-            alert('Некорректный формат фамилии! Фамилия должна состоять только из букв".');
+        const paytId = document.getElementById('pay_id');
+        const loanInput = document.getElementById('id_loan');
+        if (isNaN(parseInt(loanInput.value)) || parseFloat(loanInput.value) <= 0) {
+            alert('Некорректное значение регистрационного номера кредита! Допустимы только числовые положительные значения".');
             isValid = false;
         }
 
-        const nameInput = document.getElementById('id_name');
-        if (!nameInput.value.match(/^[А-ЯЁа-яё ]+$/u)) {
-            alert('Некорректный формат имени! Имя должно состоять только из букв".');
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        const pay_date_Input = document.getElementById('id_payment_date');
+        // Проверка соответствия введённой строки формату даты
+        if (!dateRegex.test(pay_date_Input.value)) {
+            alert('Некорректный формат даты! Дата должна быть в формате ГГГГ-ММ-ДД.');
             isValid = false;
+        } else {
+            // Разбираем дату на компоненты и проверяем их валидность
+            const parts = pay_date_Input.value.split('-');
+            const year = parseInt(parts[0], 10);  // Год
+            const month = parseInt(parts[1], 10); // Месяц (1-12)
+            const day = parseInt(parts[2], 10);   // День (1-31)
+
+            // Проверка диапазонов значений года, месяца и дня
+            if (year < 1900 || year > 2100) {  // Ограничиваем диапазон годов
+                alert('Год должен быть между 1900 и 2100.');
+                isValid = false;
+            } else if (month < 1 || month > 12) {  // Месяцы должны быть от 1 до 12
+                alert('Месяц должен быть от 1 до 12.');
+                isValid = false;
+            } else if (day < 1 || day > 31) {  // Дни должны быть от 1 до 31
+                alert('День должен быть от 1 до 31.');
+                isValid = false;
+            } else {
+                // Дополнительно можно проверить, соответствует ли день количеству дней в месяце
+                const daysInMonth = new Date(year, month - 1, 0).getDate();  // Получаем количество дней в месяце
+                if (day > daysInMonth) {
+                    alert(`Неверная дата! В месяце ${month} всего ${daysInMonth} дней.`);
+                    isValid = false;
+                }
+            }
         }
 
-        const patronymicInput = document.getElementById('id_patronymic');
-        if (!patronymicInput.value.match(/^[А-ЯЁа-яё ]+$/u)) {
-            alert('Некорректный формат отчества! Отчество должно состоять только из букв".');
-            isValid = false;
-        }
-
-        const genderInput = document.getElementById('id_sex');
-        if (genderInput.value != 'Мужской' && genderInput.value != 'Женский') {
-            alert('Некорректно указан пол клиента! Допустимы только значения Мужской или Женский".');
-            isValid = false;
-        }
-
-        const carInput = document.getElementById('id_flag_own_car');
-        if (carInput.value != 'Да' && carInput.value != 'Нет') {
-            alert('Некорректное значение! Допустимы только значения Да или Нет".');
-            isValid = false;
-        }
-
-        const propertyInput = document.getElementById('id_flag_own_property');
-        if (propertyInput.value != 'Да' && propertyInput.value != 'Нет') {
-            alert('Некорректное значение! Допустимы только значения Да или Нет".');
-            isValid = false;
-        }
-
-        const incomeInput = document.getElementById('id_month_income');
-        if (isNaN(parseFloat(incomeInput.value)) || parseFloat(incomeInput.value) <= 0) {
-            alert('Некорректное значение дохода! Допустимы только числовые положительные значения".');
-            isValid = false;
-        }
-
-        // Проверка паспорта
-        const passportInput = document.getElementById('my_field_passport');
-        if (isNaN(passportInput.value) || !passportInput.value.match(/^\d{10}$/)) {
-            alert('Некорректный формат паспорта! Пожалуйста, введите серию и номер паспорта в формате "XXXXXXXXXXX".');
-            isValid = false;
-        }
-
-        // Проверка возраста
-        const ageInput = document.getElementById('id_age');
-        if (isNaN(ageInput.value) || parseInt(ageInput.value) <= 0 || parseInt(ageInput.value) > 110) {
-            alert('Некорректный возраст! Пожалуйста, укажите правильный возраст.');
-            isValid = false;
-        }
-
-        const childrenInput = document.getElementById('id_count_children');
-        if (isNaN(childrenInput.value) || parseInt(childrenInput.value) < 0 || parseInt(childrenInput.value) >= 20) {
-            alert('Некорректное значение! Количество детей может быть от 0 до 20.');
-            isValid = false;
-        }
-
-        const educationInput = document.getElementById('id_education_type');
-        if (educationInput.value != "Высшее" && educationInput.value != "Среднее специальное") {
-            alert('Некорректное значение! Допустимые значения: Высшее, Среднее специальное');
-            isValid = false;
-        }
-
-        // Проверка номера телефона
-        const phoneInput = document.getElementById('id_phone');
-        if (isNaN(phoneInput.value) || !phoneInput.value.match(/^(\+7|7|8)[\d\s\-]{10,15}$/)) {
-            alert('Некорректный формат номера телефона!');
+        const statusInput = document.getElementById('id_payment_status');
+        // Проверка на соответствие числу в диапазоне от 0 до 5 или строкам "X" и "C"
+        if ((statusInput.value >= 0 && statusInput.value <= 5) ||
+            statusInput.value === "X" ||
+            statusInput.value === "C") {
+            // Значение корректно
+        } else {
+            alert('Некорректное значение статуса платежа! Допустимые значения: от 0 до 5, "X" или "C".');
             isValid = false;
         }
 
@@ -92,37 +66,17 @@ $(document).ready(function() {
         event.preventDefault(); // предотвращаем стандартное поведение формы
         if (validateForm()) {
             // Собираем данные вручную
-            const clientId = $('#client_id').val();
-            const passport = $('#my_field_passport').val();
-            const surname = $('#id_surname').val();
-            const name = $('#id_name').val();
-            const patronymic = $('#id_patronymic').val();
-            const address = $('#id_adress').val();
-            const phoneNumber = $('#id_phone').val();
-            const age = $('#id_age').val();
-            const sex = $('#id_sex').val();
-            const flagOwnCar = $('#id_flag_own_car').val();
-            const flagOwnProperty = $('#id_flag_own_property').val();
-            const monthIncome = $('#id_month_income').val();
-            const countChildren = $('#id_count_children').val();
-            const educationType = $('#id_education_type').val();
+            const payId = $('#pay_id').val();
+            const loan = $('#id_loan').val();
+            const date = $('#id_payment_date').val();
+            const status = $('#id_payment_status').val();
 
             // Создаем объект для отправки
             const data = new URLSearchParams();
-            data.append('client_id', clientId);
-            data.append('my_field_passport', passport);
-            data.append('my_field_surname', surname);
-            data.append('my_field_name', name);
-            data.append('my_field_patronymic', patronymic);
-            data.append('my_field_adress', address);
-            data.append('my_field_phone', phoneNumber);
-            data.append('my_field_age', age);
-            data.append('my_field_sex', sex);
-            data.append('my_field_flag_own_car', flagOwnCar);
-            data.append('my_flag_own_property', flagOwnProperty);
-            data.append('my_field_month_income', monthIncome);
-            data.append('my_field_count_children', countChildren);
-            data.append('my_field_education_type', educationType);
+            data.append('pay_id', payId);
+            data.append('my_field_loan', loan);
+            data.append('my_field_payment_date', date);
+            data.append('my_field_payment_status', status);
 
             // Добавляем csrf-token
             data.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());

@@ -27,6 +27,6 @@ urlpatterns = [
 
     path('update-clients/', views.update_client_view, name='update_client_view'),
     path('update-credit-type/', views.update_loan_type, name='update-credit-type'),
-    # path('update-payroll/', views.delete_payroll, name='delete-payroll'),
+    path('update-payroll/', views.update_payroll, name='update-payroll'),
     # path('update-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
 ]

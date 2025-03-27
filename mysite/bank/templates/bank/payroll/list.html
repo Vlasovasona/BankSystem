@@ -1,7 +1,6 @@
 {% extends "bank/base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -42,7 +41,7 @@
                     <tr>
                         <td align="center"><input type="checkbox" name="table-checkbox" value="{{ pay.id }}"></td>
                         <td align="center"><a href="{{ pay.loan.get_absolute_url }}">{{ pay.loan.number_of_the_loan_agreement }}</a></td>
-                        <td align="center">{{ pay.payment_date }}</td>
+                        <td align="center"><a href="{{ pay.get_absolute_url }}">{{ pay.payment_date }}</a></td>
                         <td align="center">{{ pay.payment_status }}</td>
                     </tr>
                 {% empty %}

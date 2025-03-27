@@ -82,9 +82,9 @@ def payroll_detail(request, id):
     :param request: HTTP-запрос.
     :param id: Код типа вклада.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
-    payroll_item = get_object_or_404(Payroll, id=id)
+    pay = get_object_or_404(Payroll, id=id)
     context = {
-        'payroll_item': payroll_item,
+        'pay': pay,
     }
     return render(request, 'bank/payroll/detail.html', context)
 
@@ -237,6 +237,32 @@ def update_loan_type(request):
 
         except LoanTypes.DoesNotExist:
             return JsonResponse({'success': False, 'error': f'Тип кредита {credit_type_id} не найден.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def update_payroll(request):
+    if request.method == 'POST':
+        # Получаем данные
+        pay_id = request.POST.get('pay_id')
+        loan = request.POST.get('my_field_loan')
+        payment_date = request.POST.get('my_field_payment_date')
+        payment_status = request.POST.get('my_field_payment_status')
+
+        try:
+            # state = CreditStatement.objects.get(id=request.POST.get('loan'))
+            # state.amount = request.POST.get('amount')
+            # state.save()
+
+            pay = Payroll.objects.get(pk=pay_id)
+            # Обновляем поля
+            pay.registration_number = loan
+            pay.name_of_the_type = payment_date
+            pay.interest_rate = payment_status
+            pay.save()
+            return JsonResponse({'success': True})
+
+        except Payroll.DoesNotExist:
+            return JsonResponse({'success': False, 'error': f'Платеж {pay_id} не найден.'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 

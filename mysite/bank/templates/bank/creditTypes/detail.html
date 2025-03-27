@@ -14,6 +14,8 @@
     {% block content %}
     <form method="post">
         {% csrf_token %}
+        <input type="hidden" id="credit_type_id" name="credit_type_id" value="{{ credit_type.id }}">
+
         <label for="id_credit_type_code">Регистрационный номер типа кредита:</label>
         <input type="text" name="my_field_credit_type_code" id="id_credit_type_code"
                value="{{ credit_type.registration_number }}" readonly required><br>
@@ -31,6 +33,9 @@
 
 
         <div class="button-group">
+            <div data-update-url="{% url 'bank:update-credit-type' %}"></div>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/update_loan_types.js' %}"></script>
             <button type="submit" class="save_button">Сохранить изменения</button>
             <button type="submit" class="delete-client">Удалить запись</button>
         </div>

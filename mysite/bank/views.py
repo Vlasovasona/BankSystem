@@ -218,5 +218,25 @@ def update_client_view(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-    # return render(request, 'your_template.html', {})
+def update_loan_type(request):
+    if request.method == 'POST':
+        # Получаем данные
+        credit_type_id = request.POST.get('credit_type_id')
+        registration_number = request.POST.get('my_field_credit_type_code')
+        name_of_the_type = request.POST.get('my_field_credit_type_name')
+        interest_rate = request.POST.get('my_field_credit_percent')
+
+        try:
+            credit_type = LoanTypes.objects.get(pk=credit_type_id)
+            # Обновляем поля
+            credit_type.registration_number = registration_number
+            credit_type.name_of_the_type = name_of_the_type
+            credit_type.interest_rate = interest_rate
+            credit_type.save()
+            return JsonResponse({'success': True})
+
+        except LoanTypes.DoesNotExist:
+            return JsonResponse({'success': False, 'error': f'Тип кредита {credit_type_id} не найден.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
 

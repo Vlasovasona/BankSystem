@@ -26,7 +26,7 @@ urlpatterns = [
     path('delete-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
 
     path('update-clients/', views.update_client_view, name='update_client_view'),
-    # path('update-credit-type/', views.delete_credit_type, name='delete-credit-type'),
+    path('update-credit-type/', views.update_loan_type, name='update-credit-type'),
     # path('update-payroll/', views.delete_payroll, name='delete-payroll'),
     # path('update-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
 ]

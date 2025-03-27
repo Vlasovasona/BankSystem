@@ -24,20 +24,9 @@ urlpatterns = [
     path('delete-credit-type/', views.delete_credit_type, name='delete-credit-type'),
     path('delete-payroll/', views.delete_payroll, name='delete-payroll'),
     path('delete-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
+
+    path('update-clients/', views.update_client_view, name='update_client_view'),
+    # path('update-credit-type/', views.delete_credit_type, name='delete-credit-type'),
+    # path('update-payroll/', views.delete_payroll, name='delete-payroll'),
+    # path('update-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
 ]
-
-
-# path('payroll/<int:credit_code>/', views.credit_detail, name='credit_detail'),
-    # path('payroll/', views.CreditsListView.as_view(), name='credit_list'),
-    #
-
-    #
-    # path('deposits/<int:deposit_code>/', views.deposit_detail, name='deposit_detail'),
-    # path('deposits/', views.DepositsListView.as_view(), name='deposit_list'),
-    #
-    # path('deposit_types/<int:deposit_type_code>/', views.deposit_type_detail, name='deposit_type_detail'),
-    # path('deposit_types/', views.DepositTypesListView.as_view(), name='deposit_types_list'),
-    #
-    # path('statement_of_deposits/<int:deposit_closing_number>/', views.statement_of_deposits_detail, name='statement_of_deposits_detail'),
-    # path('statement_of_deposits/', views.StatementOfDepositsListView.as_view(), name='statement_of_deposits_list'),
-

@@ -176,4 +176,47 @@ def delete_payroll(request):
 
         return JsonResponse({'success': True})
 
+def update_client_view(request):
+    if request.method == 'POST':
+        # Получаем данные
+        client_id = request.POST.get('client_id')
+        passport = request.POST.get('my_field_passport')
+        surname = request.POST.get('my_field_surname')
+        name = request.POST.get('my_field_name')
+        patronymic = request.POST.get('my_field_patronymic')
+        address = request.POST.get('my_field_adress')
+        phone_number = request.POST.get('my_field_phone')
+        age = request.POST.get('my_field_age')
+        sex = request.POST.get('my_field_sex')
+        flag_own_car = request.POST.get('my_field_flag_own_car')
+        flag_own_property = request.POST.get('my_flag_own_property')
+        month_income = request.POST.get('my_field_month_income')
+        count_children = request.POST.get('my_field_count_children')
+        education_type = request.POST.get('my_field_education_type')
+
+        try:
+            client = Clients.objects.get(pk=client_id)
+            # Обновляем поля
+            client.passport_serial_number = passport
+            client.surname = surname
+            client.name = name
+            client.patronymic = patronymic
+            client.address = address
+            client.phone_number = phone_number
+            client.age = age
+            client.sex = sex
+            client.flag_own_car = 1 if flag_own_car == 'Да' else 0
+            client.flag_own_property = 1 if flag_own_property == 'Да' else 0
+            client.month_income = month_income
+            client.count_children = count_children
+            client.education_type = education_type
+            client.save()
+            return JsonResponse({'success': True})
+
+        except Clients.DoesNotExist:
+            return JsonResponse({'success': False, 'error': f'Клиент {client_id} не найден.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    # return render(request, 'your_template.html', {})
 

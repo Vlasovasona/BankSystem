@@ -2,7 +2,6 @@ var csrftoken = $('[name=csrfmiddlewaretoken]').val();
 var deleteUrl = $('[data-delete-url]').data('delete-url');
 
 $(document).ready(function() {
-    console.log("Чекбокс изменился");
     // Изначально деактивируем кнопку удаления
     $('.delete-button').prop('disabled', true);
 

@@ -1,7 +1,6 @@
 {% extends "bank/base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -12,8 +11,9 @@
 </head>
 <body>
     {% block content %}
-    <form method="post">
+    <form method="POST">
         {% csrf_token %}
+        <input type="hidden" id="client_id" name="client_id" value="{{ client.id }}">
 
         <label for="my_field_passport">Серия и номер паспорта клиента:</label>
         <input type="text" name="my_field_passport" id="my_field_passport" value="{{ client.passport_serial_number }}"><br>
@@ -27,7 +27,7 @@
         <input type="text" name="my_field_name" id="id_name" value="{{ client.name }}" required><br>
         <br />
 
-        <label for="id_patronymic">Имя:</label>
+        <label for="id_patronymic">Отчество:</label>
         <input type="text" name="my_field_patronymic" id="id_patronymic" value="{{ client.patronymic }}" required><br>
         <br />
 
@@ -47,14 +47,16 @@
         <input type="text" name="my_field_sex" id="id_sex" value="{{ client.sex }}" required><br>
         <br />
 
-        <label for="id_flag_own_car">Наличие автомобиля:</label>
+        <label for="id_sex">Наличие машины:</label>
         <input type="text" name="my_field_flag_own_car" id="id_flag_own_car"
-               value="{{ client.flag_own_car|yesno:"Да,Нет" }}" required><br>
+               value="{{ client.flag_own_car|yesno:'Да,Нет' }}"
+               required /><br />
         <br />
 
-        <label for="id_flag_own_property">Наличие недвижимости:</label>
+        <label for="id_sex">Наличие недвижимости:</label>
         <input type="text" name="my_flag_own_property" id="id_flag_own_property"
-               value="{{ client.flag_own_property|yesno:"Да,Нет" }}" required><br>
+               value="{{ client.flag_own_property|yesno:'Да,Нет' }}"
+               required /><br />
         <br />
 
         <label for="id_month_income">Доход в месяц:</label>
@@ -62,25 +64,25 @@
                value="{{ client.month_income }}" required><br>
         <br />
 
-        <label for="id_month_income">Количество детей:</label>
+        <label for="id_count_children">Количество детей:</label>
         <input type="text" name="my_field_count_children" id="id_count_children"
                value="{{ client.count_children }}" required><br>
         <br />
 
-        <label for="id_education_type">Количество детей:</label>
+        <label for="id_education_type">Уровень образования:</label>
         <input type="text" name="my_field_education_type" id="id_education_type"
                value="{{ client.education_type }}" required><br>
         <br />
-
+        <div data-update-url="{% url 'bank:update_client_view' %}"></div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'js/update_client.js' %}"></script>
         <div class="button-group">
             <button type="submit" class="save_button">Сохранить изменения</button>
-            <button type="submit" class="search-client-statement">Найти данные по вкладам и кредитам</button>
+            <button type="submit" class="search-client-statement">Найти данные по кредитам</button>
             <button type="submit" class="delete-client">Удалить запись</button>
         </div>
-
     </form>
     {% endblock %}
-
 </body>
 </html>
 

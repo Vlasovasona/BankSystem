@@ -6,7 +6,10 @@ $(document).ready(function() {
     function validateForm() {
         let isValid = true;
 
-        const clientId = document.getElementById('credit_type_id');
+//        const clientId = document.getElementById('credit_type_id');
+        const clientId = document.querySelector('#credit_type_id');
+
+
         const nameInput = document.getElementById('id_credit_type_name');
         if (!nameInput.value.match(/^[А-ЯЁа-яё ]+$/u)) {
             alert('Некорректный формат названия кредита! Оно должно состоять только из букв".');
@@ -36,14 +39,16 @@ $(document).ready(function() {
         event.preventDefault(); // предотвращаем стандартное поведение формы
         if (validateForm()) {
             // Собираем данные вручную
-            const credit_type_Id = $('#credit_type_id').val();
             const credit_type_code = $('#id_credit_type_code').val();
             const credit_type_name = $('#id_credit_type_name').val();
             const credit_percent = $('#id_credit_percent').val().replace(',', '.');
 
             // Создаем объект для отправки
             const data = new URLSearchParams();
-            data.append('credit_type_id', credit_type_Id);
+            if ( document.querySelector('#credit_type_id') != null){
+                const credit_type_Id = $('#credit_type_id').val();
+                data.append('credit_type_id', credit_type_Id);
+            }
             data.append('my_field_credit_type_code', credit_type_code);
             data.append('my_field_credit_type_name', credit_type_name);
             data.append('my_field_credit_percent', credit_percent);

@@ -1,0 +1,42 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Credit{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    <form method="post">
+        {% csrf_token %}
+
+        <label for="id_credit_type_code">Регистрационный номер типа кредита:</label>
+        <input type="text" name="my_field_credit_type_code" id="id_credit_type_code"
+               value=""  required><br>
+        <br />
+
+        <label for="id_credit_type_name">Название:</label>
+        <input type="text" name="my_field_credit_type_name" id="id_credit_type_name"
+               value="" required><br>
+        <br />
+
+        <label for="id_credit_percent">Процентная ставка:</label>
+        <input type="text" name="my_field_credit_percent"
+               id="id_credit_percent" value="" required><br>
+        <br />
+
+        <div class="button-group">
+            <div data-update-url="{% url 'bank:add_new_credit_type' %}"></div>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/update_loan_types.js' %}"></script>
+            <button type="submit" class="save_button">Сохранить изменения</button>
+        </div>
+
+    </form>
+    {% endblock %}
+</body>
+</html>

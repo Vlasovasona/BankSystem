@@ -86,10 +86,28 @@ def payroll_detail(request, id):
     return render(request, 'bank/payroll/detail.html', context)
 
 def client_add_detail(request):
-    """Представление подробной информации о конкретном кредите.
+    """Представление подробной информации о конкретном клиенте.
     :param request: HTTP-запрос.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
     return render(request, 'bank/clients/add_detail.html')
+
+def credit_types_add_detail(request):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    return render(request, 'bank/creditTypes/add_detail.html')
+
+def credit_statement_add_detail(request):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    return render(request, 'bank/creditStatement/add_detail.html')
+
+def payroll_add_detail(request):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    return render(request, 'bank/payroll/add_detail.html')
 
 def search_clients(request):
     if request.method == 'POST':
@@ -357,6 +375,100 @@ def add_new_client(request):
                 education_type=education_type
             )
             client.save()
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def add_new_loan_type(request):
+    if request.method == 'POST':
+        # Получаем данные
+        registration_number = request.POST.get('my_field_credit_type_code')
+        name_of_the_type = request.POST.get('my_field_credit_type_name')
+        interest_rate = request.POST.get('my_field_credit_percent')
+
+        try:
+            credit_type = LoanTypes(
+                registration_number = registration_number,
+                name_of_the_type = name_of_the_type,
+                interest_rate = interest_rate
+            )
+            credit_type.save()
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def add_new_payroll(request):
+    if request.method == 'POST':
+        # Получаем данные
+        loan_id = request.POST.get('my_field_loan')
+        payment_date = request.POST.get('my_field_payment_date')
+        payment_status = request.POST.get('my_field_payment_status')
+
+        try:
+            # Попытка получения объекта CreditStatement
+            loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
+        except CreditStatement.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Запись в ведомости с номером договора {loan_id} не найдена.'
+            })
+
+        try:
+            pay = Payroll(
+                loan = loan,
+                payment_date = payment_date,
+                payment_status = payment_status
+            )
+            pay.save()
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def add_new_credit_statement(request):
+    if request.method == 'POST':
+        # Получаем данные
+        number_of_the_loan_agreement = request.POST.get('my_field_number_of_the_loan_agreement')
+        credit_amount = request.POST.get('my_field_credit_amount')
+        term_month = request.POST.get('my_term_month')
+        monthly_payment = request.POST.get('my_field_monthly_payment')
+        loan_opening_date = request.POST.get('my_field_loan_opening_date')
+        repayment_status = request.POST.get('my_field_repayment_status')
+        loan_type = request.POST.get('my_field_loan_type')
+        client_passport = request.POST.get('my_field_client')
+
+        try:
+            # Попытка получения объекта LoanType
+            loan_t = LoanTypes.objects.get(registration_number=loan_type)
+        except LoanTypes.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Тип кредита с регистрационным номером {loan_type} не найден.'
+            })
+
+        try:
+            # Попытка получения объекта Client
+            client = Clients.objects.get(passport_serial_number=client_passport)
+        except Clients.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Клиент с паспортными данными {client_passport} не найден.'
+            })
+
+        try:
+            statement = CreditStatement(
+                number_of_the_loan_agreement = number_of_the_loan_agreement,
+                credit_amount = credit_amount,
+                term_month = term_month,
+                monthly_payment = monthly_payment,
+                loan_opening_date = loan_opening_date,
+                repayment_status = 1 if repayment_status.strip() == 'Да' else 0,
+                loan_type = loan_t,
+                client = client
+            )
+            statement.save()
             return JsonResponse({'success': True})
 
         except Exception as e:

@@ -6,7 +6,9 @@ $(document).ready(function() {
     function validateForm() {
         let isValid = true;
 
-        const paytId = document.getElementById('pay_id');
+//        const paytId = document.getElementById('pay_id');
+        const paytId = document.querySelector('#pay_id');
+
         const loanInput = document.getElementById('id_loan');
         if (isNaN(parseInt(loanInput.value)) || parseFloat(loanInput.value) <= 0) {
             alert('Некорректное значение регистрационного номера кредита! Допустимы только числовые положительные значения".');
@@ -66,14 +68,16 @@ $(document).ready(function() {
         event.preventDefault(); // предотвращаем стандартное поведение формы
         if (validateForm()) {
             // Собираем данные вручную
-            const payId = $('#pay_id').val();
             const loan = $('#id_loan').val();
             const date = $('#id_payment_date').val();
             const status = $('#id_payment_status').val();
 
             // Создаем объект для отправки
             const data = new URLSearchParams();
-            data.append('pay_id', payId);
+            if ( document.querySelector('#pay_id') != null){
+                const payId = $('#pay_id').val();
+                data.append('pay_id', payId);
+            }
             data.append('my_field_loan', loan);
             data.append('my_field_payment_date', date);
             data.append('my_field_payment_status', status);

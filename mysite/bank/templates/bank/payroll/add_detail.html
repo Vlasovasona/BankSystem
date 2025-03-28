@@ -1,0 +1,43 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Credit{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_loan">Кредит:</label>
+        <input type="text" name="my_field_loan" id="id_loan"
+               value="" required><br>
+        <br />
+
+        <label for="id_payment_date">Дата платежа:</label>
+        <input type="text" name="my_field_payment_date" id="id_payment_date"
+               value="" required><br>
+        <br />
+
+        <label for="id_payment_status">Статус платежа:</label>
+        <input type="text" name="my_field_payment_status" id="id_payment_status"
+               value="" required><br>
+        <br />
+
+        <div class="button-group">
+            <div data-update-url="{% url 'bank:add_new_payroll' %}"></div>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/update_payroll.js' %}"></script>
+            <button type="submit" class="save_button">Сохранить изменения</button>
+        </div>
+    </form>
+    {% endblock %}
+</body>
+</html>
+
+
+

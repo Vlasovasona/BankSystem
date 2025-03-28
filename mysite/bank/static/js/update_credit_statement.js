@@ -92,7 +92,6 @@ $(document).ready(function() {
         event.preventDefault(); // предотвращаем стандартное поведение формы
         if (validateForm()) {
             // Собираем данные вручную
-            const id = $('#credit_state_id').val();
             const number_of_the_loan_agreement = $('#id_number_of_the_loan_agreement').val();
             const credit_amount = $('#id_credit_amount').val();
             const term_month = $('#id_term_month').val();
@@ -104,7 +103,10 @@ $(document).ready(function() {
 
             // Создаем объект для отправки
             const data = new URLSearchParams();
-            data.append('credit_state_id', id);
+            if ( document.querySelector('#credit_state_id') != null){
+                const id = $('#credit_state_id').val();
+                data.append('credit_state_id', id);
+            }
             data.append('my_field_number_of_the_loan_agreement', number_of_the_loan_agreement);
             data.append('my_field_credit_amount', credit_amount);
             data.append('my_term_month', term_month);

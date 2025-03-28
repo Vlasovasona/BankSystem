@@ -31,10 +31,13 @@ urlpatterns = [
     path('update-credit-statement/', views.update_credit_statement, name='update-credit-statement'),
 
     path('clients/add_new', views.client_add_detail, name='client_add_detail'),
+    path('credit_types/add_new', views.credit_types_add_detail, name='credit_types_add_detail'),
+    path('credit_statement/add_new', views.credit_statement_add_detail, name='credit_statement_add_detail'),
+    path('payroll/add_new', views.payroll_add_detail, name='payroll_add_detail'),
 
     path('add-clients/', views.add_new_client, name='add_new_client'),
-    # path('add-credit-type/', views.update_loan_type, name='update-credit-type'),
-    # path('add-payroll/', views.update_payroll, name='update-payroll'),
-    # path('add-credit-statement/', views.update_credit_statement, name='update-credit-statement'),
+    path('add-credit-type/', views.add_new_loan_type, name='add_new_credit_type'),
+    path('add-payroll/', views.add_new_payroll, name='add_new_payroll'),
+    path('add-credit-statement/', views.add_new_credit_statement, name='add_new_credit_statement'),
 
 ]

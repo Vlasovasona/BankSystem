@@ -1,0 +1,66 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Credit{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_number_of_the_loan_agreement">Номер кредитного договора:</label>
+        <input type="text" name="my_field_number_of_the_loan_agreement" id="id_number_of_the_loan_agreement"
+               value="" required><br>
+        <br />
+
+        <label for="id_credit_amount">Сумма кредита:</label>
+        <input type="text" name="my_field_credit_amount" id="id_credit_amount"
+               value="" required><br>
+        <br />
+
+        <label for="id_term_month">Срок кредита (мес.):</label>
+        <input type="text" name="my_term_month" id="id_term_month"
+               value="" required><br>
+        <br />
+
+        <label for="id_monthly_payment">Ежемесячный платеж:</label>
+        <input type="text" name="my_field_monthly_payment" id="id_monthly_payment"
+               value="" required><br>
+        <br />
+
+        <label for="id_loan_opening_date">Дата открытия кредита:</label>
+        <input type="text" name="my_field_loan_opening_date" id="id_loan_opening_date"
+               value="" required><br>
+        <br />
+
+        <label for="id_repayment_status">Статус погашения кредита:</label>
+        <input type="text" name="my_field_repayment_status" id="id_repayment_status"
+               value="" required><br>
+        <br />
+
+        <label for="id_loan_type">Тип кредита:</label>
+        <input type="text" name="my_field_loan_type" id="id_loan_type"
+               value="" required><br>
+        <br />
+
+        <label for="id_client">Клиент:</label>
+        <input type="text" name="my_field_client" id="id_client"
+               value="" required><br>
+        <br />
+
+        <div class="button-group">
+            <div data-update-url="{% url 'bank:add_new_credit_statement' %}"></div>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/update_credit_statement.js' %}"></script>
+            <button type="submit" class="save_button">Сохранить изменения</button>
+        </div>
+    </form>
+    {% endblock %}
+
+</body>
+</html>

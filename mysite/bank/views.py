@@ -245,8 +245,15 @@ def update_payroll(request):
         payment_status = request.POST.get('my_field_payment_status')
 
         try:
+            # Попытка получения объекта CreditStatement
             loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
+        except CreditStatement.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Запись в ведомости с номером договора {loan_id} не найдена.'
+            })
 
+        try:
             pay = Payroll.objects.get(pk=pay_id)
             # Обновляем поля
             pay.loan = loan
@@ -274,9 +281,24 @@ def update_credit_statement(request):
         client_passport = request.POST.get('my_field_client')
 
         try:
+            # Попытка получения объекта LoanType
             loan_t = LoanTypes.objects.get(registration_number=loan_type)
-            client = Clients.objects.get(passport_serial_number=client_passport)
+        except LoanTypes.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Тип кредита с регистрационным номером {loan_type} не найден.'
+            })
 
+        try:
+            # Попытка получения объекта Client
+            client = Clients.objects.get(passport_serial_number=client_passport)
+        except Clients.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Клиент с паспортными данными {client_passport} не найден.'
+            })
+
+        try:
             statement = CreditStatement.objects.get(pk=statement_id)
             # Обновляем поля
             statement.number_of_the_loan_agreement = number_of_the_loan_agreement

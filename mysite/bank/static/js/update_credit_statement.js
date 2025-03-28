@@ -6,7 +6,10 @@ $(document).ready(function() {
     function validateForm() {
         let isValid = true;
 
-        const credit_statement_Id = document.getElementById('credit_state_id');
+//        const credit_statement_Id = document.getElementById('credit_state_id');
+
+        const credit_statement_Id = document.querySelector('#credit_state_id');
+
         const number_of_the_loan_agreementInput = document.getElementById('id_number_of_the_loan_agreement');
         if (isNaN(parseInt(number_of_the_loan_agreementInput.value)) || parseInt(number_of_the_loan_agreementInput.value) <= 0) {
             alert('Некорректное значение! Номер кредитного договора должен быть положительным целым числом.');

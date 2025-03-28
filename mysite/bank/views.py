@@ -85,6 +85,11 @@ def payroll_detail(request, id):
     }
     return render(request, 'bank/payroll/detail.html', context)
 
+def client_add_detail(request):
+    """Представление подробной информации о конкретном кредите.
+    :param request: HTTP-запрос.
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    return render(request, 'bank/clients/add_detail.html')
 
 def search_clients(request):
     if request.method == 'POST':
@@ -317,3 +322,42 @@ def update_credit_statement(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+def add_new_client(request):
+    if request.method == 'POST':
+        # Получаем данные
+        passport = request.POST.get('my_field_passport')
+        surname = request.POST.get('my_field_surname')
+        name = request.POST.get('my_field_name')
+        patronymic = request.POST.get('my_field_patronymic')
+        adress = request.POST.get('my_field_adress')
+        phone_number = request.POST.get('my_field_phone')
+        age = request.POST.get('my_field_age')
+        sex = request.POST.get('my_field_sex')
+        flag_own_car = request.POST.get('my_field_flag_own_car')
+        flag_own_property = request.POST.get('my_flag_own_property')
+        month_income = request.POST.get('my_field_month_income')
+        count_children = request.POST.get('my_field_count_children')
+        education_type = request.POST.get('my_field_education_type')
+
+        try:
+            # Создаем нового клиента
+            client = Clients(
+                passport_serial_number=passport,
+                surname=surname,
+                name=name,
+                patronymic=patronymic,
+                adress=adress,
+                phone_number=phone_number,
+                age=age,
+                sex=sex,
+                flag_own_car=1 if flag_own_car == 'Да' else 0,
+                flag_own_property=1 if flag_own_property == 'Да' else 0,
+                month_income=month_income,
+                count_children=count_children,
+                education_type=education_type
+            )
+            client.save()
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

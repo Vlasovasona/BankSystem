@@ -29,4 +29,12 @@ urlpatterns = [
     path('update-credit-type/', views.update_loan_type, name='update-credit-type'),
     path('update-payroll/', views.update_payroll, name='update-payroll'),
     path('update-credit-statement/', views.update_credit_statement, name='update-credit-statement'),
+
+    path('clients/add_new', views.client_add_detail, name='client_add_detail'),
+
+    path('add-clients/', views.add_new_client, name='add_new_client'),
+    # path('add-credit-type/', views.update_loan_type, name='update-credit-type'),
+    # path('add-payroll/', views.update_payroll, name='update-payroll'),
+    # path('add-credit-statement/', views.update_credit_statement, name='update-credit-statement'),
+
 ]

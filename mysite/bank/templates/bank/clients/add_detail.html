@@ -1,0 +1,87 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Client{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    <form method="POST">
+        {% csrf_token %}
+
+        <label for="my_field_passport">Серия и номер паспорта клиента:</label>
+        <input type="text" name="my_field_passport" id="my_field_passport" value=""><br>
+        <br />
+
+        <label for="id_surname">Фамилия:</label>
+        <input type="text" name="my_field_surname" id="id_surname" value="" required><br>
+        <br />
+
+        <label for="id_name">Имя:</label>
+        <input type="text" name="my_field_name" id="id_name" value="" required><br>
+        <br />
+
+        <label for="id_patronymic">Отчество:</label>
+        <input type="text" name="my_field_patronymic" id="id_patronymic" value="" required><br>
+        <br />
+
+        <label for="id_adress">Адрес:</label>
+        <input type="text" class="adress-label" name="my_field_adress" id="id_adress" value="" required><br>
+        <br />
+
+        <label for="id_phone">Номер телефона:</label>
+        <input type="text" name="my_field_phone" id="id_phone" value="" required><br>
+        <br />
+
+        <label for="id_age">Возраст:</label>
+        <input type="text" name="my_field_age" id="id_age" value="" required><br>
+        <br />
+
+        <label for="id_sex">Пол:</label>
+        <input type="text" name="my_field_sex" id="id_sex" value="" required><br>
+        <br />
+
+        <label for="id_sex">Наличие машины:</label>
+        <input type="text" name="my_field_flag_own_car" id="id_flag_own_car"
+               value=""
+               required /><br />
+        <br />
+
+        <label for="id_sex">Наличие недвижимости:</label>
+        <input type="text" name="my_flag_own_property" id="id_flag_own_property"
+               value=""
+               required /><br />
+        <br />
+
+        <label for="id_month_income">Доход в месяц:</label>
+        <input type="text" name="my_field_month_income" id="id_month_income"
+               value="" required><br>
+        <br />
+
+        <label for="id_count_children">Количество детей:</label>
+        <input type="text" name="my_field_count_children" id="id_count_children"
+               value="" required><br>
+        <br />
+
+        <label for="id_education_type">Уровень образования:</label>
+        <input type="text" name="my_field_education_type" id="id_education_type"
+               value="" required><br>
+        <br />
+        <div data-update-url="{% url 'bank:add_new_client' %}"></div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'js/update_client.js' %}"></script>
+        <div class="button-group">
+            <button type="submit" class="save_button">Сохранить изменения</button>
+        </div>
+    </form>
+    {% endblock %}
+</body>
+</html>
+
+
+

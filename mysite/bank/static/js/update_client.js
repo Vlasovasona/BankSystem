@@ -5,9 +5,9 @@ $(document).ready(function() {
 
     function validateForm() {
         let isValid = true;
-        console.log("Скрипт выполняется");
 
-        const clientId = document.getElementById('client_id');
+//        const clientId = document.getElementById('client_id');
+        const clientId = document.querySelector('#client_id');
         const surnameInput = document.getElementById('id_surname');
         if (!surnameInput.value.match(/^[А-ЯЁа-яё ]+$/u)) {
             alert('Некорректный формат фамилии! Фамилия должна состоять только из букв".');
@@ -92,7 +92,7 @@ $(document).ready(function() {
         event.preventDefault(); // предотвращаем стандартное поведение формы
         if (validateForm()) {
             // Собираем данные вручную
-            const clientId = $('#client_id').val();
+
             const passport = $('#my_field_passport').val();
             const surname = $('#id_surname').val();
             const name = $('#id_name').val();
@@ -109,7 +109,11 @@ $(document).ready(function() {
 
             // Создаем объект для отправки
             const data = new URLSearchParams();
-            data.append('client_id', clientId);
+            if ( document.querySelector('#client_id') != null){
+                const clientId = $('#client_id').val();
+                data.append('client_id', clientId);
+            }
+
             data.append('my_field_passport', passport);
             data.append('my_field_surname', surname);
             data.append('my_field_name', name);

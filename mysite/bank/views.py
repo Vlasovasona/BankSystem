@@ -9,9 +9,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse
 import json
 
-
-
-
 # Методы для работы с таблицей Clients
 
 class ClientListView(ListView):
@@ -156,7 +153,6 @@ def delete_credit_statement(request):
 
         return JsonResponse({'success': True})
 
-
 def delete_payroll(request):
     if request.method == 'POST':
         # Получение списка идентификаторов из POST-запроса
@@ -261,6 +257,41 @@ def update_payroll(request):
 
         except Payroll.DoesNotExist:
             return JsonResponse({'success': False, 'error': f'Платеж {pay_id} не найден.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def update_credit_statement(request):
+    if request.method == 'POST':
+        # Получаем данные
+        statement_id = request.POST.get('credit_state_id')
+        number_of_the_loan_agreement = request.POST.get('my_field_number_of_the_loan_agreement')
+        credit_amount = request.POST.get('my_field_credit_amount')
+        term_month = request.POST.get('my_term_month')
+        monthly_payment = request.POST.get('my_field_monthly_payment')
+        loan_opening_date = request.POST.get('my_field_loan_opening_date')
+        repayment_status = request.POST.get('my_field_repayment_status')
+        loan_type = request.POST.get('my_field_loan_type')
+        client_passport = request.POST.get('my_field_client')
+
+        try:
+            loan_t = LoanTypes.objects.get(registration_number=loan_type)
+            client = Clients.objects.get(passport_serial_number=client_passport)
+
+            statement = CreditStatement.objects.get(pk=statement_id)
+            # Обновляем поля
+            statement.number_of_the_loan_agreement = number_of_the_loan_agreement
+            statement.credit_amount = credit_amount
+            statement.term_month = term_month
+            statement.monthly_payment = monthly_payment
+            statement.loan_opening_date = loan_opening_date
+            statement.repayment_status = 1 if repayment_status.strip() == 'Да' else 0
+            statement.loan_type = loan_t
+            statement.client = client
+            statement.save()
+            return JsonResponse({'success': True})
+
+        except Payroll.DoesNotExist:
+            return JsonResponse({'success': False, 'error': f'Кредитный договор {statement_id} не найден.'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 

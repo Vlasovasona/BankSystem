@@ -14,6 +14,7 @@
     <form method="post">
         {% csrf_token %}
         <input type="hidden" id="credit_state_id" name="credit_state_id" value="{{ credit_statement_item.id }}">
+
         <label for="id_number_of_the_loan_agreement">Номер кредитного договора:</label>
         <input type="text" name="my_field_number_of_the_loan_agreement" id="id_number_of_the_loan_agreement"
                value="{{ credit_statement_item.number_of_the_loan_agreement }}" readonly required><br>
@@ -36,7 +37,7 @@
 
         <label for="id_loan_opening_date">Дата открытия кредита:</label>
         <input type="text" name="my_field_loan_opening_date" id="id_loan_opening_date"
-               value="{{ credit_statement_item.loan_opening_date }}" required><br>
+               value="{{ credit_statement_item.loan_opening_date|date:"Y-m-d" }}" required><br>
         <br />
 
         <label for="id_repayment_status">Статус погашения кредита:</label>
@@ -55,9 +56,9 @@
         <br />
 
         <div class="button-group">
-            <div data-update-url="{% url 'bank:update_client_view' %}"></div>
+            <div data-update-url="{% url 'bank:update-credit-statement' %}"></div>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="{% static 'js/update_client.js' %}"></script>
+            <script src="{% static 'js/update_credit_statement.js' %}"></script>
             <button type="submit" class="save_button">Сохранить изменения</button>
             <button type="submit" class="delete-client">Удалить запись</button>
         </div>

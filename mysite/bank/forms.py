@@ -1,39 +1,26 @@
 from django import forms
-from .models import Clients
-from .models import Credits, CreditType, Deposits, DepositTypes, StatementOfDeposits, CreditStatement
+from .models import CreditStatement, LoanTypes, Clients, Payroll
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
 
 
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Clients
-        exclude = ('client_code',)
-
-class CreditsForm(forms.ModelForm):
-    class Meta:
-        model = Credits
-        exclude = ('credit_code',)
+        exclude = ('id',)
 
 class CreditTypesForm(forms.ModelForm):
     class Meta:
-        model = CreditType
-        exclude = ('credit_type_code',)
+        model = LoanTypes
+        exclude = ('id',)
 
-class DepositsForm(forms.ModelForm):
-    class Meta:
-        model = Deposits
-        exclude = ('deposit_code',)
 
-class DepositTypesForm(forms.ModelForm):
+class PayrollForm(forms.ModelForm):
     class Meta:
-        model = DepositTypes
-        exclude = ('deposit_type_code',)
-
-class StatementOfDepositsForm(forms.ModelForm):
-    class Meta:
-        model = StatementOfDeposits
-        exclude = ('deposit_closing_number',)
+        model = Payroll
+        exclude = ('id',)
 
 class CreditStatementForm(forms.ModelForm):
     class Meta:
         model = CreditStatement
-        exclude = ('loan_repayment_number',)
+        exclude = ('id',)

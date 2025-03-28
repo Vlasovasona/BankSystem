@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+from django.urls import include
 
 
 app_name = 'bank'
@@ -39,5 +40,9 @@ urlpatterns = [
     path('add-credit-type/', views.add_new_loan_type, name='add_new_credit_type'),
     path('add-payroll/', views.add_new_payroll, name='add_new_payroll'),
     path('add-credit-statement/', views.add_new_credit_statement, name='add_new_credit_statement'),
+
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
 
 ]

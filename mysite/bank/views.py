@@ -1,5 +1,5 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
-
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Clients, CreditStatement, LoanTypes, Payroll
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse
 import json
+from django.contrib.auth.forms import UserCreationForm
 
 # Методы для работы с таблицей Clients
 
@@ -473,3 +474,21 @@ def add_new_credit_statement(request):
 
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
+
+def register_view(request):
+    if request.method == 'POST': # если запрос POST, то пользователь передает данные для регистрации, создаем новую учетную запись
+        form = UserCreationForm(request.POST) # встроенная форма Django для регистрации пользователя
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('/bank/clients/') # Переадресация после успешной регистрации
+    else: # если метод GET - значит, нужно отобразить пустую страницу для заполнения пользователем регистрационных полей
+        form = UserCreationForm()
+
+    context = {'form': form} # передаем форму в html-шаблон для отображения
+    return render(request, 'bank/registrationPage.html', context)
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')

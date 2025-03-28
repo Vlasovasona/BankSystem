@@ -244,20 +244,18 @@ def update_payroll(request):
     if request.method == 'POST':
         # Получаем данные
         pay_id = request.POST.get('pay_id')
-        loan = request.POST.get('my_field_loan')
+        loan_id = request.POST.get('my_field_loan')
         payment_date = request.POST.get('my_field_payment_date')
         payment_status = request.POST.get('my_field_payment_status')
 
         try:
-            # state = CreditStatement.objects.get(id=request.POST.get('loan'))
-            # state.amount = request.POST.get('amount')
-            # state.save()
+            loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
 
             pay = Payroll.objects.get(pk=pay_id)
             # Обновляем поля
-            pay.registration_number = loan
-            pay.name_of_the_type = payment_date
-            pay.interest_rate = payment_status
+            pay.loan = loan
+            pay.payment_date = payment_date
+            pay.payment_status = payment_status
             pay.save()
             return JsonResponse({'success': True})
 

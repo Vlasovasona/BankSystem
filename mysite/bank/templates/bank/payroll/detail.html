@@ -22,7 +22,7 @@
 
         <label for="id_payment_date">Дата платежа:</label>
         <input type="text" name="my_field_payment_date" id="id_payment_date"
-               value="{{ pay.payment_date }}" required><br>
+               value="{{ pay.payment_date|date:"Y-m-d" }}" required><br>
         <br />
 
         <label for="id_payment_status">Статус платежа:</label>

@@ -2,21 +2,21 @@
 {% load static %}
 <html lang="ru">
 <head>
-    <title>{% block title %}My bank registration{% endblock %}</title>
+    <title>{% block title %}My bank login{% endblock %}</title>
     <link href="{% static 'bank/login.css' %}" rel="stylesheet">
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
     <div class="image_label">
-        <img src="{% static 'images/registration_label.png' %}" alt="Мой банк" class="main_label">
+        <img src="{% static 'images/label_login.png' %}" alt="Мой банк" class="main_label">
     </div>
     <div class="container">
         <div class="login_rectangle">
-            <h1 class="login_title">Регистрация</h1>
+            <h1 class="login_title">Вход</h1>
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit">Зарегистрировать пользователя</button>
+                <button type="submit">Войти</button>
             </form>
         </div>
     </div>

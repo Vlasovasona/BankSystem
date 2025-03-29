@@ -2,15 +2,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Clients, CreditStatement, LoanTypes, Payroll
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView
 from django.db.models import Q
-from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse
 import json
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .forms import CustomUserCreationForm
 
-# Методы для работы с таблицей Clients
 
 class ClientListView(ListView):
     queryset = Clients.objects.all()
@@ -37,7 +35,6 @@ class CreditTypesListView(ListView):
     paginate_by = 25
     template_name = 'bank/creditTypes/list.html'
 
-# Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
 def credit_type_detail(request, id):
     """Представление подробной информации о конкретном кредите.
     :param request: HTTP-запрос.
@@ -56,7 +53,6 @@ class CreditStatementListView(ListView):
     paginate_by = 25
     template_name = 'bank/creditStatement/list.html'
 
-# Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
 def credit_statement_detail(request, id):
     """Представление подробной информации о конкретном кредите.
     :param request: HTTP-запрос.
@@ -74,7 +70,6 @@ class PayrollListView(ListView):
     paginate_by = 25
     template_name = 'bank/payroll/list.html'
 
-# Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
 def payroll_detail(request, id):
     """Представление подробной информации о конкретном кредите.
     :param request: HTTP-запрос.
@@ -476,18 +471,49 @@ def add_new_credit_statement(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 
-def register_view(request):
-    if request.method == 'POST': # если запрос POST, то пользователь передает данные для регистрации, создаем новую учетную запись
-        form = UserCreationForm(request.POST) # встроенная форма Django для регистрации пользователя
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('/bank/clients/') # Переадресация после успешной регистрации
-    else: # если метод GET - значит, нужно отобразить пустую страницу для заполнения пользователем регистрационных полей
-        form = UserCreationForm()
+# def register_view(request):
+#     if request.method == 'POST': # если запрос POST, то пользователь передает данные для регистрации, создаем новую учетную запись
+#         form = UserCreationForm(request.POST) # встроенная форма Django для регистрации пользователя
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)
+#             return redirect('/bank/clients/') # Переадресация после успешной регистрации
+#     else: # если метод GET - значит, нужно отобразить пустую страницу для заполнения пользователем регистрационных полей
+#         form = UserCreationForm()
+#
+#     context = {'form': form} # передаем форму в html-шаблон для отображения
+#     return render(request, 'bank/registrationPage.html', context)
 
-    context = {'form': form} # передаем форму в html-шаблон для отображения
+def register_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()  # Сохраняет нового пользователя с указанным email и статусом staff
+            login(request, user)
+            return redirect('/bank/clients/')
+    else:
+        form = CustomUserCreationForm()
+
+    context = {'form': form}
     return render(request, 'bank/registrationPage.html', context)
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('/bank/clients/')  # Переадресация после успешного входа
+        else:
+            print("Ошибка при входе")
+    else:
+        form = AuthenticationForm()
+
+    context = {'form': form}
+    return render(request, 'bank/login_start_page.html', context)
 
 def logout_view(request):
     logout(request)

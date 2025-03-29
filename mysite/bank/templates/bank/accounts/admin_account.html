@@ -1,0 +1,22 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Account{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/list.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+    <h1>Личный кабинет</h1>
+    <p>Привет, {{ user.username }}.</p>
+    <p>Ваше имя: {{ user.first_name }}.</p>
+    <p>Ваша фамилия: {{ user.last_name }}.</p>
+    <p>Ваш email: {{ user.email }}.</p>
+    <p>Вы {{ user.is_staff|yesno:"администратор,обычный пользователь" }}.</p>
+{% endblock %}
+</body>
+</html>

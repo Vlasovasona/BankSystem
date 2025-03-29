@@ -518,3 +518,12 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+def personal_account(request):
+    context = {
+        'user': request.user
+    }
+    if request.user.is_staff == 1:
+        return render(request, 'bank/accounts/admin_account.html', context)
+    else:
+        return render(request, 'bank/accounts/regular.html', context)

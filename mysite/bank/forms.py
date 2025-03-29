@@ -15,7 +15,6 @@ class CreditTypesForm(forms.ModelForm):
         model = LoanTypes
         exclude = ('id',)
 
-
 class PayrollForm(forms.ModelForm):
     class Meta:
         model = Payroll

@@ -26,8 +26,7 @@ class CreditStatementForm(forms.ModelForm):
         exclude = ('id',)
 
 
-
-# Формы для регистрации нового пользователя
+# Форма для регистрации нового пользователя
 class CustomUserCreationForm(UserCreationForm):
     first_name = forms.CharField(label='Имя', required=False)
     last_name = forms.CharField(label='Фамилия', required=False)

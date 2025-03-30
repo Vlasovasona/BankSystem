@@ -84,28 +84,31 @@ def payroll_detail(request, id):
 def client_add_detail(request):
     """Представление подробной информации о конкретном клиенте.
     :param request: HTTP-запрос.
-    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали клиента. """
     return render(request, 'bank/clients/add_detail.html')
 
 def credit_types_add_detail(request):
-    """Представление подробной информации о конкретном кредите.
+    """Представление подробной информации о конкретном типе кредита.
     :param request: HTTP-запрос.
-    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа кредита. """
     return render(request, 'bank/creditTypes/add_detail.html')
 
 def credit_statement_add_detail(request):
-    """Представление подробной информации о конкретном кредите.
+    """Представление подробной информации о конкретном кредитном договоре.
     :param request: HTTP-запрос.
-    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали кредитного договора. """
     return render(request, 'bank/creditStatement/add_detail.html')
 
 def payroll_add_detail(request):
-    """Представление подробной информации о конкретном кредите.
+    """Представление подробной информации о конкретном платеже.
     :param request: HTTP-запрос.
-    :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа вклада. """
+    :return: Возвращает HTML-шаблон с контекстом, содержащим детали платежа. """
     return render(request, 'bank/payroll/add_detail.html')
 
 def search_clients(request):
+    """Использование поисковой строки для поиска клиента по паспортным данным.
+        :param request: HTTP-запрос.
+        :return: Возвращает HTML-шаблон с контекстом, содержащим найденного клиента. """
     if request.method == 'POST':
         query = request.POST.get('search_query')
         clients = Clients.objects.filter(Q(passport_serial_number__icontains=query))
@@ -116,6 +119,7 @@ def search_clients(request):
 
 
 def delete_clients(request):
+    """Осуществление удаления списка клиентов у которых активирован чекбокс."""
     if request.method == 'POST':
         # Получение списка идентификаторов из POST-запроса
         ids_json = request.POST.get('ids', None)
@@ -135,6 +139,7 @@ def delete_clients(request):
         return JsonResponse({'success': True})
 
 def delete_credit_type(request):
+    """Осуществление удаления списка типов кредита у которых активирован чекбокс."""
     if request.method == 'POST':
         # Получение списка идентификаторов из POST-запроса
         ids_json = request.POST.get('ids', None)
@@ -154,6 +159,7 @@ def delete_credit_type(request):
         return JsonResponse({'success': True})
 
 def delete_credit_statement(request):
+    """Осуществление удаления списка кредитных договоров у которых активирован чекбокс."""
     if request.method == 'POST':
         # Получение списка идентификаторов из POST-запроса
         ids_json = request.POST.get('ids', None)
@@ -173,6 +179,7 @@ def delete_credit_statement(request):
         return JsonResponse({'success': True})
 
 def delete_payroll(request):
+    """Осуществление удаления списка платежей у которых активирован чекбокс."""
     if request.method == 'POST':
         # Получение списка идентификаторов из POST-запроса
         ids_json = request.POST.get('ids', None)
@@ -192,6 +199,7 @@ def delete_payroll(request):
         return JsonResponse({'success': True})
 
 def update_client_view(request):
+    """Осуществление изменение клиента в БД."""
     if request.method == 'POST':
         # Получаем данные
         client_id = request.POST.get('client_id')
@@ -234,6 +242,7 @@ def update_client_view(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def update_loan_type(request):
+    """Осуществление изменение типа кредита в БД."""
     if request.method == 'POST':
         # Получаем данные
         credit_type_id = request.POST.get('credit_type_id')
@@ -256,6 +265,7 @@ def update_loan_type(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def update_payroll(request):
+    """Осуществление изменение платежа в БД."""
     if request.method == 'POST':
         # Получаем данные
         pay_id = request.POST.get('pay_id')
@@ -287,6 +297,7 @@ def update_payroll(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def update_credit_statement(request):
+    """Осуществление изменение кредитного договора в БД."""
     if request.method == 'POST':
         # Получаем данные
         statement_id = request.POST.get('credit_state_id')
@@ -337,6 +348,7 @@ def update_credit_statement(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def add_new_client(request):
+    """Осуществление добавления клиента в БД."""
     if request.method == 'POST':
         # Получаем данные
         passport = request.POST.get('my_field_passport')
@@ -377,6 +389,7 @@ def add_new_client(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def add_new_loan_type(request):
+    """Осуществление добавления типа кредита в БД."""
     if request.method == 'POST':
         # Получаем данные
         registration_number = request.POST.get('my_field_credit_type_code')
@@ -396,6 +409,7 @@ def add_new_loan_type(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def add_new_payroll(request):
+    """Осуществление добавления платежа в БД."""
     if request.method == 'POST':
         # Получаем данные
         loan_id = request.POST.get('my_field_loan')
@@ -424,6 +438,7 @@ def add_new_payroll(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 def add_new_credit_statement(request):
+    """Осуществление добавления кредитного договора в БД."""
     if request.method == 'POST':
         # Получаем данные
         number_of_the_loan_agreement = request.POST.get('my_field_number_of_the_loan_agreement')
@@ -485,6 +500,7 @@ def add_new_credit_statement(request):
 #     return render(request, 'bank/registrationPage.html', context)
 
 def register_view(request):
+    """Осуществление регистрации нового юзера."""
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -498,6 +514,7 @@ def register_view(request):
     return render(request, 'bank/registrationPage.html', context)
 
 def login_view(request):
+    """Осуществление авторизации юзера."""
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -516,10 +533,12 @@ def login_view(request):
     return render(request, 'bank/login_start_page.html', context)
 
 def logout_view(request):
+    """Осуществление выхода из аккаунта текущего юзера."""
     logout(request)
     return redirect('home')
 
 def personal_account(request):
+    """Осуществление перехода в ЛК с автоматическим определением прав юзера."""
     context = {
         'user': request.user
     }

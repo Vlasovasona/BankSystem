@@ -13,17 +13,6 @@
     font-style: italic;
 }
 
-.search-client-statement{
-    border-radius: 5%;
-    background-color: #ADD8E6;
-    border-color: #ADD8E6;
-    border-width: 1px;
-    font-size: 16px;
-    color: black;
-    margin: 5px;
-    font-style: italic;
-}
-
 .button-group{
     display: flex;
     align-items: right;
@@ -40,4 +29,30 @@
     border-color: #FF4500;
     margin: 5px;
     font-style: italic;
+}
+
+input[type="text"] { /* Увеличенные размеры полей ввода */
+    width: 300px; /* Ширина полей */
+    padding: 10px; /* Внутренний отступ полей */
+    font-size: 16px; /* Размер шрифта в полях */
+    border: 1px solid #ccc; /* Тонкая граница серого цвета */
+    border-radius: 5px; /* Округлые углы полей */
+}
+
+button.save_button, button.delete-client {
+    padding: 10px 22px; /* Увеличенные размеры кнопки */
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-size: 14px; /* Увеличенный размер текста на кнопке */
+}
+
+button.save_button:hover {
+    background-color: #FF4500;
+}
+
+button.delete-client:hover {
+    background-color: #D21400;
 }

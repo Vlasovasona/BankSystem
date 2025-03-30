@@ -6,17 +6,28 @@
     <meta charset="UTF-8">
     <title>{% block title %}Account{% endblock %}</title>
     {% block extra_styles %}
-        <link href="{% static 'bank/list.css' %}" rel="stylesheet">
+        <link href="{% static 'bank/account.css' %}" rel="stylesheet">
     {% endblock %}
 </head>
 <body>
 {% block content %}
-    <h1>Личный кабинет</h1>
-    <p>Привет, {{ user.username }}.</p>
-    <p>Ваше имя: {{ user.first_name }}.</p>
-    <p>Ваша фамилия: {{ user.last_name }}.</p>
-    <p>Ваш email: {{ user.email }}.</p>
-    <p>Вы {{ user.is_staff|yesno:"администратор,обычный пользователь" }}.</p>
+    <h1 class="title">Личный кабинет</h1>
+    <div class="account_container">
+        <div class="image">
+            <img src="{% static 'images/user_icon.png' %}" alt="Иконка" class="user_icon">
+        </div>
+        <div class="information_about_user">
+            <p class="FIO">{{ user.last_name }} {{ user.first_name }}</p>
+            <p class="login">Ваш логин: {{ user.username }}</p>
+            <p class="login">Ваш email: {{ user.email }}</p>
+            <p class="is_admin">Вы {{ user.is_staff|yesno:"администратор,обычный пользователь" }}.</p>
+            <p class="is_admin">Вам {{ user.is_staff|yesno:"доступно управление пользователями системы," }}.</p>
+        </div>
+    </div>
+    <div class="admin_buttons">
+        <button class="add_new_user">Добавить пользователя</button>
+        <button class="watch_users_table">Управлять пользователями</button>
+    </div>
 {% endblock %}
 </body>
 </html>

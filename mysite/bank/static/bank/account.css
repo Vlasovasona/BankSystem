@@ -1,0 +1,59 @@
+.title {
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.account_container {
+    display: flex;
+    align-items: center;
+}
+
+.image {
+    margin-right: 20px; /* Отступ между изображением и текстом */
+}
+
+.FIO {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    font-size: 36px;
+}
+
+.login {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.is_admin {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: 20px;
+    font-style: italic;
+}
+
+.admin_buttons {
+    position: fixed;         /* Закрепляем блок кнопок относительно окна браузера */
+    bottom: 0;               /* Располагаем блок снизу */
+    right: 0;                /* Располагаем блок справа */
+    display: flex;           /* Используем Flexbox для выравнивания кнопок */
+    justify-content: flex-end; /* Выравниваем кнопки вправо */
+    gap: 10px;              /* Задаём расстояние между кнопками */
+    padding: 10px;          /* Добавляем внутренний отступ */
+    border-top-left-radius: 8px; /* Скругление верхнего левого угла */
+}
+
+.add_new_user, .watch_users_table {
+    padding: 10px 20px;     /* Настраиваем размер кнопок */
+    cursor: pointer;        /* Курсор меняется на указатель при наведении */
+    border: none;           /* Убираем стандартные границы */
+    outline: none;          /* Убираем выделение при клике */
+    color: black;           /* Цвет текста */
+    font-style: italic;
+    background-color: #FF8C00; /* Цвет фона кнопок */
+    border-radius: 5px;      /* Скругленные углы кнопок */
+}
+
+button.add_new_user:hover, button.watch_users_table:hover {
+    background-color: #BF6D30; /* Более темный оранжевый при наведении */
+}
+

@@ -588,6 +588,20 @@ def add_new_credit_statement(request):
 #     context = {'form': form} # передаем форму в html-шаблон для отображения
 #     return render(request, 'bank/registrationPage.html', context)
 
+def add_new_user(request):
+    """Осуществление регистрации нового юзера."""
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()  # Сохраняет нового пользователя с указанным email и статусом staff
+            login(request, user)
+            return redirect('/bank/personal_account/')
+    else:
+        form = CustomUserCreationForm()
+
+    context = {'form': form}
+    return render(request, 'bank/registrationPage.html', context)
+
 def register_view(request):
     """Осуществление регистрации нового юзера."""
     if request.method == 'POST':

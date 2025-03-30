@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
     <title>{% block title %}My bank registration{% endblock %}</title>
-    <link href="{% static 'bank/login.css' %}" rel="stylesheet">
+    <link href="{% static 'bank/add_new_user_by_admin.css' %}" rel="stylesheet">
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
@@ -13,10 +13,120 @@
     <div class="container">
         <div class="login_rectangle">
             <h1 class="login_title">Регистрация</h1>
+            <div class="instructions">
+                <div class="block">
+                    <div class="circle">
+                        <span>1</span>
+                    </div>
+                    <div class="info">
+                        <p class="main_string">ФИО <img src="{% static 'images/line.png' %}" class="main_label"></p>
+                        <p>Заполните логин,</p>
+                        <p>фамилию и имя</p>
+                    </div>
+
+                </div>
+                <div class="block">
+                    <div class="circle">
+                        <span>2</span>
+                    </div>
+                    <div class="info">
+                        <p class="main_string">Дополнительно <img src="{% static 'images/line.png' %}" class="main_label"></p>
+                        <p>Укажите e-mail и</p>
+                        <p>права администратора</p>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="circle">
+                        <span>3</span>
+                    </div>
+                    <div class="info">
+                        <p class="main_string">Идентификация</p>
+                        <p>Установите надежный</p>
+                        <p>пароль</p>
+                    </div>
+                </div>
+            </div>
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Зарегистрировать пользователя</button>
+                <div class="info">
+                    <p>Логин:</p>
+                    <p class="username">{{ form.username }}</p>
+                    {% if form.username.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <div class="info">
+                        <p>{{ form.last_name.label_tag }}</p>
+                        <p> {{ form.last_name }}</p>
+                        {% if form.last_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.last_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="info">
+                        <p>{{ form.first_name.label_tag }}</p>
+                        <p>{{ form.first_name }}</p>
+                        {% if form.first_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.first_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="info">
+                        <p>{{ form.password1.label_tag }}</p>
+                        <p> {{ form.password1 }}</p>
+                        {% if form.password1.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password1.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="info">
+                        <p>{{ form.password2.label_tag }}</p>
+                        <p>{{ form.password2 }}</p>
+                        {% if form.password2.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password2.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="info">
+                        <p>{{ form.email.label_tag }}</p>
+                        <p> {{ form.email }}</p>
+                        {% if form.email.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.email.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="info">
+                        <p>При необходимости отметьте права администратора:</p>
+                        <p>{{ form.is_staff.label_tag }}{{ form.is_staff }}</p>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button type="submit">Зарегистрировать пользователя</button>
+                </div>
             </form>
         </div>
     </div>

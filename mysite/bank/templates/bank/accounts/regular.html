@@ -24,10 +24,6 @@
             <p class="is_admin">Вам {{ user.is_staff|yesno:"доступно управление пользователями системы," }}.</p>
         </div>
     </div>
-    <div class="admin_buttons">
-        <button class="add_new_user">Добавить пользователя</button>
-        <button class="watch_users_table">Управлять пользователями</button>
-    </div>
 {% endblock %}
 </body>
 </html>

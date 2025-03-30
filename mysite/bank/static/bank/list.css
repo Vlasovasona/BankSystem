@@ -42,6 +42,21 @@
     font-style: italic;
 }
 
+button.add-button:hover {
+    background-color: #00A648;
+}
+
+button.delete-button:not([disabled]):hover {
+    background-color: #D21400;
+}
+
+/* Стиль для неактивной кнопки */
+button.delete-button[disabled]:hover {
+    cursor: not-allowed;
+    background-color: #FF4500;
+}
+
+
 /* шапка таблицы - конец */
 
 

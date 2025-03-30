@@ -17,8 +17,8 @@
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="{% static 'js/checkboxes.js' %}"></script>
             <div class="buttons">
-                <button class="add-button" type="submit"><a href="{% url 'bank:credit_statement_add_detail' %}">Добавить запись</a></button>
-                <button class="delete-button" type="submit">Удалить выбранное</button>
+                <button class="add-button" onclick="window.location.href='{% url 'bank:credit_statement_add_detail' %}'">Добавить запись</button>
+                <button class="delete-button" type="submit" disabled title="Для удаления необходимо выбрать записи в таблице">Удалить выбранное</button>
             </div>
             <script src="{% static 'js/script.js' %}"></script>
             <select class="select-table" onchange="handleChange(this)">

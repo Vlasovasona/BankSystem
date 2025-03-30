@@ -49,6 +49,16 @@ button.save_button, button.delete-client {
     font-size: 14px; /* Увеличенный размер текста на кнопке */
 }
 
+button.back {
+    padding: 7px 15px; /* Увеличенные размеры кнопки */
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-size: 14px; /* Увеличенный размер текста на кнопке */
+}
+
 button.save_button:hover {
     background-color: #FF4500;
 }

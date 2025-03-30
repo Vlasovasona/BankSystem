@@ -11,6 +11,7 @@
 </head>
 <body>
     {% block content %}
+    <button class="back" onclick="window.location.href='/bank/credit_types/'">Назад</button>
     <form method="post">
         {% csrf_token %}
 

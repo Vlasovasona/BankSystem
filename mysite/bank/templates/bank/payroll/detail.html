@@ -11,6 +11,8 @@
 </head>
 <body>
     {% block content %}
+    <button class="back" onclick="window.location.href='/bank/payroll/'">Назад</button>
+
     <form method="post">
         {% csrf_token %}
         <input type="hidden" id="pay_id" name="pay_id" value="{{ pay.id }}">

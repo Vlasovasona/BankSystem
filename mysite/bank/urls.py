@@ -9,7 +9,7 @@ app_name = 'bank'
 urlpatterns = [
     # отображение всех таблиц из БД
     path('', views.ClientListView.as_view(), name='clients_list'),
-    path('clients/<int:id>/', views.client_detail, name='client_detail'),
+    path('c/<int:id>/', views.client_detail, name='client_detail'),
     path('clients/', views.ClientListView.as_view(), name='clients_list_select'),
     path('clients/search', views.search_clients, name='search_clients'),
 
@@ -29,6 +29,10 @@ urlpatterns = [
     path('delete-payroll/', views.delete_payroll, name='delete-payroll'),
     path('delete-credit-statement/', views.delete_credit_statement, name='delete-credit-statement'),
 
+    path('delete_single_client/', views.delete_single_client, name='delete_single_client'),
+    path('delete_single_statement/', views.delete_single_statement, name='delete_single_statement'),
+    path('delete_single_loan_type/', views.delete_single_loan_type, name='delete_single_loan_type'),
+    path('delete_single_payroll/', views.delete_single_payroll, name='delete_single_payroll'),
 
     # изменение записей в базе данных
     path('update-clients/', views.update_client_view, name='update_client_view'),

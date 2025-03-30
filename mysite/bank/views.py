@@ -138,6 +138,95 @@ def delete_clients(request):
 
         return JsonResponse({'success': True})
 
+
+def delete_single_client(request):
+    if request.method == 'POST':
+        # Десериализация JSON тела запроса
+        try:
+            data = json.loads(request.body)
+            client_id = data.get('client_id')  # Теперь получаем client_id из десериализованных данных
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Ошибка разбора JSON."}, status=400)
+
+        if client_id is not None:
+            try:
+                client = Clients.objects.get(id=int(client_id))
+                client.delete()
+                return JsonResponse({'success': True}, status=200)
+            except Clients.DoesNotExist:
+                return JsonResponse({'error': f"Клиента с ID {client_id} не существует."}, status=404)
+            except ValueError:
+                return JsonResponse({'error': f"Передано неверное значение ID: {client_id}."}, status=400)
+        else:
+            return JsonResponse({'error': "Не найден параметр 'client_id'."}, status=400)
+    return JsonResponse({}, status=405)
+
+def delete_single_statement(request):
+    if request.method == 'POST':
+        # Десериализация JSON тела запроса
+        try:
+            data = json.loads(request.body)
+            credit_state_id = data.get('credit_state_id')  # Теперь получаем client_id из десериализованных данных
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Ошибка разбора JSON."}, status=400)
+
+        if credit_state_id is not None:
+            try:
+                state = CreditStatement.objects.get(id=int(credit_state_id))
+                state.delete()
+                return JsonResponse({'success': True}, status=200)
+            except CreditStatement.DoesNotExist:
+                return JsonResponse({'error': f"Договора с ID {credit_state_id} не существует."}, status=404)
+            except ValueError:
+                return JsonResponse({'error': f"Передано неверное значение ID: {credit_state_id}."}, status=400)
+        else:
+            return JsonResponse({'error': "Не найден параметр 'credit_state_id'."}, status=400)
+    return JsonResponse({}, status=405)
+
+def delete_single_loan_type(request):
+    if request.method == 'POST':
+        # Десериализация JSON тела запроса
+        try:
+            data = json.loads(request.body)
+            loan_type_id = data.get('credit_type_id')  # Теперь получаем client_id из десериализованных данных
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Ошибка разбора JSON."}, status=400)
+
+        if loan_type_id is not None:
+            try:
+                type = LoanTypes.objects.get(id=int(loan_type_id))
+                type.delete()
+                return JsonResponse({'success': True}, status=200)
+            except LoanTypes.DoesNotExist:
+                return JsonResponse({'error': f"Договора с ID {loan_type_id} не существует."}, status=404)
+            except ValueError:
+                return JsonResponse({'error': f"Передано неверное значение ID: {loan_type_id}."}, status=400)
+        else:
+            return JsonResponse({'error': "Не найден параметр 'loan_type_id'."}, status=400)
+    return JsonResponse({}, status=405)
+
+def delete_single_payroll(request):
+    if request.method == 'POST':
+        # Десериализация JSON тела запроса
+        try:
+            data = json.loads(request.body)
+            pay_id = data.get('pay_id')  # Теперь получаем client_id из десериализованных данных
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Ошибка разбора JSON."}, status=400)
+
+        if pay_id is not None:
+            try:
+                pay = Payroll.objects.get(id=int(pay_id))
+                pay.delete()
+                return JsonResponse({'success': True}, status=200)
+            except Payroll.DoesNotExist:
+                return JsonResponse({'error': f"Платежа с ID {pay_id} не существует."}, status=404)
+            except ValueError:
+                return JsonResponse({'error': f"Передано неверное значение ID: {pay_id}."}, status=400)
+        else:
+            return JsonResponse({'error': "Не найден параметр 'pay_id'."}, status=400)
+    return JsonResponse({}, status=405)
+
 def delete_credit_type(request):
     """Осуществление удаления списка типов кредита у которых активирован чекбокс."""
     if request.method == 'POST':

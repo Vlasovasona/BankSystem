@@ -3,6 +3,29 @@ $(document).ready(function() {
     var updateUrl = $('[data-update-url]').data('update-url');
     var csrftoken = $('[name=csrfmiddlewaretoken]').val();
 
+    $('.delete-client').on('click', function(event) {
+        event.preventDefault();
+
+        const credit_type_id = $('#credit_type_id').val(); // Получение id
+        const csrfToken = getCookie('csrftoken'); // Получение CSRF-токена
+        fetch('/bank/delete_single_loan_type/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                credit_type_id: credit_type_id
+            })
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/bank/credit_types';
+            } else {
+                alert('Ошибка при удалении типа кредита.');
+            }
+        });
+    });
+
     function validateForm() {
         let isValid = true;
 
@@ -76,3 +99,19 @@ $(document).ready(function() {
         }
     });
 });
+
+// Функция для получения CSRF-токена из cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

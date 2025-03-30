@@ -78,9 +78,7 @@
         <script src="{% static 'js/update_client.js' %}"></script>
         <div class="button-group">
             <button type="submit" class="save_button">Сохранить изменения</button>
-            <button type="submit" class="delete-client" onclick="window.location.href='{% url 'bank:client_add_detail' %}'>
-                Удалить запись
-            </button>
+            <button type="submit" class="delete-client">Удалить запись</button>
         </div>
     </form>
     {% endblock %}

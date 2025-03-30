@@ -3,10 +3,33 @@ $(document).ready(function() {
     var updateUrl = $('[data-update-url]').data('update-url');
     var csrftoken = $('[name=csrfmiddlewaretoken]').val();
 
+    $('.delete-client').on('click', function(event) {
+        event.preventDefault();
+
+        const credit_state_id = $('#credit_state_id').val(); // Получение id клиента
+        const csrfToken = getCookie('csrftoken'); // Получение CSRF-токена
+
+        fetch('/bank/delete_single_statement/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                credit_state_id: credit_state_id
+            })
+        }).then(response => {
+            if (response.ok) {
+                 window.location.href = '/bank/credit_statement';
+            } else {
+                alert('Ошибка при удалении кредитного договора.');
+            }
+        });
+    });
+
     function validateForm() {
         let isValid = true;
 
-//        const credit_statement_Id = document.getElementById('credit_state_id');
 
         const credit_statement_Id = document.querySelector('#credit_state_id');
 
@@ -140,3 +163,19 @@ $(document).ready(function() {
         }
     });
 });
+
+// Функция для получения CSRF-токена из cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

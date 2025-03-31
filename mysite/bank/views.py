@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 import json
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import CustomUserCreationForm, UpdateUserForm
+from .forms import CustomUserCreationForm
 
 
 class ClientListView(ListView):

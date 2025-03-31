@@ -11,20 +11,10 @@
 </head>
 <body>
     {% block content %}
-    <div data-delete-url="{% url 'bank:delete_users' %}"></div>
-        <div class="buttons-table-choose">
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="{% static 'js/checkboxes.js' %}"></script>
-            <div class="buttons">
-                <button class="delete-button" type="submit" disabled title="Для удаления необходимо выбрать записи в таблице">
-                    Удалить выбранное
-                </button>
-            </div>
-        </div>
+    <button class="back" onclick="window.location.href='/bank/personal_account/'">Назад</button>
         <table class="clients-table">
             <thead class="table-thead">
                 <tr>
-                    <th>Выбрать</th>
                     <th>Последний вход в систему</th>
                     <th>Логин</th>
                     <th>Имя</th>
@@ -38,7 +28,6 @@
             <tbody class="table-body">
                 {% for user in users %}
                     <tr>
-                        <td align="center"><input type="checkbox" name="table-checkbox" value="{{ user.username }}"></td>
                         <td align="center">{{ user.last_login }}</td>
                         <td align="center"><a href="{{ user.get_absolute_url }}">{{ user.username }}</a></td>
                         <td align="center">{{ user.first_name }}</td>

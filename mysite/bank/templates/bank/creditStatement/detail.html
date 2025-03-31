@@ -16,45 +16,61 @@
         {% csrf_token %}
         <input type="hidden" id="credit_state_id" name="credit_state_id" value="{{ credit_statement_item.id }}">
 
-        <label for="id_number_of_the_loan_agreement">Номер кредитного договора:</label>
-        <input type="text" name="my_field_number_of_the_loan_agreement" id="id_number_of_the_loan_agreement"
-               value="{{ credit_statement_item.number_of_the_loan_agreement }}" readonly required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_number_of_the_loan_agreement">Номер кредитного договора:</label>
+            <input type="text" name="my_field_number_of_the_loan_agreement" id="id_number_of_the_loan_agreement"
+                value="{{ credit_statement_item.number_of_the_loan_agreement }}" readonly required>
+            <span class="error-message" id="number-error"></span>
+        </div>
 
-        <label for="id_credit_amount">Сумма кредита:</label>
-        <input type="text" name="my_field_credit_amount" id="id_credit_amount"
-               value="{{ credit_statement_item.credit_amount }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_credit_amount">Сумма кредита:</label>
+            <input type="text" name="my_field_credit_amount" id="id_credit_amount"
+                value="{{ credit_statement_item.credit_amount }}" required>
+            <span class="error-message" id="amount-error"></span>
+        </div>
 
-        <label for="id_term_month">Срок кредита (мес.):</label>
-        <input type="text" name="my_term_month" id="id_term_month"
-               value="{{ credit_statement_item.term_month }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_term_month">Срок кредита (мес.):</label>
+            <input type="text" name="my_term_month" id="id_term_month"
+                value="{{ credit_statement_item.term_month }}" required>
+            <span class="error-message" id="month-error"></span>
+        </div>
 
-        <label for="id_monthly_payment">Ежемесячный платеж:</label>
-        <input type="text" name="my_field_monthly_payment" id="id_monthly_payment"
-               value="{{ credit_statement_item.monthly_payment }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_monthly_payment">Ежемесячный платеж:</label>
+            <input type="text" name="my_field_monthly_payment" id="id_monthly_payment"
+                   value="{{ credit_statement_item.monthly_payment }}" required>
+            <span class="error-message" id="payment-error"></span>
+        </div>
 
-        <label for="id_loan_opening_date">Дата открытия кредита:</label>
-        <input type="text" name="my_field_loan_opening_date" id="id_loan_opening_date"
-               value="{{ credit_statement_item.loan_opening_date|date:"Y-m-d" }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_loan_opening_date">Дата открытия кредита:</label>
+            <input type="text" name="my_field_loan_opening_date" id="id_loan_opening_date"
+                value="{{ credit_statement_item.loan_opening_date|date:"Y-m-d" }}" required>
+            <span class="error-message" id="open_date-error"></span>
+        </div>
 
-        <label for="id_repayment_status">Статус погашения кредита:</label>
-        <input type="text" name="my_field_repayment_status" id="id_repayment_status"
-               value="{{ credit_statement_item.repayment_status|yesno:"Да,Нет" }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_repayment_status">Статус погашения кредита:</label>
+            <input type="text" name="my_field_repayment_status" id="id_repayment_status"
+                   value="{{ credit_statement_item.repayment_status|yesno:"Да,Нет" }}" required>
+            <span class="error-message" id="repayment-error"></span>
+        </div>
 
-        <label for="id_loan_type">Тип кредита:</label>
-        <input type="text" name="my_field_loan_type" id="id_loan_type"
-               value="{{ credit_statement_item.loan_type.registration_number }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_loan_type">Тип кредита:</label>
+            <input type="text" name="my_field_loan_type" id="id_loan_type"
+                   value="{{ credit_statement_item.loan_type.registration_number }}" required>
+            <span class="error-message" id="loanType-error"></span>
+        </div>
 
-        <label for="id_client">Клиент:</label>
-        <input type="text" name="my_field_client" id="id_client"
-               value="{{ credit_statement_item.client.passport_serial_number }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_client">Клиент:</label>
+            <input type="text" name="my_field_client" id="id_client"
+                value="{{ credit_statement_item.client.passport_serial_number }}" required>
+            <span class="error-message" id="client-error"></span>
+        </div>
 
         <div class="button-group">
             <div data-update-url="{% url 'bank:update-credit-statement' %}"></div>

@@ -8,8 +8,7 @@ from django.http import JsonResponse
 import json
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import CustomUserCreationForm
-from datetime import datetime
-
+import re
 
 class ClientListView(ListView):
     queryset = Clients.objects.all()
@@ -289,19 +288,85 @@ def update_client_view(request):
     if request.method == 'POST':
         # Получаем данные
         client_id = request.POST.get('client_id')
+
+        errors = {}
+        # Валидируем каждое поле
         passport = request.POST.get('my_field_passport')
+        if not re.match(r'\d{10}', passport):
+            errors['passport'] = 'Серия и номер паспорта'
+
         surname = request.POST.get('my_field_surname')
+        if not re.match(r'^[А-ЯЁа-яё ]+$', surname):
+            errors['surname'] = 'Фамилия может состоять только из русских букв!'
+
         name = request.POST.get('my_field_name')
+        if not re.match(r'^[А-ЯЁа-яё ]+$', name):
+            errors['name'] = 'Имя может состоять только из русских букв!'
+
         patronymic = request.POST.get('my_field_patronymic')
-        address = request.POST.get('my_field_adress')
+        if not re.match(r'^[А-ЯЁа-яё ]+$', patronymic):
+            errors['patronymic'] = 'Отчество может состоять только из русских букв!'
+
+        adress = request.POST.get('my_field_adress')
+
         phone_number = request.POST.get('my_field_phone')
+        if not re.match(r'^8[0-9]{10}$', phone_number):
+            errors['phone'] = 'Номер телефона должен начинаться с 8 и состоять из 11 цифр'
+
         age = request.POST.get('my_field_age')
+        if not isinstance(age, str):
+            errors['age'] = 'Поле возраста должно содержать строку.'
+        elif not age.isdigit():
+            # Если введено не число, сообщаем об ошибке
+            errors['age'] = 'Возраст должен быть числовым значением.'
+        else:
+            # Преобразуем возраст в целое число
+            age_int = int(age)
+
+            # Проверяем диапазон допустимых значений
+            if not (18 <= age_int < 100):
+                errors['age'] = 'Возраст должен быть целым числом от 18 до 99.'
+
         sex = request.POST.get('my_field_sex')
+        if not isinstance(sex, str):
+            errors['sex'] = 'Обязательно для заполнения.'
+        if not (sex == 'Мужской' or sex == 'Женский'):
+            errors['sex'] = 'Допустимы только значения Мужской/Женский'
+
         flag_own_car = request.POST.get('my_field_flag_own_car')
+        if not isinstance(flag_own_car, str):
+            errors['car'] = 'Обязательно для заполнения.'
+        if not (flag_own_car == 'Да' or flag_own_car == 'Нет'):
+            errors['car'] = 'Допустимы только значения Да/Нет'
+
         flag_own_property = request.POST.get('my_flag_own_property')
+        if not isinstance(flag_own_property, str):
+            errors['property'] = 'Обязательно для заполнения.'
+        if not (flag_own_property == 'Да' or flag_own_property == 'Нет'):
+            errors['property'] = 'Допустимы только значения Да/Нет'
+
         month_income = request.POST.get('my_field_month_income')
+        if not isinstance(month_income, str):
+            errors['income'] = 'Обязательно для заполнения.'
+        elif not month_income.isdigit():
+            # Если введено не число, сообщаем об ошибке
+            errors['income'] = 'Доход должен быть целым положительным числом.'
+
         count_children = request.POST.get('my_field_count_children')
+        if not isinstance(count_children, str):
+            errors['children'] = 'Обязательно для заполнения.'
+        elif not count_children.isdigit():
+            # Если введено не число, сообщаем об ошибке
+            errors['children'] = 'Количество детей должно быть целым неотрицательным числом.'
+
         education_type = request.POST.get('my_field_education_type')
+        if not isinstance(education_type, str):
+            errors['education'] = 'Обязательно для заполнения.'
+        if not (education_type == 'Высшее' or education_type == 'Среднее специальное'):
+            errors['education'] = 'Допустимы только значения Высшее/Среднее специальное'
+
+        if errors:
+            return JsonResponse({'errors': errors})
 
         try:
             client = Clients.objects.get(pk=client_id)
@@ -310,7 +375,7 @@ def update_client_view(request):
             client.surname = surname
             client.name = name
             client.patronymic = patronymic
-            client.address = address
+            client.address = adress
             client.phone_number = phone_number
             client.age = age
             client.sex = sex
@@ -437,23 +502,88 @@ def add_new_client(request):
     """Осуществление добавления клиента в БД."""
     if request.method == 'POST':
         # Получаем данные
+
+        errors = {}
+        # Валидируем каждое поле
         passport = request.POST.get('my_field_passport')
+        if not re.match(r'\d{10}', passport):
+            errors['passport'] = 'Серия и номер паспорта'
+
         surname = request.POST.get('my_field_surname')
+        if not re.match(r'^[А-ЯЁа-яё ]+$', surname):
+            errors['surname'] = 'Фамилия может состоять только из русских букв!'
+
         name = request.POST.get('my_field_name')
+        if not re.match(r'^[А-ЯЁа-яё ]+$', name):
+            errors['name'] = 'Имя может состоять только из русских букв!'
+
         patronymic = request.POST.get('my_field_patronymic')
+        if not re.match(r'^[А-ЯЁа-яё ]+$', patronymic):
+            errors['patronymic'] = 'Отчество может состоять только из русских букв!'
+
         adress = request.POST.get('my_field_adress')
+
         phone_number = request.POST.get('my_field_phone')
+        if not re.match(r'^8[0-9]{10}$', phone_number):
+            errors['phone'] = 'Номер телефона должен начинаться с 8 и состоять из 11 цифр'
+
         age = request.POST.get('my_field_age')
+        if not isinstance(age, str):
+            errors['age'] = 'Поле возраста должно содержать строку.'
+        elif not age.isdigit():
+            # Если введено не число, сообщаем об ошибке
+            errors['age'] = 'Возраст должен быть числовым значением.'
+        else:
+            # Преобразуем возраст в целое число
+            age_int = int(age)
+
+            # Проверяем диапазон допустимых значений
+            if not (18 <= age_int < 100):
+                errors['age'] = 'Возраст должен быть целым числом от 18 до 99.'
+
         sex = request.POST.get('my_field_sex')
+        if not isinstance(sex, str):
+            errors['sex'] = 'Обязательно для заполнения.'
+        if not (sex == 'Мужской' or sex == 'Женский'):
+            errors['sex'] = 'Допустимы только значения Мужской/Женский'
+
         flag_own_car = request.POST.get('my_field_flag_own_car')
+        if not isinstance(flag_own_car, str):
+            errors['car'] = 'Обязательно для заполнения.'
+        if not (flag_own_car == 'Да' or flag_own_car == 'Нет'):
+            errors['car'] = 'Допустимы только значения Да/Нет'
+
         flag_own_property = request.POST.get('my_flag_own_property')
+        if not isinstance(flag_own_property, str):
+            errors['property'] = 'Обязательно для заполнения.'
+        if not (flag_own_property == 'Да' or flag_own_property == 'Нет'):
+            errors['property'] = 'Допустимы только значения Да/Нет'
+
         month_income = request.POST.get('my_field_month_income')
+        if not isinstance(month_income, str):
+            errors['income'] = 'Обязательно для заполнения.'
+        elif not month_income.isdigit():
+            # Если введено не число, сообщаем об ошибке
+            errors['income'] = 'Доход должен быть целым положительным числом.'
+
         count_children = request.POST.get('my_field_count_children')
+        if not isinstance(count_children, str):
+            errors['children'] = 'Обязательно для заполнения.'
+        elif not count_children.isdigit():
+            # Если введено не число, сообщаем об ошибке
+            errors['children'] = 'Количество детей должно быть целым неотрицательным числом.'
+
         education_type = request.POST.get('my_field_education_type')
+        if not isinstance(education_type, str):
+            errors['education'] = 'Обязательно для заполнения.'
+        if not (education_type == 'Высшее' or education_type == 'Среднее специальное'):
+            errors['education'] = 'Допустимы только значения Высшее/Среднее специальное'
 
-        if Clients.objects.filter(passport_serial_number=passport).exists():
-            return JsonResponse({'success': False, 'error': "Клиент с такими паспортными данными уже существует!"})
 
+        if re.match(r'\d{10}', passport) and Clients.objects.filter(passport_serial_number=passport).exists():
+            errors['passport'] = 'Клиент с такими паспортными данными существует!'
+        if errors:
+            return JsonResponse({'errors': errors})
         try:
             # Создаем нового клиента
             client = Clients(

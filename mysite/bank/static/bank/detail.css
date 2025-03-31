@@ -37,6 +37,7 @@ input[type="text"] { /* Увеличенные размеры полей вво�
     font-size: 16px; /* Размер шрифта в полях */
     border: 1px solid #ccc; /* Тонкая граница серого цвета */
     border-radius: 5px; /* Округлые углы полей */
+    margin-bottom: 10px;
 }
 
 button.save_button, button.delete-client {
@@ -65,4 +66,25 @@ button.save_button:hover {
 
 button.delete-client:hover {
     background-color: #D21400;
+}
+
+/* Стили для ошибок */
+
+.field-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Расстояние между полями */
+}
+
+/* Стиль для сообщений об ошибках */
+.error-message {
+    color: red;           /* Красный цвет текста */
+    font-size: 16px;      /* Размер шрифта */
+    margin-left: 5px;
+}
+
+
+label {
+    min-width: 150px;     /* Минимальная ширина метки */
+    margin-right: 10px;   /* Отступ между меткой и полем */
 }

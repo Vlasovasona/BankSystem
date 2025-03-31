@@ -1,13 +1,13 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Clients, CreditStatement, LoanTypes, Payroll
+from .models import Clients, CreditStatement, LoanTypes, Payroll, AuthUser
 from django.views.generic import ListView
 from django.db.models import Q
 from django.http import JsonResponse
 import json
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, UpdateUserForm
 
 
 class ClientListView(ListView):
@@ -574,7 +574,6 @@ def add_new_credit_statement(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-
 # def register_view(request):
 #     if request.method == 'POST': # если запрос POST, то пользователь передает данные для регистрации, создаем новую учетную запись
 #         form = UserCreationForm(request.POST) # встроенная форма Django для регистрации пользователя
@@ -608,8 +607,7 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()  # Сохраняет нового пользователя с указанным email и статусом staff
-            login(request, user)
-            return redirect('/bank/clients/')
+            return redirect('/bank/personal_account/')
     else:
         form = CustomUserCreationForm()
 
@@ -649,3 +647,93 @@ def personal_account(request):
         return render(request, 'bank/accounts/admin_account.html', context)
     else:
         return render(request, 'bank/accounts/regular.html', context)
+
+def delete_users(request):
+    """Осуществление удаления списка юзеров у которых активирован чекбокс."""
+    if request.method == 'POST':
+        # Получение списка идентификаторов из POST-запроса
+        ids_json = request.POST.get('ids', None)
+
+        # Преобразование JSON-строки в список идентификаторов
+        if ids_json:
+            try:
+                ids = json.loads(ids_json)
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+
+        # Удаление записей из базы данных
+        AuthUser.objects.filter(id__in=ids).delete()
+
+        return JsonResponse({'success': True})
+
+class UsersListView(ListView):
+    queryset = AuthUser.objects.all()
+    context_object_name = 'users'
+    paginate_by = 10
+    template_name = 'bank/accounts/admin_capabilities/users_list.html'
+
+def user_detail(request, username):
+    user = get_object_or_404(AuthUser, username=username)
+    context = {
+        'user': user,
+    }
+    return render(request, 'bank/accounts/admin_capabilities/users_detail.html', context)
+
+def update_user(request):
+    """Осуществление изменение платежа в БД."""
+    if request.method == 'POST':
+        # Получаем данные
+        username = request.POST.get('my_field_login')
+        first_name = request.POST.get('my_field_name')
+        last_name = request.POST.get('my_field_last_name')
+        email = request.POST.get('my_field_email')
+        is_staff = request.POST.get('my_field_is_staff')
+        is_active = request.POST.get('my_field_is_active')
+
+        try:
+            user = AuthUser.objects.get(username=username)
+        except AuthUser.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': f'Пользователь с логином {username} не найден.'
+            })
+
+        try:
+            user = AuthUser.objects.get(username=username)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.is_staff = 1 if is_staff == "Да" else 0
+            user.is_active = 1 if is_active == "Да" else 0
+            user.save()
+            return JsonResponse({'success': True})
+
+        except Payroll.DoesNotExist:
+            return JsonResponse({'success': False, 'error': f'Пользователь {username} не найден.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def delete_single_user(request):
+    if request.method == 'POST':
+        # Десериализация JSON тела запроса
+        try:
+            data = json.loads(request.body)
+            username = data.get('my_field_login')  # Теперь получаем client_id из десериализованных данных
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Ошибка разбора JSON."}, status=400)
+
+        if username is not None:
+            try:
+                user = AuthUser.objects.get(username=username)
+                user.delete()
+                return JsonResponse({'success': True}, status=200)
+            except AuthUser.DoesNotExist:
+                return JsonResponse({'error': f"Пользователя с ID {username} не существует."}, status=404)
+            except ValueError:
+                return JsonResponse({'error': f"Передано неверное значение ID: {username}."}, status=400)
+        else:
+            return JsonResponse({'error': "Не найден параметр 'username'."}, status=400)
+    return JsonResponse({}, status=405)
+

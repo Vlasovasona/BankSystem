@@ -59,4 +59,9 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'), # пока что не сделала
     path('login/', views.login_view, name='login'),
     path('personal_account/', views.personal_account, name='personal_account'),
+    path('delete-users/', views.delete_users, name='delete_users'),
+    path('users/', views.UsersListView.as_view(), name='users_list'),
+    path('users/<str:username>/', views.user_detail, name='users_detail'),
+    path('delete_single_user/', views.delete_single_user, name='delete_single_user'),
+    path('update-user/', views.update_user, name='update_user'),
 ]

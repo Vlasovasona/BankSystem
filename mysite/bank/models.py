@@ -51,6 +51,9 @@ class AuthUser(models.Model):
     is_active = models.IntegerField()
     date_joined = models.DateTimeField()
 
+    def get_absolute_url(self):
+        return reverse('bank:users_detail', args=[self.username])
+
     class Meta:
         managed = False
         db_table = 'auth_user'

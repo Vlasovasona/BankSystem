@@ -1,10 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block title %}My bank{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/list.css' %}" rel="stylesheet">
+    {% endblock %}
 </head>
 <body>
-
+    {% block content %}
+    <div data-delete-url="{% url 'bank:delete_users' %}"></div>
+        <div class="buttons-table-choose">
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="{% static 'js/checkboxes.js' %}"></script>
+            <div class="buttons">
+                <button class="delete-button" type="submit" disabled title="Для удаления необходимо выбрать записи в таблице">
+                    Удалить выбранное
+                </button>
+            </div>
+        </div>
+        <table class="clients-table">
+            <thead class="table-thead">
+                <tr>
+                    <th>Выбрать</th>
+                    <th>Последний вход в систему</th>
+                    <th>Логин</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th>Почта</th>
+                    <th>Администратор</th>
+                    <th>Активен?</th>
+                    <th>Дата регистрации</th>
+                </tr>
+            </thead>
+            <tbody class="table-body">
+                {% for user in users %}
+                    <tr>
+                        <td align="center"><input type="checkbox" name="table-checkbox" value="{{ user.username }}"></td>
+                        <td align="center">{{ user.last_login }}</td>
+                        <td align="center"><a href="{{ user.get_absolute_url }}">{{ user.username }}</a></td>
+                        <td align="center">{{ user.first_name }}</td>
+                        <td align="center">{{ user.last_name }}</td>
+                        <td align="center">{{ user.email }}</td>
+                        <td align="center">
+                            {% if user.is_staff == 1 %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+                        <td align="center">
+                            {% if user.is_active == 1 %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+                        <td align="center">{{ user.date_joined }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Нет данных о пользователях.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            {% include "pagination.html" with page=page_obj %}
+        {% endif %}
+    {% endblock %}
 </body>
 </html>
+
+
+
+

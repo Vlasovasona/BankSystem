@@ -1,10 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block title %}User{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/detail.css' %}" rel="stylesheet">
+    {% endblock %}
 </head>
 <body>
+    {% block content %}
+    <button class="back" onclick="window.location.href='/bank/personal_account/'">Назад</button>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="my_field_login">Логин:</label>
+        <input type="text" name="my_field_login" id="my_field_login" value="{{ user.username }}" readonly required><br>
+        <br />
 
+        <label for="id_last_login">Последний вход в систему:</label>
+        <input type="text" name="my_field_last_login" id="id_last_login" value="{{ user.last_login }}" readonly required><br>
+        <br />
+
+        <label for="id_name">Имя:</label>
+        <input type="text" name="my_field_name" id="id_name" value="{{ user.first_name }}"><br>
+        <br />
+
+        <label for="id_last_name">Фамилия:</label>
+        <input type="text" name="my_field_last_name" id="id_last_name" value="{{ user.last_name }}"><br>
+        <br />
+
+        <label for="id_email">Почта:</label>
+        <input type="text" class="adress-label" name="my_field_email" id="id_email" value="{{ user.email }}"><br>
+        <br />
+
+        <label for="id_is_staff">Статус администратора:</label>
+        <input type="text" name="my_field_is_staff" id="id_is_staff"
+               value="{{ user.is_staff|yesno:'Да,Нет' }}"
+                /><br />
+        <br />
+
+        <label for="id_is_active">Активен:</label>
+        <input type="text" name="my_field_is_active" id="id_is_active"
+               value="{{ user.is_active|yesno:'Да,Нет' }}"
+               required /><br />
+        <br />
+
+        <label for="id_date_joined">Дата регистрации:</label>
+        <input type="text" name="my_field_date_joined" id="id_date_joined" value="{{ user.date_joined }}" readonly required><br>
+        <br />
+        <div data-update-url="{% url 'bank:update_user' %}"></div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'js/update_user.js' %}"></script>
+        <div class="button-group">
+            <button type="submit" class="save_button">Сохранить изменения</button>
+            <button type="submit" class="delete-client">Удалить запись</button>
+        </div>
+    </form>
+    {% endblock %}
 </body>
 </html>
+
+
+

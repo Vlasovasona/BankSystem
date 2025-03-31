@@ -8,6 +8,7 @@ from django.http import JsonResponse
 import json
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import CustomUserCreationForm
+from datetime import datetime
 
 
 class ClientListView(ListView):
@@ -28,7 +29,6 @@ def client_detail(request, id):
     }
     return render(request, 'bank/clients/detail.html', context)
 
-
 class CreditTypesListView(ListView):
     queryset = LoanTypes.objects.all()
     context_object_name = 'credit_types'
@@ -45,7 +45,6 @@ def credit_type_detail(request, id):
         'credit_type': credit_type,
     }
     return render(request, 'bank/creditTypes/detail.html', context)
-
 
 class CreditStatementListView(ListView):
     queryset = CreditStatement.objects.all()
@@ -117,7 +116,6 @@ def search_clients(request):
     else:
         return render(request, 'bank/clients/list.html')
 
-
 def delete_clients(request):
     """Осуществление удаления списка клиентов у которых активирован чекбокс."""
     if request.method == 'POST':
@@ -137,7 +135,6 @@ def delete_clients(request):
         Clients.objects.filter(id__in=ids).delete()
 
         return JsonResponse({'success': True})
-
 
 def delete_single_client(request):
     if request.method == 'POST':
@@ -454,6 +451,9 @@ def add_new_client(request):
         count_children = request.POST.get('my_field_count_children')
         education_type = request.POST.get('my_field_education_type')
 
+        if Clients.objects.filter(passport_serial_number=passport).exists():
+            return JsonResponse({'success': False, 'error': "Клиент с такими паспортными данными уже существует!"})
+
         try:
             # Создаем нового клиента
             client = Clients(
@@ -485,6 +485,9 @@ def add_new_loan_type(request):
         name_of_the_type = request.POST.get('my_field_credit_type_name')
         interest_rate = request.POST.get('my_field_credit_percent')
 
+        if LoanTypes.objects.filter(registration_number=registration_number).exists():
+            return JsonResponse({'success': False, 'error': "Тип кредита с таким регистрационным номером уже существует"})
+
         try:
             credit_type = LoanTypes(
                 registration_number = registration_number,
@@ -508,6 +511,9 @@ def add_new_payroll(request):
         try:
             # Попытка получения объекта CreditStatement
             loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
+            if Payroll.objects.filter(loan=loan, payment_date=payment_date).exists():
+                return JsonResponse(
+                    {'success': False, 'error': "Для этого кредита в эту дату уже был внесен платеж!"})
         except CreditStatement.DoesNotExist:
             return JsonResponse({
                 'success': False,
@@ -538,6 +544,10 @@ def add_new_credit_statement(request):
         repayment_status = request.POST.get('my_field_repayment_status')
         loan_type = request.POST.get('my_field_loan_type')
         client_passport = request.POST.get('my_field_client')
+
+        if CreditStatement.objects.filter(number_of_the_loan_agreement=number_of_the_loan_agreement).exists():
+            return JsonResponse(
+                {'success': False, 'error': "Кредит с таким номером договора уже существует"})
 
         try:
             # Попытка получения объекта LoanType
@@ -573,19 +583,6 @@ def add_new_credit_statement(request):
 
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-
-# def register_view(request):
-#     if request.method == 'POST': # если запрос POST, то пользователь передает данные для регистрации, создаем новую учетную запись
-#         form = UserCreationForm(request.POST) # встроенная форма Django для регистрации пользователя
-#         if form.is_valid():
-#             user = form.save()
-#             login(request, user)
-#             return redirect('/bank/clients/') # Переадресация после успешной регистрации
-#     else: # если метод GET - значит, нужно отобразить пустую страницу для заполнения пользователем регистрационных полей
-#         form = UserCreationForm()
-#
-#     context = {'form': form} # передаем форму в html-шаблон для отображения
-#     return render(request, 'bank/registrationPage.html', context)
 
 def add_new_user(request):
     """Осуществление регистрации нового юзера."""

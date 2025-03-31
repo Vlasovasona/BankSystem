@@ -130,7 +130,7 @@ $(document).ready(function() {
             const monthIncome = $('#id_month_income').val();
             const countChildren = $('#id_count_children').val();
             const educationType = $('#id_education_type').val();
-
+            console.log(passport, surname, name, age)
             // Создаем объект для отправки
             const data = new URLSearchParams();
             if ( document.querySelector('#client_id') != null){

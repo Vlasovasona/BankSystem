@@ -1,38 +1,45 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const createReportButton = document.querySelector('.create_report');
     var updateUrl = $('[data-update-url]').data('update-url');
-    if (createReportButton) {
 
-        createReportButton.addEventListener('click', function(event) {
+    if (createReportButton) {
+        createReportButton.addEventListener('click', async function (event) {
             event.preventDefault();
 
             // Получаем значения отмеченных чекбоксов
             const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
             let selectedTables = [];
 
-            checkedCheckboxes.forEach(function(checkbox) {
+            checkedCheckboxes.forEach((checkbox) => {
                 selectedTables.push(checkbox.value);
             });
-            console.log(selectedTables)
+
             // Отправляем данные на сервер методом POST
-            fetch(updateUrl, {
+            const response = await fetch(updateUrl, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    tables: selectedTables
-                })
-            }).then(response => response.json())
-              .then(data => {
-                  console.log(data); // Логируем результат для отладки
-                  alert("Ваш отчет был успешно сформирован.");
-              })
-              .catch(error => {
-                  console.error('Ошибка:', error);
-                  alert("Произошла ошибка при формировании отчета.");
-              });
+                body: JSON.stringify({ tables: selectedTables }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Network response was not ok (${response.status})`);
+            }
+
+            // Получаем двоичные данные (blob) и инициируем скачивание
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'report.pdf'; // Устанавливаем название файла для скачивания
+            document.body.appendChild(link);
+            link.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+
+            alert("Ваш отчет был успешно сформирован.");
         });
     }
 });

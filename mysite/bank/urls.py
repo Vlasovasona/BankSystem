@@ -64,4 +64,8 @@ urlpatterns = [
     path('users/<str:username>/', views.user_detail, name='users_detail'),
     path('delete_single_user/', views.delete_single_user, name='delete_single_user'),
     path('update-user/', views.update_user, name='update_user'),
+
+    # urls для страниц отчетов
+    path('reports_main_page/', views.show_reports_main_page, name='reports_main_page'),
+    path('create_report/', views.create_report, name='create_report'),
 ]

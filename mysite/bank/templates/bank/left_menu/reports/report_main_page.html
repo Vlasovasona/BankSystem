@@ -1,0 +1,42 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Reports{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/account.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+    <h1 class="title">Отчеты</h1>
+    <p class="is_admin">Выберите, какие таблицы нужно включить в отчет формата pdf:</p>
+
+    <div class="table-checkboxes">
+        <div class="checkbox-item">
+            <input type="checkbox" id="clients-checkbox" name="clients-checkbox" value="Clients">
+            <label for="clients-checkbox">Клиенты</label>
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox" id="loanType-checkbox" name="loanType-checkbox" value="LoanTypes">
+            <label for="loanType-checkbox">Виды кредитов</label>
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox" id="statement-checkbox" name="statement-checkbox" value="CreditStatement">
+            <label for="statement-checkbox">Кредитная ведомость</label>
+        </div>
+    </div>
+    <p class="is_admin">Выберите, какие графики нужно включить в отчет:</p>
+    <div class="graph-checkboxes">
+    </div>
+    <div class="admin_buttons">
+        <div data-update-url="{% url 'bank:create_report' %}"></div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'js/report.js' %}"></script>
+        <button class="create_report">Сформировать отчет</button>
+    </div>
+{% endblock %}
+</body>
+</html>

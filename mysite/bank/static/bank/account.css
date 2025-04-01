@@ -42,7 +42,7 @@
     border-top-left-radius: 8px; /* Скругление верхнего левого угла */
 }
 
-.add_new_user, .watch_users_table {
+.add_new_user, .watch_users_table, .create_report {
     padding: 10px 20px;     /* Настраиваем размер кнопок */
     cursor: pointer;        /* Курсор меняется на указатель при наведении */
     border: none;           /* Убираем стандартные границы */
@@ -53,7 +53,21 @@
     border-radius: 5px;      /* Скругленные углы кнопок */
 }
 
-button.add_new_user:hover, button.watch_users_table:hover {
+button.add_new_user:hover, button.watch_users_table:hover, button.create_report:hover {
     background-color: #BF6D30; /* Более темный оранжевый при наведении */
+}
+
+.table-checkboxes .checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px; /* Отступ между чекбоксами */
+}
+
+.table-checkboxes input[type="checkbox"] {
+    margin-right: 10px; /* Отступ между чекбоксом и подписью */
+}
+
+.is_admin {
+    margin-bottom: 5px;
 }
 

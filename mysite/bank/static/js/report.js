@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'report.pdf'; // Устанавливаем название файла для скачивания
+            link.download = 'report.pdf';
             document.body.appendChild(link);
             link.click();
             window.URL.revokeObjectURL(url);

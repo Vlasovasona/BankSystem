@@ -397,9 +397,28 @@ def update_loan_type(request):
     if request.method == 'POST':
         # Получаем данные
         credit_type_id = request.POST.get('credit_type_id')
+        errors = {}
         registration_number = request.POST.get('my_field_credit_type_code')
+        if not isinstance(registration_number, str):
+            errors['credit_types'] = 'Регистрационный номер обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not registration_number.isdigit() or int(registration_number) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['credit_types'] = 'Ргеистрационный номер должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         name_of_the_type = request.POST.get('my_field_credit_type_name')
+        if not isinstance(name_of_the_type, str):
+            errors['name'] = 'Название типа кредита обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+
         interest_rate = request.POST.get('my_field_credit_percent')
+        if not isinstance(interest_rate, str):
+            errors['percent'] = 'Поле обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not is_positive_number(interest_rate):
+            errors['percent'] = 'Процентная ставка должна быть положительным числом.'
+            return JsonResponse({'success': False, 'errors': errors})
 
         try:
             credit_type = LoanTypes.objects.get(pk=credit_type_id)
@@ -686,16 +705,47 @@ def add_new_client(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+def is_positive_number(value):
+    try:
+        float_value = float(value)
+        if float_value > 0:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+
 def add_new_loan_type(request):
     """Осуществление добавления типа кредита в БД."""
     if request.method == 'POST':
         # Получаем данные
+        errors = {}
         registration_number = request.POST.get('my_field_credit_type_code')
-        name_of_the_type = request.POST.get('my_field_credit_type_name')
-        interest_rate = request.POST.get('my_field_credit_percent')
+        if not isinstance(registration_number, str):
+            errors['credit_types'] = 'Регистрационный номер обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not registration_number.isdigit() or int(registration_number) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['credit_types'] = 'Ргеистрационный номер должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
-        if LoanTypes.objects.filter(registration_number=registration_number).exists():
-            return JsonResponse({'success': False, 'error': "Тип кредита с таким регистрационным номером уже существует"})
+        name_of_the_type = request.POST.get('my_field_credit_type_name')
+        if not isinstance(name_of_the_type, str):
+            errors['name'] = 'Название типа кредита обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+
+        interest_rate = request.POST.get('my_field_credit_percent')
+        if not isinstance(interest_rate, str):
+            errors['percent'] = 'Поле обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not is_positive_number(interest_rate):
+            errors['percent'] = 'Процентная ставка должна быть положительным числом.'
+            return JsonResponse({'success': False, 'errors': errors})
+
+        if 'credit_types' not in errors:
+            if LoanTypes.objects.filter(registration_number=registration_number).exists():
+                errors['credit_types'] = "Тип кредита с таким регистрационным номером уже существует"
+                return JsonResponse({'success': False, 'errors': errors})
 
         try:
             credit_type = LoanTypes(

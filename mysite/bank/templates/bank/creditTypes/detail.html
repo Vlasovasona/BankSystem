@@ -12,24 +12,31 @@
 <body>
     {% block content %}
     <button class="back" onclick="window.location.href='/bank/credit_types/'">Назад</button>
+
     <form method="post">
         {% csrf_token %}
         <input type="hidden" id="credit_type_id" name="credit_type_id" value="{{ credit_type.id }}">
 
-        <label for="id_credit_type_code">Регистрационный номер типа кредита:</label>
-        <input type="text" name="my_field_credit_type_code" id="id_credit_type_code"
-               value="{{ credit_type.registration_number }}" readonly required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_credit_type_code">Регистрационный номер типа кредита:</label>
+            <input type="text" name="my_field_credit_type_code" id="id_credit_type_code"
+                   value="{{ credit_type.registration_number }}" readonly required>
+            <span class="error-message" id="credit_types-error"></span>
+        </div>
 
-        <label for="id_credit_type_name">Название:</label>
-        <input type="text" name="my_field_credit_type_name" id="id_credit_type_name"
-               value="{{ credit_type.name_of_the_type }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_credit_type_name">Название:</label>
+            <input type="text" name="my_field_credit_type_name" id="id_credit_type_name"
+                value="{{ credit_type.name_of_the_type }}" required>
+            <span class="error-message" id="name-error"></span>
+        </div>
 
-        <label for="id_credit_percent">Процентная ставка:</label>
-        <input type="text" name="my_field_credit_percent"
-               id="id_credit_percent" value="{{ credit_type.interest_rate }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_credit_percent">Процентная ставка:</label>
+            <input type="text" name="my_field_credit_percent"
+                   id="id_credit_percent" value="{{ credit_type.interest_rate }}" required>
+            <span class="error-message" id="percent-error"></span>
+        </div>
 
 
         <div class="button-group">
@@ -39,7 +46,6 @@
             <button type="submit" class="save_button">Сохранить изменения</button>
             <button type="submit" class="delete-client">Удалить запись</button>
         </div>
-
     </form>
     {% endblock %}
 

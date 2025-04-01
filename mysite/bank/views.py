@@ -439,9 +439,52 @@ def update_payroll(request):
     if request.method == 'POST':
         # Получаем данные
         pay_id = request.POST.get('pay_id')
+        errors = {}
         loan_id = request.POST.get('my_field_loan')
+        if not isinstance(loan_id, str):
+            errors['loan'] = 'Номер договора обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not loan_id.isdigit() or int(loan_id) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['loan'] = 'Номер договора должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         payment_date = request.POST.get('my_field_payment_date')
+        date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+
+        match = re.match(date_pattern, payment_date)
+        if not isinstance(payment_date, str) or not match:
+            errors['date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
+            return JsonResponse({'success': False, 'errors': errors})
+        else:
+            year, month, day = map(int, match.groups())
+            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
+            if not (1950 <= year <= 2025):
+                errors['date'] = f'Год должен быть между 1950 и 2025, введён {year}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности месяца (от 1 до 12)
+            if not (1 <= month <= 12):
+                errors['date'] = f'Месяц должен быть между 1 и 12, введён {month}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности дня (от 1 до 31)
+            if not (1 <= day <= 31):
+                errors['date'] = f'День должен быть между 1 и 31, введён {day}'
+                return JsonResponse({'success': False, 'errors': errors})
+
         payment_status = request.POST.get('my_field_payment_status')
+        if not isinstance(payment_status, str):
+            errors['status'] = 'Обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        if not (payment_status == 'X' or payment_status == 'C' or (payment_status.isdigit() and 0<=int(payment_status)<=5)):
+            errors['status'] = 'Допустимы только значения X, C или число от 0 до 5'
+            return JsonResponse({'success': False, 'errors': errors})
+
+        try:
+            # Попытка получения объекта CreditStatement
+            loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
+        except CreditStatement.DoesNotExist:
+            errors['loan'] = f'Запись в ведомости с номером договора {loan_id} не найдена.'
+            return JsonResponse({'success': False, 'errors': errors})
 
         try:
             # Попытка получения объекта CreditStatement
@@ -763,21 +806,57 @@ def add_new_payroll(request):
     """Осуществление добавления платежа в БД."""
     if request.method == 'POST':
         # Получаем данные
+        errors = {}
         loan_id = request.POST.get('my_field_loan')
+        if not isinstance(loan_id, str):
+            errors['loan'] = 'Номер договора обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not loan_id.isdigit() or int(loan_id) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['loan'] = 'Номер договора должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         payment_date = request.POST.get('my_field_payment_date')
+        date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+
+        match = re.match(date_pattern, payment_date)
+        if not isinstance(payment_date, str) or not match:
+            errors['date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
+            return JsonResponse({'success': False, 'errors': errors})
+        else:
+            year, month, day = map(int, match.groups())
+            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
+            if not (1950 <= year <= 2025):
+                errors['date'] = f'Год должен быть между 1950 и 2025, введён {year}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности месяца (от 1 до 12)
+            if not (1 <= month <= 12):
+                errors['date'] = f'Месяц должен быть между 1 и 12, введён {month}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности дня (от 1 до 31)
+            if not (1 <= day <= 31):
+                errors['date'] = f'День должен быть между 1 и 31, введён {day}'
+                return JsonResponse({'success': False, 'errors': errors})
+
         payment_status = request.POST.get('my_field_payment_status')
+        if not isinstance(payment_status, str):
+            errors['status'] = 'Обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        if not (payment_status == 'X' or payment_status == 'C' or (
+                payment_status.isdigit() and 0 <= int(payment_status) <= 5)):
+            errors['status'] = 'Допустимы только значения X, C или число от 0 до 5'
+            return JsonResponse({'success': False, 'errors': errors})
+
 
         try:
             # Попытка получения объекта CreditStatement
             loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
             if Payroll.objects.filter(loan=loan, payment_date=payment_date).exists():
-                return JsonResponse(
-                    {'success': False, 'error': "Для этого кредита в эту дату уже был внесен платеж!"})
+                errors['date'] = "Для этого кредита в эту дату уже был внесен платеж!"
+                return JsonResponse({'success': False, 'errors': errors})
         except CreditStatement.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': f'Запись в ведомости с номером договора {loan_id} не найдена.'
-            })
+            errors['loan'] = 'Зпись с таким номером договора не найдена'
+            return JsonResponse({'success': False, 'errors': errors})
 
         try:
             pay = Payroll(

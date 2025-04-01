@@ -16,21 +16,28 @@
     <form method="post">
         {% csrf_token %}
         <input type="hidden" id="pay_id" name="pay_id" value="{{ pay.id }}">
-        <label for="id_loan">Кредит:</label>
-        <input type="text" name="my_field_loan" id="id_loan"
-               value="{{ pay.loan.number_of_the_loan_agreement }}"
-               readonly required><br>
-        <br />
 
-        <label for="id_payment_date">Дата платежа:</label>
-        <input type="text" name="my_field_payment_date" id="id_payment_date"
-               value="{{ pay.payment_date|date:"Y-m-d" }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_loan">Кредит:</label>
+            <input type="text" name="my_field_loan" id="id_loan"
+                   value="{{ pay.loan.number_of_the_loan_agreement }}"
+                   readonly required>
+            <span class="error-message" id="loan-error"></span>
+        </div>
 
-        <label for="id_payment_status">Статус платежа:</label>
-        <input type="text" name="my_field_payment_status" id="id_payment_status"
-               value="{{ pay.payment_status }}" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_payment_date">Дата платежа:</label>
+            <input type="text" name="my_field_payment_date" id="id_payment_date"
+                   value="{{ pay.payment_date|date:"Y-m-d" }}" required>
+            <span class="error-message" id="date-error"></span>
+        </div>
+
+        <div class="field-container">
+            <label for="id_payment_status">Статус платежа:</label>
+            <input type="text" name="my_field_payment_status" id="id_payment_status"
+                   value="{{ pay.payment_status }}" required>
+            <span class="error-message" id="status-error"></span>
+        </div>
 
         <div class="button-group">
             <div data-update-url="{% url 'bank:update-payroll' %}"></div>

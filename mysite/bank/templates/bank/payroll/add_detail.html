@@ -14,20 +14,26 @@
     <button class="back" onclick="window.location.href='/bank/payroll/'">Назад</button>
     <form method="post">
         {% csrf_token %}
-        <label for="id_loan">Кредит:</label>
-        <input type="text" name="my_field_loan" id="id_loan"
-               value="" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_loan">Кредит:</label>
+            <input type="text" name="my_field_loan" id="id_loan"
+                   value="" required>
+            <span class="error-message" id="loan-error"></span>
+        </div>
 
-        <label for="id_payment_date">Дата платежа:</label>
-        <input type="text" name="my_field_payment_date" id="id_payment_date"
-               value="" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_payment_date">Дата платежа:</label>
+            <input type="text" name="my_field_payment_date" id="id_payment_date"
+                   value="" required>
+            <span class="error-message" id="date-error"></span>
+        </div>
 
-        <label for="id_payment_status">Статус платежа:</label>
-        <input type="text" name="my_field_payment_status" id="id_payment_status"
-               value="" required><br>
-        <br />
+        <div class="field-container">
+            <label for="id_payment_status">Статус платежа:</label>
+            <input type="text" name="my_field_payment_status" id="id_payment_status"
+                   value="" required>
+            <span class="error-message" id="status-error"></span>
+        </div>
 
         <div class="button-group">
             <div data-update-url="{% url 'bank:add_new_payroll' %}"></div>

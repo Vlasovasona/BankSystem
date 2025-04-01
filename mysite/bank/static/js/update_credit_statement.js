@@ -59,7 +59,6 @@ $(document).ready(function() {
 
         // Добавляем csrf-token
         data.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());
-
         // Отправка данных на сервер
         fetch(updateUrl, {
             method: 'POST',
@@ -69,7 +68,8 @@ $(document).ready(function() {
         .then(data => {
             console.log('Server Response:', data);
             if (data && data.success) {
-                alert('Изменения успешно сохранены!');
+                alert('Изменения успешно сохранены');
+                window.location.href = '/bank/credit_statement/';
             } else {
                 // Очистка предыдущих ошибок
                 const errorElements = document.querySelectorAll('.error-message');
@@ -90,7 +90,7 @@ $(document).ready(function() {
                     alert('Произошла ошибка при сохранении изменений: ' + (data.error || 'Неизвестная ошибка.'));
                 }
             }
-        }) // Закрывающая скобка после then
+        })
         .catch(error => {
             console.error('Fetch Error:', error);
             alert('Произошла ошибка при отправке данных на сервер.');

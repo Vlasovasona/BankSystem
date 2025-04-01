@@ -457,81 +457,103 @@ def update_credit_statement(request):
         number_of_the_loan_agreement = request.POST.get('my_field_number_of_the_loan_agreement')
         if not isinstance(number_of_the_loan_agreement, str):
             errors['number'] = 'Номер кредитного договора обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
         elif not number_of_the_loan_agreement.isdigit() or int(number_of_the_loan_agreement) <= 0:
             # Если введено не число, сообщаем об ошибке
             errors['number'] = 'Номер кредитного договора должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
         credit_amount = request.POST.get('my_field_credit_amount')
         if not isinstance(credit_amount, str):
             errors['amount'] = 'Сумма кредита обязательная для заполнения'
+            return JsonResponse({'success': False, 'errors': errors})
         elif not credit_amount.isdigit() or int(credit_amount) <= 0:
             # Если введено не число, сообщаем об ошибке
             errors['amount'] = 'Сумма кредита должна быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
         term_month = request.POST.get('my_term_month')
         if not isinstance(term_month, str):
             errors['month'] = 'Длительность выплат обязательна для заполнения'
+            return JsonResponse({'success': False, 'errors': errors})
         elif not term_month.isdigit() or int(term_month) <= 0:
             # Если введено не число, сообщаем об ошибке
             errors['month'] = 'Длительность выплат должна быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
         monthly_payment = request.POST.get('my_field_monthly_payment')
         if not isinstance(monthly_payment, str):
             errors['payment'] = 'Ежемесячная выплата обязательна для заполнения'
+            return JsonResponse({'success': False, 'errors': errors})
         elif not monthly_payment.isdigit() or int(monthly_payment) <= 0:
             # Если введено не число, сообщаем об ошибке
             errors['payment'] = 'Ежемесячная выплата должна быть числовым положительным значением'
-
+            return JsonResponse({'success': False, 'errors': errors})
 
         loan_opening_date = request.POST.get('my_field_loan_opening_date')
         date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
 
         match = re.match(date_pattern, loan_opening_date)
-        if not match:
+        if not isinstance(loan_opening_date, str) or not match:
             errors['open_date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
-        year, month, day = map(int, match.groups())
-        # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
-        if not (1950 <= year <= 2025):
-            errors['open_date'] = f'Год должен быть между 1950 и 2025, введён {year}'
-        # Проверка корректности месяца (от 1 до 12)
-        if not (1 <= month <= 12):
-            errors['open_date'] = f'Месяц должен быть между 1 и 12, введён {month}'
-        # Проверка корректности дня (от 1 до 31)
-        if not (1 <= day <= 31):
-            errors['open_date'] = f'День должен быть между 1 и 31, введён {day}'
+            return JsonResponse({'success': False, 'errors': errors})
+        else:
+            year, month, day = map(int, match.groups())
+            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
+            if not (1950 <= year <= 2025):
+                errors['open_date'] = f'Год должен быть между 1950 и 2025, введён {year}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности месяца (от 1 до 12)
+            if not (1 <= month <= 12):
+                errors['open_date'] = f'Месяц должен быть между 1 и 12, введён {month}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности дня (от 1 до 31)
+            if not (1 <= day <= 31):
+                errors['open_date'] = f'День должен быть между 1 и 31, введён {day}'
+                return JsonResponse({'success': False, 'errors': errors})
 
         repayment_status = request.POST.get('my_field_repayment_status')
         if not isinstance(repayment_status, str):
             errors['repayment'] = 'Обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
         if not (repayment_status == 'Да' or repayment_status == 'Нет'):
             errors['repayment'] = 'Допустимы только значения Да/Нет'
+            return JsonResponse({'success': False, 'errors': errors})
 
         loan_type = request.POST.get('my_field_loan_type')
         if not isinstance(loan_type, str):
             errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
         elif not loan_type.isdigit() or int(loan_type) <= 0:
             # Если введено не число, сообщаем об ошибке
             errors['loanType'] = 'Регистр. номер типа кредита должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
         client_passport = request.POST.get('my_field_client')
         if not isinstance(client_passport, str):
             errors['client'] = 'Паспорт клиента обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
         elif not client_passport.isdigit() or int(client_passport) <= 0 or not re.match(r'\d{10}', client_passport):
             # Если введено не число, сообщаем об ошибке
             errors['client'] = 'Серия и номер паспорта должны быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
 
-        try:
-            # Попытка получения объекта LoanType
-            loan_t = LoanTypes.objects.get(registration_number=loan_type)
-        except LoanTypes.DoesNotExist:
-            errors['loanType'] = f'Тип кредита с регистрационным номером {loan_type} не найден.'
+        if 'loanType' not in errors:
+            try:
+                # Попытка получения объекта LoanType
+                loan_t = LoanTypes.objects.get(registration_number=int(loan_type))
+            except LoanTypes.DoesNotExist:
+                errors['loanType'] = f'Тип кредита с регистрационным номером {loan_type} не найден.'
+                return JsonResponse({'success': False, 'errors': errors})
 
-        try:
-            # Попытка получения объекта Client
-            client = Clients.objects.get(passport_serial_number=client_passport)
-        except Clients.DoesNotExist:
-            errors['client'] = f'Клиент с паспортными данными {client_passport} не найден.'
+        if 'client' not in errors:
+            try:
+                # Попытка получения объекта Client
+                client = Clients.objects.get(passport_serial_number=int(client_passport))
+            except Clients.DoesNotExist:
+                errors['client'] = f'Клиент с паспортными данными {client_passport} не найден.'
+                return JsonResponse({'success': False, 'errors': errors})
 
         if errors:
             return JsonResponse({'errors': errors})
@@ -723,36 +745,115 @@ def add_new_credit_statement(request):
     """Осуществление добавления кредитного договора в БД."""
     if request.method == 'POST':
         # Получаем данные
+        errors = {}
         number_of_the_loan_agreement = request.POST.get('my_field_number_of_the_loan_agreement')
+        if not isinstance(number_of_the_loan_agreement, str):
+            errors['number'] = 'Номер кредитного договора обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not number_of_the_loan_agreement.isdigit() or int(number_of_the_loan_agreement) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['number'] = 'Номер кредитного договора должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         credit_amount = request.POST.get('my_field_credit_amount')
+        if not isinstance(credit_amount, str):
+            errors['amount'] = 'Сумма кредита обязательная для заполнения'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not credit_amount.isdigit() or int(credit_amount) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['amount'] = 'Сумма кредита должна быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         term_month = request.POST.get('my_term_month')
+        if not isinstance(term_month, str):
+            errors['month'] = 'Длительность выплат обязательна для заполнения'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not term_month.isdigit() or int(term_month) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['month'] = 'Длительность выплат должна быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         monthly_payment = request.POST.get('my_field_monthly_payment')
+        if not isinstance(monthly_payment, str):
+            errors['payment'] = 'Ежемесячная выплата обязательна для заполнения'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not monthly_payment.isdigit() or int(monthly_payment) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['payment'] = 'Ежемесячная выплата должна быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         loan_opening_date = request.POST.get('my_field_loan_opening_date')
+        date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+
+        match = re.match(date_pattern, loan_opening_date)
+        if not isinstance(loan_opening_date, str) or not match:
+            errors['open_date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
+            return JsonResponse({'success': False, 'errors': errors})
+        else:
+            year, month, day = map(int, match.groups())
+            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
+            if not (1950 <= year <= 2025):
+                errors['open_date'] = f'Год должен быть между 1950 и 2025, введён {year}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности месяца (от 1 до 12)
+            if not (1 <= month <= 12):
+                errors['open_date'] = f'Месяц должен быть между 1 и 12, введён {month}'
+                return JsonResponse({'success': False, 'errors': errors})
+            # Проверка корректности дня (от 1 до 31)
+            if not (1 <= day <= 31):
+                errors['open_date'] = f'День должен быть между 1 и 31, введён {day}'
+                return JsonResponse({'success': False, 'errors': errors})
+
         repayment_status = request.POST.get('my_field_repayment_status')
+        if not isinstance(repayment_status, str):
+            errors['repayment'] = 'Обязательно для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        if not (repayment_status == 'Да' or repayment_status == 'Нет'):
+            errors['repayment'] = 'Допустимы только значения Да/Нет'
+            return JsonResponse({'success': False, 'errors': errors})
+
         loan_type = request.POST.get('my_field_loan_type')
+        if not isinstance(loan_type, str):
+            errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not loan_type.isdigit() or int(loan_type) <= 0:
+            # Если введено не число, сообщаем об ошибке
+            errors['loanType'] = 'Регистр. номер типа кредита должен быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
+
         client_passport = request.POST.get('my_field_client')
+        if not isinstance(client_passport, str):
+            errors['client'] = 'Паспорт клиента обязателен для заполнения.'
+            return JsonResponse({'success': False, 'errors': errors})
+        elif not client_passport.isdigit() or int(client_passport) <= 0 or not re.match(r'\d{10}', client_passport):
+            # Если введено не число, сообщаем об ошибке
+            errors['client'] = 'Серия и номер паспорта должны быть числовым положительным значением'
+            return JsonResponse({'success': False, 'errors': errors})
 
-        if CreditStatement.objects.filter(number_of_the_loan_agreement=number_of_the_loan_agreement).exists():
-            return JsonResponse(
-                {'success': False, 'error': "Кредит с таким номером договора уже существует"})
+        if 'number' not in errors:
+            if CreditStatement.objects.filter(number_of_the_loan_agreement=int(number_of_the_loan_agreement)).exists():
+                errors['number'] = "Кредит с таким номером договора уже существует"
+                return JsonResponse({'success': False, 'errors': errors})
 
-        try:
-            # Попытка получения объекта LoanType
-            loan_t = LoanTypes.objects.get(registration_number=loan_type)
-        except LoanTypes.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': f'Тип кредита с регистрационным номером {loan_type} не найден.'
-            })
 
-        try:
-            # Попытка получения объекта Client
-            client = Clients.objects.get(passport_serial_number=client_passport)
-        except Clients.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': f'Клиент с паспортными данными {client_passport} не найден.'
-            })
+        if 'loanType' not in errors:
+            try:
+                # Попытка получения объекта LoanType
+                loan_t = LoanTypes.objects.get(registration_number=int(loan_type))
+            except LoanTypes.DoesNotExist:
+                errors['loanType'] = f'Тип кредита с регистрационным номером {loan_type} не найден.'
+                return JsonResponse({'success': False, 'errors': errors})
+
+        if 'client' not in errors:
+            try:
+                # Попытка получения объекта Client
+                client = Clients.objects.get(passport_serial_number=int(client_passport))
+            except Clients.DoesNotExist:
+                errors['client'] = f'Клиент с паспортными данными {client_passport} не найден.'
+                return JsonResponse({'success': False, 'errors': errors})
+
+        if errors:
+            return JsonResponse({'success': False, 'errors': errors})
 
         try:
             statement = CreditStatement(

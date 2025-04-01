@@ -31,7 +31,6 @@ $(document).ready(function() {
 
     $('.save_button').on('click', function(event) { // Начало функции-обработчика
         event.preventDefault(); // предотвращаем стандартное поведение формы
-        console.log('Hello')
         // Сбор данных из полей формы
         const passport = $('#my_field_passport').val();
         const surname = $('#id_surname').val();
@@ -46,8 +45,6 @@ $(document).ready(function() {
         const monthIncome = $('#id_month_income').val();
         const countChildren = $('#id_count_children').val();
         const educationType = $('#id_education_type').val();
-
-        console.log(passport, surname, name, age);
 
         // Создаем объект для отправки
         const data = new URLSearchParams();

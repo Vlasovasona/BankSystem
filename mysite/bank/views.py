@@ -21,6 +21,9 @@ from reportlab.platypus.tables import LongTable
 from django.http import FileResponse, HttpResponse
 import os
 import tempfile
+import seaborn as sb
+import matplotlib as plt
+import pandas as pd
 
 
 
@@ -1170,98 +1173,6 @@ def show_reports_main_page(request):
     return render(request, 'bank/left_menu/reports/report_main_page.html')
 
 
-# @csrf_exempt
-# def create_report(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         selected_tables = data.get('tables', [])
-#
-#         # Регистрация шрифта
-#         pdfmetrics.registerFont(
-#             TTFont('Arial', 'C:/Users/sofav/PycharmProjects/PythonProject/mysite/bank/static/bank/fonts/arial3.ttf'))
-#
-#         styles = getSampleStyleSheet()
-#
-#         # Обновление существующего стиля 'Normal'
-#         styles['Normal'].fontName = 'Arial'
-#         styles['Normal'].fontSize = 12
-#
-#         heading_style = ParagraphStyle(
-#             name='TableHeading',
-#             parent=styles['Normal'],
-#             spaceAfter=10
-#         )
-#
-#         doc = SimpleDocTemplate("output.pdf", pagesize=landscape(letter))  # Ландшафтная ориентация
-#
-#         elements = []
-#
-#         for table_name in selected_tables:
-#             if table_name == 'Clients':
-#                 clients_data = Clients.objects.all().values_list('passport_serial_number', 'name', 'surname',
-#                                                                  'patronymic', 'phone_number', 'age', 'sex',
-#                                                                  'month_income', 'count_children', 'education_type')
-#                 client_table = LongTable([['Серия номер паспорта', 'Имя', 'Фамилия', 'Отчество', 'Номер телефона',
-#                                            'Возраст', 'Пол', 'Доход в месяц', 'Кол-во детей',
-#                                            'Образование']] + list(clients_data))
-#
-#                 client_table.setStyle(TableStyle([
-#                     ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
-#                     ('FONTSIZE', (0, 0), (-1, -1), 10),
-#                     ('GRID', (0, 0), (-1, -1), 0.25, 'black'),
-#                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-#                 ]))
-#
-#                 elements.append(Paragraph(f"Таблица Клиенты", heading_style))
-#                 elements.append(client_table)
-#             elif table_name == 'LoanTypes':
-#                 pay_data = LoanTypes.objects.all().values_list('registration_number', 'name_of_the_type', 'interest_rate')
-#                 pay_table = LongTable([['Регистрационный номер', 'Название типа кредита', 'Процентная ставка']] + list(pay_data))
-#                 pay_table.setStyle(TableStyle([
-#                     ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
-#                     ('FONTSIZE', (0, 0), (-1, -1), 10),
-#                     ('GRID', (0, 0), (-1, -1), 0.25, 'black'),
-#                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-#                 ]))
-#                 elements.append(Paragraph(f"Таблица Типы кредитов", heading_style))
-#                 elements.append(pay_table)
-#             elif table_name == 'CreditStatement':
-#                 state_data = CreditStatement.objects.select_related(
-#                     'loan_type',
-#                     'client'
-#                 ).all().values_list(
-#                     'number_of_the_loan_agreement',
-#                     'credit_amount',
-#                     'term_month',
-#                     'monthly_payment',
-#                     'loan_opening_date',
-#                     'repayment_status',
-#                     'loan_type__registration_number',
-#                     'client__passport_serial_number'  # Извлекаем значение поля passport из связанной модели Clients
-#                 )
-#                 state_table = LongTable([['Договор', 'Сумма', 'Срок (мес.)', 'Ежемесячная выплата', 'Дата оформления', 'Статус погашения', 'Тип кредита', 'Паспорт клиента']] + list(state_data))
-#                 state_table.setStyle(TableStyle([
-#                     ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
-#                     ('FONTSIZE', (0, 0), (-1, -1), 10),
-#                     ('GRID', (0, 0), (-1, -1), 0.25, 'black'),
-#                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-#                 ]))
-#                 elements.append(Paragraph(f"Таблица Кредитная ведомость", heading_style))
-#                 elements.append(state_table)
-#
-#         doc.build(elements)
-#
-#         with open("output.pdf", 'rb') as pdf:
-#             response = HttpResponse(pdf.read(), content_type='application/pdf')
-#             response['Content-Disposition'] = f'attachment; filename="output.pdf"'
-#             return response
-#
-#         finally:
-#             os.remove(filename)
-#
-#     return JsonResponse({'error': 'Метод не поддерживается'}, status=400)
-
-
 @csrf_exempt
 def create_report(request):
     if request.method == 'POST':
@@ -1364,3 +1275,38 @@ def create_report(request):
             os.remove("output.pdf")
 
     return JsonResponse({'error': 'Метод не поддерживается'}, status=400)
+
+# блок создания графиков для отчетности
+def get_pandas_dataset_clients():
+    model_objects = Clients.objects.all()
+    dataframe = pd.DataFrame(model_objects)
+
+    return dataframe
+
+def get_pandas_dataset_payroll():
+    model_objects = Payroll.objects.all()
+    dataframe = pd.DataFrame(model_objects)
+
+    return dataframe
+
+def get_pandas_dataset_statement():
+    model_objects = CreditStatement.objects.all()
+    dataframe = pd.DataFrame(model_objects)
+
+    return dataframe
+
+def get_pandas_dataset_types():
+    model_objects = LoanTypes.objects.all()
+    dataframe = pd.DataFrame(model_objects)
+
+    return dataframe
+
+def create_credit_structure(statement, clients, payroll, types):
+    merged_df = pd.merge(statement, clients, left_on='client', right_on='id', how='left')
+    merged_df = merged_df.dropna()
+    merged_df = pd.merge(merged_df, types, left_on='loan_type', right_on='id', how='left')
+    merged_df = merged_df.dropna()
+    merged_df = pd.merge(payroll, merged_df, left_on='loan', right_on='id_x', how='left')
+    merged_df = merged_df.dropna()
+
+    return merged_df

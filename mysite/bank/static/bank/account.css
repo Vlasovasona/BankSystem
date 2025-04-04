@@ -71,3 +71,26 @@ button.add_new_user:hover, button.watch_users_table:hover, button.create_report:
     margin-bottom: 5px;
 }
 
+.graph-checkboxes {
+    display: flex;
+}
+
+.container_table {
+    display: flex;
+    max-height: 60vh;
+    min-height: 20vh;
+    background-color: white; /* Фон белый */
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.rectangle {
+    max-width: 500px; /* Увеличенный размер прямоугольника */
+    display: flex;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта глубины */
+    flex-direction: column;
+}
+

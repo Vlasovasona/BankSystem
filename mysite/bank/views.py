@@ -22,8 +22,12 @@ from django.http import FileResponse, HttpResponse
 import os
 import tempfile
 import seaborn as sb
-import matplotlib as plt
+from reportlab.platypus import Image
+import matplotlib.pyplot as plt
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 import pandas as pd
+from datetime import datetime
 
 
 
@@ -1198,7 +1202,6 @@ def create_report(request):
                     parent=styles['Normal'],
                     spaceAfter=10
                 )
-                # Ваш код генерации PDF здесь
                 doc = SimpleDocTemplate("output.pdf", pagesize=landscape(letter))
 
                 elements = []
@@ -1262,6 +1265,58 @@ def create_report(request):
                         ]))
                         elements.append(Paragraph(f"Таблица Кредитная ведомость", heading_style))
                         elements.append(state_table)
+                    elif table_name == 'Credit_structure':
+                        months_dict = {
+                            1: "январь",
+                            2: "февраль",
+                            3: "март",
+                            4: "апрель",
+                            5: "май",
+                            6: "июнь",
+                            7: "июль",
+                            8: "август",
+                            9: "сентябрь",
+                            10: "октябрь",
+                            11: "ноябрь",
+                            12: "декабрь"
+                        }
+
+                        statement = get_pandas_dataset_statement()
+                        loanTypes = get_pandas_dataset_types()
+
+
+                        data = pd.merge(statement, loanTypes, left_on='loan_type', right_on='id', how='left')
+
+                        current_year = datetime.now().year
+                        current_month = datetime.now().month
+
+                        mask = (pd.to_datetime(data['loan_opening_date']).dt.year == current_year) & \
+                               (pd.to_datetime(data['loan_opening_date']).dt.month == current_month)
+
+                        grouped_data = data[mask].groupby('loan_type')['credit_amount'].sum()
+                        labels = data[['name_of_the_type', 'registration_number']].drop_duplicates().values
+
+                        # Формируем подписи в формате: "Рег.номер (Название)"
+                        formatted_labels = [f"{reg_num} ({name})" for reg_num, name in labels]
+
+                        graph_tempfile = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+                        plt.figure(figsize=(8, 6))
+                        grouped_data.plot(kind='pie', autopct='%1.1f%%', labels=formatted_labels)
+                        plt.title(f'Структура кредитного портфеля за {months_dict[current_month]} {current_year}г.')
+                        plt.ylabel('')
+                        plt.savefig(graph_tempfile.name, bbox_inches='tight')
+                        plt.close()
+
+                        # Закрываем временный файл, чтобы избежать ошибок при чтении
+                        graph_tempfile.close()
+
+                        # Добавляем изображение графика в список элементов
+                        elements.append(Image(graph_tempfile.name, width=6 * inch,
+                                              height=4 * inch))
+
+                        # Удаляем временный файл после завершения работы
+                        os.remove(graph_tempfile.name)
+                    # elif table_name == 'PaymentStatus-MonthIncome':
 
                 doc.build(elements)
 
@@ -1278,25 +1333,25 @@ def create_report(request):
 
 # блок создания графиков для отчетности
 def get_pandas_dataset_clients():
-    model_objects = Clients.objects.all()
+    model_objects = Clients.objects.all().values()
     dataframe = pd.DataFrame(model_objects)
 
     return dataframe
 
 def get_pandas_dataset_payroll():
-    model_objects = Payroll.objects.all()
+    model_objects = Payroll.objects.all().values()
     dataframe = pd.DataFrame(model_objects)
 
     return dataframe
 
 def get_pandas_dataset_statement():
-    model_objects = CreditStatement.objects.all()
+    model_objects = CreditStatement.objects.all().values()
     dataframe = pd.DataFrame(model_objects)
 
     return dataframe
 
 def get_pandas_dataset_types():
-    model_objects = LoanTypes.objects.all()
+    model_objects = LoanTypes.objects.all().values()
     dataframe = pd.DataFrame(model_objects)
 
     return dataframe

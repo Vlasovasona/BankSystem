@@ -13,24 +13,66 @@
 {% block content %}
     <h1 class="title">Отчеты</h1>
     <p class="is_admin">Выберите, какие таблицы нужно включить в отчет формата pdf:</p>
-
     <div class="table-checkboxes">
         <div class="checkbox-item">
+
             <input type="checkbox" id="clients-checkbox" name="clients-checkbox" value="Clients">
             <label for="clients-checkbox">Клиенты</label>
         </div>
+
         <div class="checkbox-item">
             <input type="checkbox" id="loanType-checkbox" name="loanType-checkbox" value="LoanTypes">
             <label for="loanType-checkbox">Виды кредитов</label>
         </div>
+
         <div class="checkbox-item">
             <input type="checkbox" id="statement-checkbox" name="statement-checkbox" value="CreditStatement">
             <label for="statement-checkbox">Кредитная ведомость</label>
         </div>
+
     </div>
+
     <p class="is_admin">Выберите, какие графики нужно включить в отчет:</p>
+
     <div class="graph-checkboxes">
+        <div class="container_table">
+            <div class="rectangle">
+                <div class="checkbox-item">
+                    <img src="{% static 'images/credit_structure.png' %}" width="410" height="210">
+                    <div class="label_checkbox">
+                        <input type="checkbox" id="credit-structure-checkbox" name="credit-structure-checkbox" value="Credit_structure">
+                        <label for="credit-structure-checkbox">Структура кредитного портфеля</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container_table">
+            <div class="rectangle">
+                <div class="checkbox-item">
+                    <img src="{% static 'images/payment-income.png' %}" width="470" height="220">
+                    <div class="label_checkbox">
+                        <input type="checkbox" id="paymentStatus-income-checkbox" name="paymentStatus-income-checkbox" value="PaymentStatus-MonthIncome">
+                        <label for="paymentStatus-income-checkbox">Зависимость среднего значения статуса просроченного платежа от месячного дохода</label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="graph=checkboxes">
+        <div class="container_table">
+            <div class="rectangle">
+                <div class="checkbox-item">
+                    <img src="{% static 'images/credit_amount_year.png' %}" width="480" height="240">
+                    <div class="label_checkbox">
+                        <input type="checkbox" id="year-checkbox" name="year-checkbox" value="Year">
+                        <label for="year-checkbox">Годовой отчет о сумме выданных кредитов по месяцам</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="admin_buttons">
         <div data-update-url="{% url 'bank:create_report' %}"></div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

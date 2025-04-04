@@ -6,6 +6,7 @@ from django.views.generic import ListView
 from django.db.models import Q
 from django.http import JsonResponse
 import json
+from threading import Thread
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import CustomUserCreationForm
@@ -32,7 +33,7 @@ from datetime import datetime
 
 
 class ClientListView(ListView):
-    queryset = Clients.objects.all()
+    queryset = Clients.objects.order_by('id')
     context_object_name = 'clients'
     paginate_by = 25
     template_name = 'bank/clients/list.html'
@@ -50,7 +51,7 @@ def client_detail(request, id):
     return render(request, 'bank/clients/detail.html', context)
 
 class CreditTypesListView(ListView):
-    queryset = LoanTypes.objects.all()
+    queryset = LoanTypes.objects.order_by('id')
     context_object_name = 'credit_types'
     paginate_by = 25
     template_name = 'bank/creditTypes/list.html'
@@ -67,7 +68,7 @@ def credit_type_detail(request, id):
     return render(request, 'bank/creditTypes/detail.html', context)
 
 class CreditStatementListView(ListView):
-    queryset = CreditStatement.objects.all()
+    queryset = CreditStatement.objects.order_by('id')
     context_object_name = 'credit_statement'
     paginate_by = 25
     template_name = 'bank/creditStatement/list.html'
@@ -84,7 +85,7 @@ def credit_statement_detail(request, id):
     return render(request, 'bank/creditStatement/detail.html', context)
 
 class PayrollListView(ListView):
-    queryset = Payroll.objects.all()
+    queryset = Payroll.objects.order_by('id')
     context_object_name = 'payroll'
     paginate_by = 25
     template_name = 'bank/payroll/list.html'
@@ -1177,7 +1178,6 @@ def show_reports_main_page(request):
     return render(request, 'bank/left_menu/reports/report_main_page.html')
 
 
-@csrf_exempt
 def create_report(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -1186,7 +1186,7 @@ def create_report(request):
         try:
             # Создание временного файла для хранения PDF
             with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
-                # Регистрация шрифта
+                temp_filename = temp_file.name
                 pdfmetrics.registerFont(
                     TTFont('Arial',
                            'C:/Users/sofav/PycharmProjects/PythonProject/mysite/bank/static/bank/fonts/arial3.ttf'))
@@ -1252,7 +1252,6 @@ def create_report(request):
                             'repayment_status',
                             'loan_type__registration_number',
                             'client__passport_serial_number'
-                            # Извлекаем значение поля passport из связанной модели Clients
                         )
                         state_table = LongTable([['Договор', 'Сумма', 'Срок (мес.)', 'Ежемесячная выплата',
                                                   'Дата оформления', 'Статус погашения', 'Тип кредита',
@@ -1284,8 +1283,7 @@ def create_report(request):
                         statement = get_pandas_dataset_statement()
                         loanTypes = get_pandas_dataset_types()
 
-
-                        data = pd.merge(statement, loanTypes, left_on='loan_type', right_on='id', how='left')
+                        data = pd.merge(statement, loanTypes, left_on='loan_type_id', right_on='id', how='left')
 
                         current_year = datetime.now().year
                         current_month = datetime.now().month
@@ -1293,45 +1291,54 @@ def create_report(request):
                         mask = (pd.to_datetime(data['loan_opening_date']).dt.year == current_year) & \
                                (pd.to_datetime(data['loan_opening_date']).dt.month == current_month)
 
-                        grouped_data = data[mask].groupby('loan_type')['credit_amount'].sum()
+                        grouped_data = data[mask].groupby('loan_type_id')['credit_amount'].sum()
+
                         labels = data[['name_of_the_type', 'registration_number']].drop_duplicates().values
 
                         # Формируем подписи в формате: "Рег.номер (Название)"
                         formatted_labels = [f"{reg_num} ({name})" for reg_num, name in labels]
 
-                        graph_tempfile = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
-                        plt.figure(figsize=(8, 6))
-                        grouped_data.plot(kind='pie', autopct='%1.1f%%', labels=formatted_labels)
-                        plt.title(f'Структура кредитного портфеля за {months_dict[current_month]} {current_year}г.')
-                        plt.ylabel('')
-                        plt.savefig(graph_tempfile.name, bbox_inches='tight')
-                        plt.close()
+                        # Генерация изображения графика
+                        chart_image_path = generate_chart_image(grouped_data, formatted_labels,
+                                                               f'Структура кредитного портфеля за {months_dict[current_month]} {current_year}г.')
 
-                        # Закрываем временный файл, чтобы избежать ошибок при чтении
-                        graph_tempfile.close()
-
-                        # Добавляем изображение графика в список элементов
-                        elements.append(Image(graph_tempfile.name, width=6 * inch,
+                        elements.append(Image(chart_image_path, width=7 * inch,
                                               height=4 * inch))
-
-                        # Удаляем временный файл после завершения работы
-                        os.remove(graph_tempfile.name)
-                    # elif table_name == 'PaymentStatus-MonthIncome':
 
                 doc.build(elements)
 
                 # Отправляем созданный файл пользователю
-                with open("output.pdf", 'rb') as pdf:
+                with open('output.pdf', 'rb') as pdf:
                     response = HttpResponse(pdf.read(), content_type='application/pdf')
-                    response['Content-Disposition'] = f'attachment; filename="{"output.pdf"}"'
+                    response['Content-Disposition'] = f'attachment; filename="output.pdf"'
                     return response
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error': str(e)}, status=500)
         finally:
-            # Уничтожаем временный файл
-            os.remove("output.pdf")
+            if os.path.exists('output.pdf'):
+                os.remove('output.pdf')
 
     return JsonResponse({'error': 'Метод не поддерживается'}, status=400)
+import matplotlib
+matplotlib.use('Agg')
 
-# блок создания графиков для отчетности
+def generate_chart_image(grouped_data, labels, title):
+    # Создаем график
+    plt.figure(figsize=(9, 6))
+    # Обеспечиваем, что grouped_data и labels не пустые
+    if grouped_data.empty or len(labels) == 0:
+        return None
+    grouped_data.plot(kind='pie', autopct='%1.1f%%', labels=labels)
+    plt.title(title)
+    plt.ylabel('')
+
+    # Сохраняем график в файл
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as image_file:
+        plt.savefig(image_file.name, bbox_inches='tight')
+        plt.close()
+        return image_file.name
+
 def get_pandas_dataset_clients():
     model_objects = Clients.objects.all().values()
     dataframe = pd.DataFrame(model_objects)

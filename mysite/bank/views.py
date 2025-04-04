@@ -25,6 +25,7 @@ import tempfile
 import seaborn as sb
 from reportlab.platypus import Image
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 import pandas as pd
@@ -1299,11 +1300,55 @@ def create_report(request):
                         formatted_labels = [f"{reg_num} ({name})" for reg_num, name in labels]
 
                         # Генерация изображения графика
-                        chart_image_path = generate_chart_image(grouped_data, formatted_labels,
+                        chart_image_path = generate_chart_image('1', grouped_data, formatted_labels,
                                                                f'Структура кредитного портфеля за {months_dict[current_month]} {current_year}г.')
 
                         elements.append(Image(chart_image_path, width=7 * inch,
                                               height=4 * inch))
+
+                    elif table_name == 'PaymentStatus-MonthIncome':
+                        clients = get_pandas_dataset_clients()
+                        statement = get_pandas_dataset_statement()
+                        payment = get_pandas_dataset_payroll()
+
+                        merged_df = pd.merge(statement, clients, left_on='client_id', right_on='id', how='left')
+                        merged_df = merged_df.dropna()
+
+                        merged_df = pd.merge(payment, merged_df, left_on='loan_id', right_on='id_x', how='left')
+                        merged_df = merged_df.dropna()
+
+                        merged_df['payment_status'] = pd.to_numeric(merged_df['payment_status'], errors='coerce')
+
+                        # Удаление строк с NaN значениями
+                        df_clean = merged_df.dropna(subset=['payment_status'])
+                        mean_payment_status = df_clean.groupby('id_y')['payment_status'].mean().reset_index()
+                        mean_payment_status = pd.merge(mean_payment_status, clients, left_on='id_y', right_on='id',
+                                                       how='left')
+                        sorted_mean_payment_status = mean_payment_status.sort_values(by=['month_income'])
+
+                        chart_image_path = generate_chart_image('2', sorted_mean_payment_status, 'NaN',f'Зависимость среднего значения просроченного платежа от месячного дохода')
+
+                        elements.append(Image(chart_image_path, width=7 * inch,
+                                              height=4 * inch))
+
+                    elif table_name == 'Year':
+                        statement = get_pandas_dataset_statement()
+                        statement['loan_opening_date'] = pd.to_datetime(statement['loan_opening_date'])
+                        current_year = datetime.now().year
+
+                        df_2025 = statement[statement['loan_opening_date'].dt.year == current_year]
+
+                        # Группируем данные по месяцам и считаем сумму кредитов
+                        grouped_data = df_2025.groupby(df_2025['loan_opening_date'].dt.month)['credit_amount'].sum()
+                        chart_image_path = generate_chart_image('3', grouped_data, current_year,
+                                                                f'Годовой отчет о сумме выданных кредитов')
+
+                        elements.append(Image(chart_image_path, width=7 * inch,
+                                              height=4 * inch))
+
+
+
+
 
                 doc.build(elements)
 
@@ -1323,15 +1368,32 @@ def create_report(request):
 import matplotlib
 matplotlib.use('Agg')
 
-def generate_chart_image(grouped_data, labels, title):
-    # Создаем график
-    plt.figure(figsize=(9, 6))
-    # Обеспечиваем, что grouped_data и labels не пустые
-    if grouped_data.empty or len(labels) == 0:
-        return None
-    grouped_data.plot(kind='pie', autopct='%1.1f%%', labels=labels)
-    plt.title(title)
-    plt.ylabel('')
+def generate_chart_image(st, grouped_data, labels, title):
+    if st == '1':
+        plt.figure(figsize=(9, 6))
+        # Обеспечиваем, что grouped_data и labels не пустые
+        if grouped_data.empty or len(labels) == 0:
+            return None
+        grouped_data.plot(kind='pie', autopct='%1.1f%%', labels=labels)
+        plt.title(title)
+        plt.ylabel('')
+    elif st == '2':
+        plt.figure(figsize=(12, 8))
+        plt.scatter(grouped_data['month_income'], grouped_data['payment_status'],
+                    label='Статус платежа/доход в месяц')
+        plt.xlabel('Месячный доход')
+        plt.ylabel('Среднее значение просрочки')
+        plt.title(title)
+        plt.legend()
+        plt.grid(True)
+    elif st == '3':
+        plt.figure(figsize=(10, 6))
+        plt.bar(grouped_data.index, grouped_data.values / 1_000_000, color='SlateBlue')
+        plt.xlabel(f'Месяцы {labels} года')
+        plt.ylabel('Сумма оформленных кредитов (млн.р.)')
+        plt.title('Годовой отчет о сумме выданных кредитов')
+        plt.grid(True)
+        plt.gca().yaxis.set_major_formatter(mtick.FormatStrFormatter('%d'))
 
     # Сохраняем график в файл
     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as image_file:

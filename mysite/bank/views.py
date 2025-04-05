@@ -1464,3 +1464,12 @@ def create_credit_structure(statement, clients, payroll, types):
     merged_df = merged_df.dropna()
 
     return merged_df
+
+
+# Помощь и о приложении
+
+def about_page(request):
+    return render(request, 'bank/about_page.html')
+
+def help_page(request):
+    return render(request, 'bank/help_page.html')

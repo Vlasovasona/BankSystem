@@ -1,0 +1,16 @@
+.container_table {
+    max-height: 400vh;
+    min-height: 100vh;
+    background-color: white; /* Фон белый */
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.rectangle {
+    max-width: 800px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта глубины */
+    flex-direction: column;
+}

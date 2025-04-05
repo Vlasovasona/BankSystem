@@ -1,0 +1,28 @@
+{% extends "bank/base.html" %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My bank{% endblock %}</title>
+    {% block extra_styles %}
+        <link href="{% static 'bank/about_page.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+
+        <div class="container_table">
+            <div class="rectangle">
+                <h1>Как связаться с поддержкой?</h1>
+                <p>При возникновении трудностей при использовании приложения отправьте электронное</p>
+                <p>письмо на адрес sivlasova@hse.edu.ru с подробным описанием вашей проблемы.</p>
+            </div>
+        </div>
+    {% endblock %}
+</body>
+</html>>
+
+
+
+

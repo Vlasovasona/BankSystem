@@ -26,8 +26,8 @@
 
             <nav> <!-- Навигация -->
                 <ul>
-                    <li><a href="#">О приложении</a></li>
-                    <li><a href="#">Помощь</a></li>
+                    <li><a href="{% url 'bank:about_page' %}">О приложении</a></li>
+                    <li><a href="{% url 'bank:help_page' %}">Помощь</a></li>
                     <li><a href="{% url 'bank:personal_account' %}">Личный кабинет</a></li>
                 </ul>
             </nav>

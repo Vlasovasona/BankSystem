@@ -68,4 +68,8 @@ urlpatterns = [
     # urls для страниц отчетов
     path('reports_main_page/', views.show_reports_main_page, name='reports_main_page'),
     path('create_report/', views.create_report, name='create_report'),
+
+    # urls для страниц "О приложении" и "Помощь"
+    path('about_page/', views.about_page, name='about_page'),
+    path('help_page/', views.help_page, name='help_page'),
 ]

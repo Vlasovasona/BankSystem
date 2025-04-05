@@ -1340,14 +1340,12 @@ def create_report(request):
 
                         # Группируем данные по месяцам и считаем сумму кредитов
                         grouped_data = df_2025.groupby(df_2025['loan_opening_date'].dt.month)['credit_amount'].sum()
+                        
                         chart_image_path = generate_chart_image('3', grouped_data, current_year,
                                                                 f'Годовой отчет о сумме выданных кредитов')
 
                         elements.append(Image(chart_image_path, width=7 * inch,
                                               height=4 * inch))
-
-
-
 
 
                 doc.build(elements)
@@ -1387,13 +1385,45 @@ def generate_chart_image(st, grouped_data, labels, title):
         plt.legend()
         plt.grid(True)
     elif st == '3':
+        median_value = grouped_data.median()
+
+        # Построение столбчатой диаграммы
         plt.figure(figsize=(10, 6))
-        plt.bar(grouped_data.index, grouped_data.values / 1_000_000, color='SlateBlue')
+
+        for i, value in enumerate(grouped_data):
+            if value < median_value:  # Если значение меньше медианы, красим столбец в красный цвет
+                color = 'red'
+            else:
+                color = 'SlateBlue'
+
+            plt.bar(i + 1, value / 1_000_000, color=color)  # Используем индекс для обозначения месяца
+
         plt.xlabel(f'Месяцы {labels} года')
         plt.ylabel('Сумма оформленных кредитов (млн.р.)')
         plt.title('Годовой отчет о сумме выданных кредитов')
         plt.grid(True)
+
+        months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+        plt.xticks(range(1, len(months) + 1), months)
+
+        # Создание легенды
+        plt.legend(handles=[
+            plt.Rectangle((0, 0), 1, 1, color='SlateBlue'),
+            plt.Rectangle((0, 0), 1, 1, color='red')],
+            labels=['Больше среднего', 'Меньше среднего'], loc='upper right')
+
+        # Форматирование оси Y в целые числа
         plt.gca().yaxis.set_major_formatter(mtick.FormatStrFormatter('%d'))
+
+
+        # plt.figure(figsize=(10, 6))
+        # plt.bar(grouped_data.index, grouped_data.values / 1_000_000, color='SlateBlue')
+        # plt.xlabel(f'Месяцы {labels} года')
+        # plt.ylabel('Сумма оформленных кредитов (млн.р.)')
+        # plt.title('Годовой отчет о сумме выданных кредитов')
+        # plt.grid(True)
+        # plt.gca().yaxis.set_major_formatter(mtick.FormatStrFormatter('%d'))
 
     # Сохраняем график в файл
     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as image_file:

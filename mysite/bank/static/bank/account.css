@@ -94,3 +94,10 @@ button.add_new_user:hover, button.watch_users_table:hover, button.create_report:
     flex-direction: column;
 }
 
+.side-menu {
+    width: 120px;
+    background-color: #6495ED;
+    padding: 20px;
+    height: 100vh;
+}
+

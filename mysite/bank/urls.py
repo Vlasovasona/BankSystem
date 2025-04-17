@@ -72,4 +72,7 @@ urlpatterns = [
     # urls для страниц "О приложении" и "Помощь"
     path('about_page/', views.about_page, name='about_page'),
     path('help_page/', views.help_page, name='help_page'),
+
+    # urls для "Заявки"
+    path('application_page/', views.application_page, name='application_page'),
 ]

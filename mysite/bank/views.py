@@ -1495,10 +1495,10 @@ def application_page(request):
     return render(request, 'bank/left_menu/applications/application_page.html')
 
 def check_income_and_credit_value(month_income, credit_amount, term_month):
-    if (month_income*0.5)*term_month < credit_amount:
-        return False
-    else:
+    if (month_income*0.5)*term_month >= credit_amount:
         return True
+    else:
+        return False
 
 
 def load_or_create_model():
@@ -1704,8 +1704,7 @@ def analysis(request):
             errors['client'] = 'Паспорт клиента обязателен для заполнения.'
             return JsonResponse({'success': False, 'errors': errors})
         elif not client_passport.isdigit() or int(client_passport) <= 0 or not re.match(r'\d{10}', client_passport):
-            # Если введено не число, сообщаем об ошибке
-            errors['client'] = 'Серия и номер паспорта должны быть числовым положительным значением'
+            errors['client'] = 'Серия и номер паспорта должны быть числовым положительным значением, состоящим из 10 цифр'
             return JsonResponse({'success': False, 'errors': errors})
 
         if 'number' not in errors:
@@ -1737,7 +1736,7 @@ def analysis(request):
         # предсказание ML подели
         prediction = predict_client(y)
         # если предсказано 0, то проверка соответствия выплаты, длительности выплат и ЗП
-        if (int(client.month_income)*0.3 <= int(monthly_payment)) or (prediction == 0 and (check_income_and_credit_value(int(client.month_income), int(credit_amount), int(term_month)))):
+        if ((int(client.month_income)*0.3 >= int(monthly_payment)) or (prediction == 0)) and check_income_and_credit_value(int(client.month_income), int(credit_amount), int(term_month)):
             try:
                 statement = CreditStatement(
                     number_of_the_loan_agreement = number_of_the_loan_agreement,

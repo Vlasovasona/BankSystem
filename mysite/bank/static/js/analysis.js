@@ -10,8 +10,6 @@ $(document).ready(function() {
             document.querySelector('#id_number_of_the_loan_agreement'),
             document.querySelector('#id_credit_amount'),
             document.querySelector('#id_term_month'),
-            document.querySelector('#id_monthly_payment'),
-            document.querySelector('#id_loan_opening_date'),
             document.querySelector('#id_loan_type')
         ];
 
@@ -41,9 +39,6 @@ $(document).ready(function() {
         const number_of_the_loan_agreement = $('#id_number_of_the_loan_agreement').val();
         const credit_amount = $('#id_credit_amount').val();
         const term_month = $('#id_term_month').val();
-        const monthly_payment = $('#id_monthly_payment').val();
-        const loan_opening_date = $('#id_loan_opening_date').val();
-        const repayment_status = $('#id_repayment_status').val();
         const loan_type = $('#id_loan_type').val();
         const client = $('#id_client').val();
 
@@ -56,9 +51,6 @@ $(document).ready(function() {
         data.append('my_field_number_of_the_loan_agreement', number_of_the_loan_agreement);
         data.append('my_field_credit_amount', credit_amount);
         data.append('my_term_month', term_month);
-        data.append('my_field_monthly_payment', monthly_payment);
-        data.append('my_field_loan_opening_date', loan_opening_date);
-        data.append('my_field_repayment_status', repayment_status);
         data.append('my_field_loan_type', loan_type);
         data.append('my_field_client', client);
 
@@ -140,7 +132,7 @@ $(document).ready(function() {
         .then(data => {
             console.log('Server Response:', data);
             if (data && data.success) {
-                alert('Изменения успешно сохранены');
+                alert(`Изменения успешно сохранены. ${data.message}`);
                 window.location.href = '/bank/application_page/';
             } else {
                 // Очистка предыдущих ошибок

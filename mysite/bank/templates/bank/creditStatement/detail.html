@@ -40,21 +40,21 @@
         <div class="field-container">
             <label for="id_monthly_payment">Ежемесячный платеж:</label>
             <input type="text" name="my_field_monthly_payment" id="id_monthly_payment"
-                   value="{{ credit_statement_item.monthly_payment }}" required>
+                   value="{{ credit_statement_item.monthly_payment }}" readonly required>
             <span class="error-message" id="payment-error"></span>
         </div>
 
         <div class="field-container">
             <label for="id_loan_opening_date">Дата открытия кредита:</label>
             <input type="text" name="my_field_loan_opening_date" id="id_loan_opening_date"
-                value="{{ credit_statement_item.loan_opening_date|date:"Y-m-d" }}" required>
+                value="{{ credit_statement_item.loan_opening_date|date:"Y-m-d" }}" readonly required>
             <span class="error-message" id="open_date-error"></span>
         </div>
 
         <div class="field-container">
             <label for="id_repayment_status">Статус погашения кредита:</label>
             <input type="text" name="my_field_repayment_status" id="id_repayment_status"
-                   value="{{ credit_statement_item.repayment_status|yesno:"Да,Нет" }}" required>
+                   value="{{ credit_statement_item.repayment_status|yesno:"Да,Нет" }}" readonly required>
             <span class="error-message" id="repayment-error"></span>
         </div>
 

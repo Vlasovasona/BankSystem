@@ -1,6 +1,6 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
 import math
-
+from datetime import date
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
@@ -584,45 +584,6 @@ def update_credit_statement(request):
             errors['month'] = 'Длительность выплат должна быть числовым положительным значением'
             return JsonResponse({'success': False, 'errors': errors})
 
-        monthly_payment = request.POST.get('my_field_monthly_payment')
-        if not isinstance(monthly_payment, str):
-            errors['payment'] = 'Ежемесячная выплата обязательна для заполнения'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not monthly_payment.isdigit() or int(monthly_payment) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['payment'] = 'Ежемесячная выплата должна быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
-        loan_opening_date = request.POST.get('my_field_loan_opening_date')
-        date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
-
-        match = re.match(date_pattern, loan_opening_date)
-        if not isinstance(loan_opening_date, str) or not match:
-            errors['open_date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
-            return JsonResponse({'success': False, 'errors': errors})
-        else:
-            year, month, day = map(int, match.groups())
-            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
-            if not (1950 <= year <= 2025):
-                errors['open_date'] = f'Год должен быть между 1950 и 2025, введён {year}'
-                return JsonResponse({'success': False, 'errors': errors})
-            # Проверка корректности месяца (от 1 до 12)
-            if not (1 <= month <= 12):
-                errors['open_date'] = f'Месяц должен быть между 1 и 12, введён {month}'
-                return JsonResponse({'success': False, 'errors': errors})
-            # Проверка корректности дня (от 1 до 31)
-            if not (1 <= day <= 31):
-                errors['open_date'] = f'День должен быть между 1 и 31, введён {day}'
-                return JsonResponse({'success': False, 'errors': errors})
-
-        repayment_status = request.POST.get('my_field_repayment_status')
-        if not isinstance(repayment_status, str):
-            errors['repayment'] = 'Обязательно для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        if not (repayment_status == 'Да' or repayment_status == 'Нет'):
-            errors['repayment'] = 'Допустимы только значения Да/Нет'
-            return JsonResponse({'success': False, 'errors': errors})
-
         loan_type = request.POST.get('my_field_loan_type')
         if not isinstance(loan_type, str):
             errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
@@ -664,18 +625,28 @@ def update_credit_statement(request):
         try:
             statement = CreditStatement.objects.get(pk=statement_id)
             # Обновляем поля
+
+            percent = loan_t.interest_rate
+            count_of_pays = Payroll.objects.filter(loan=CreditStatement.objects.get(pk=statement_id)).count()
+            old_payment = (CreditStatement.objects.get(pk=statement_id)).monthly_payment
+
+            if statement.repayment_status != 1:
+                balance_of_debt = (int(statement.credit_amount) - int(old_payment) * count_of_pays) * (
+                            percent / 100 + 1.0) / int(term_month)
+                if balance_of_debt <= 0:
+                    statement.repayment_status = 1
+                else:
+                    statement.monthly_payment = math.ceil(balance_of_debt)
+
             statement.number_of_the_loan_agreement = number_of_the_loan_agreement
             statement.credit_amount = credit_amount
             statement.term_month = term_month
-            statement.monthly_payment = monthly_payment
-            statement.loan_opening_date = loan_opening_date
-            statement.repayment_status = 1 if repayment_status.strip() == 'Да' else 0
             statement.loan_type = loan_t
             statement.client = client
             statement.save()
             return JsonResponse({'success': True})
 
-        except Payroll.DoesNotExist:
+        except CreditStatement.DoesNotExist:
             return JsonResponse({'success': False, 'error': f'Кредитный договор {statement_id} не найден.'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -921,6 +892,8 @@ def add_new_payroll(request):
             # Проверяем условия:
             if dd_new == dd_create and mm_last + 1 == mm_new and yy_new == yy_last:
                 payment_status = 'C'
+            elif mm_last == mm_new and yy_new == yy_last:
+                return JsonResponse({'success': False, 'error': 'По этому кредиту уже была выплата в этом месяце'})
             else:
                 # Находим разницу между датами
                 delta = abs((new_data - last_data).days)
@@ -981,45 +954,6 @@ def add_new_credit_statement(request):
             errors['month'] = 'Длительность выплат должна быть числовым положительным значением'
             return JsonResponse({'success': False, 'errors': errors})
 
-        monthly_payment = request.POST.get('my_field_monthly_payment')
-        if not isinstance(monthly_payment, str):
-            errors['payment'] = 'Ежемесячная выплата обязательна для заполнения'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not monthly_payment.isdigit() or int(monthly_payment) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['payment'] = 'Ежемесячная выплата должна быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
-        loan_opening_date = request.POST.get('my_field_loan_opening_date')
-        date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
-
-        match = re.match(date_pattern, loan_opening_date)
-        if not isinstance(loan_opening_date, str) or not match:
-            errors['open_date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
-            return JsonResponse({'success': False, 'errors': errors})
-        else:
-            year, month, day = map(int, match.groups())
-            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
-            if not (1950 <= year <= 2025):
-                errors['open_date'] = f'Год должен быть между 1950 и 2025, введён {year}'
-                return JsonResponse({'success': False, 'errors': errors})
-            # Проверка корректности месяца (от 1 до 12)
-            if not (1 <= month <= 12):
-                errors['open_date'] = f'Месяц должен быть между 1 и 12, введён {month}'
-                return JsonResponse({'success': False, 'errors': errors})
-            # Проверка корректности дня (от 1 до 31)
-            if not (1 <= day <= 31):
-                errors['open_date'] = f'День должен быть между 1 и 31, введён {day}'
-                return JsonResponse({'success': False, 'errors': errors})
-
-        repayment_status = request.POST.get('my_field_repayment_status')
-        if not isinstance(repayment_status, str):
-            errors['repayment'] = 'Обязательно для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        if not (repayment_status == 'Да' or repayment_status == 'Нет'):
-            errors['repayment'] = 'Допустимы только значения Да/Нет'
-            return JsonResponse({'success': False, 'errors': errors})
-
         loan_type = request.POST.get('my_field_loan_type')
         if not isinstance(loan_type, str):
             errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
@@ -1065,13 +999,17 @@ def add_new_credit_statement(request):
         try:
             percent = loan_t.interest_rate
             monthly_payment = math.ceil((int(credit_amount)*(percent/100+1.0))/int(term_month))
+
+            today = date.today()
+            formatted_date = today.strftime('%Y-%m-%d')
+
             statement = CreditStatement(
                 number_of_the_loan_agreement = number_of_the_loan_agreement,
                 credit_amount = credit_amount,
                 term_month = term_month,
                 monthly_payment = monthly_payment,
-                loan_opening_date = loan_opening_date,
-                repayment_status = 1 if repayment_status.strip() == 'Да' else 0,
+                loan_opening_date = formatted_date,
+                repayment_status = 0,
                 loan_type = loan_t,
                 client = client
             )
@@ -1693,45 +1631,6 @@ def analysis(request):
             errors['month'] = 'Длительность выплат должна быть числовым положительным значением'
             return JsonResponse({'success': False, 'errors': errors})
 
-        monthly_payment = request.POST.get('my_field_monthly_payment')
-        if not isinstance(monthly_payment, str):
-            errors['payment'] = 'Ежемесячная выплата обязательна для заполнения'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not monthly_payment.isdigit() or int(monthly_payment) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['payment'] = 'Ежемесячная выплата должна быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
-        loan_opening_date = request.POST.get('my_field_loan_opening_date')
-        date_pattern = r'^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
-
-        match = re.match(date_pattern, loan_opening_date)
-        if not isinstance(loan_opening_date, str) or not match:
-            errors['open_date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
-            return JsonResponse({'success': False, 'errors': errors})
-        else:
-            year, month, day = map(int, match.groups())
-            # Дополнительная проверка диапазона года: от 1950 до 2025 включительно
-            if not (1950 <= year <= 2025):
-                errors['open_date'] = f'Год должен быть между 1950 и 2025, введён {year}'
-                return JsonResponse({'success': False, 'errors': errors})
-            # Проверка корректности месяца (от 1 до 12)
-            if not (1 <= month <= 12):
-                errors['open_date'] = f'Месяц должен быть между 1 и 12, введён {month}'
-                return JsonResponse({'success': False, 'errors': errors})
-            # Проверка корректности дня (от 1 до 31)
-            if not (1 <= day <= 31):
-                errors['open_date'] = f'День должен быть между 1 и 31, введён {day}'
-                return JsonResponse({'success': False, 'errors': errors})
-
-        repayment_status = request.POST.get('my_field_repayment_status')
-        if not isinstance(repayment_status, str):
-            errors['repayment'] = 'Обязательно для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        if not (repayment_status == 'Да' or repayment_status == 'Нет'):
-            errors['repayment'] = 'Допустимы только значения Да/Нет'
-            return JsonResponse({'success': False, 'errors': errors})
-
         loan_type = request.POST.get('my_field_loan_type')
         if not isinstance(loan_type, str):
             errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
@@ -1773,6 +1672,8 @@ def analysis(request):
         if errors:
             return JsonResponse({'success': False, 'errors': errors})
 
+        percent = loan_t.interest_rate
+        monthly_payment = math.ceil((int(credit_amount) * (percent / 100 + 1.0)) / int(term_month))
         # составление пандас элемента
         y = create_dataframe(client);
         # предсказание ML подели
@@ -1780,20 +1681,32 @@ def analysis(request):
         # если предсказано 0, то проверка соответствия выплаты, длительности выплат и ЗП
         if ((int(client.month_income)*0.3 >= int(monthly_payment)) or (prediction == 0)) and check_income_and_credit_value(int(client.month_income), int(credit_amount), int(term_month)):
             try:
+                today = date.today()
+                formatted_date = today.strftime('%Y-%m-%d')
                 statement = CreditStatement(
                     number_of_the_loan_agreement = number_of_the_loan_agreement,
                     credit_amount = credit_amount,
                     term_month = term_month,
                     monthly_payment = monthly_payment,
-                    loan_opening_date = loan_opening_date,
-                    repayment_status = 1 if repayment_status.strip() == 'Да' else 0,
+                    loan_opening_date = formatted_date,
+                    repayment_status = 0,
                     loan_type = loan_t,
                     client = client
                 )
                 statement.save()
-                return JsonResponse({'success': True})
-
             except Exception as e:
                 return JsonResponse({'success': False, 'error': str(e)})
+
+            try:
+                pay = Payroll(
+                    loan=CreditStatement.objects.get(number_of_the_loan_agreement=number_of_the_loan_agreement),
+                    payment_date=formatted_date,
+                    payment_status='C'
+                )
+                pay.save()
+                return JsonResponse({'success': True})
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)})
+
         else:
             return JsonResponse({'success': False, 'error': 'Отправленная на анализ кредитная заявка не одобрена системой. Все равно хотите сохранить заявку в системе?'})

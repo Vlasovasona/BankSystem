@@ -26,6 +26,7 @@
             <button class="exit-button" onclick="window.location.href='{% url 'bank:clients_list' %}'">Выйти</button>
             <button class="analysis-button" type="submit"  title="Для обработки заявки необходимо заполнить все поля">Обработать заявку</button>
         </div>
+        <input type="hidden" id="credit_state_id" name="credit_state_id" value="{{ credit_statement_item.id }}">
         <div class="head">
             <p class="main">Заполнение новой заявки</p>
             <hr>
@@ -78,25 +79,6 @@
             <input type="text" name="my_term_month" id="id_term_month"
                 value="" required>
             <span class="error-message" id="month-error"></span>
-        </div>
-
-        <div class="field-container">
-            <label for="id_monthly_payment">Ежемесячный платеж:</label>
-            <input type="text" name="my_field_monthly_payment" id="id_monthly_payment"
-                   value="" required>
-            <span class="error-message" id="payment-error"></span>
-        </div>
-
-        <div class="field-container">
-            <label for="id_loan_opening_date">Дата открытия кредита:</label>
-            <input type="text" name="my_field_loan_opening_date" id="id_loan_opening_date"
-                value="{{ credit_statement_item.loan_opening_date|date:"Y-m-d" }}" required>
-            <span class="error-message" id="open_date-error"></span>
-        </div>
-
-        <div class="field-container">
-            <input type="text" name="my_field_repayment_status" id="id_repayment_status"
-                   value="Нет" style="display:none;">
         </div>
 
         <div class="field-container">

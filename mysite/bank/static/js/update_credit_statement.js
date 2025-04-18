@@ -63,7 +63,7 @@ $(document).ready(function() {
 
 
     $('.analysis-button').on('click', function(event) {
-        console.log('я защел')
+        document.querySelector('.analysis-button').disabled = true;
         event.preventDefault();
 
         const number_of_the_loan_agreement = $('#id_number_of_the_loan_agreement').val();
@@ -93,7 +93,6 @@ $(document).ready(function() {
         // Добавляем csrf-token
         data.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());
         // Отправка данных на сервер
-        console.log('я отправил')
         fetch(analysisUrl, {
             method: 'POST',
             body: data
@@ -105,16 +104,14 @@ $(document).ready(function() {
             return response.json(); // Only proceed to the next `.then()` if the response is OK
         })
         .then(data => {
-            console.log('я в дате'); // This will be executed after the previous `.then()` resolves
             console.log('Server Response:', data);
             if (data && data.success) {
                 alert('Система одобрила заявку. Она автоматически добавлена в ведомость');
                 // window.location.href = '/bank/credit_statement/';
             } else {
-                // Handle errors as described
                 const errorElements = document.querySelectorAll('.error-message');
                 errorElements.forEach(element => {
-                    element.textContent = ''; // Clear previous error messages
+                    element.textContent = '';
                 });
 
                 if (data.errors) {
@@ -122,7 +119,7 @@ $(document).ready(function() {
                         const errorMessage = data.errors[key];
                         const errorElement = document.getElementById(`${key}-error`);
                         if (errorElement) {
-                            errorElement.textContent = errorMessage; // Set the error message
+                            errorElement.textContent = errorMessage;
                         }
                     }
                 } else {

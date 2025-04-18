@@ -850,16 +850,6 @@ def add_new_payroll(request):
                 errors['date'] = f'День должен быть между 1 и 31, введён {day}'
                 return JsonResponse({'success': False, 'errors': errors})
 
-        payment_status = request.POST.get('my_field_payment_status')
-        if not isinstance(payment_status, str):
-            errors['status'] = 'Обязательно для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        if not (payment_status == 'X' or payment_status == 'C' or (
-                payment_status.isdigit() and 0 <= int(payment_status) <= 5)):
-            errors['status'] = 'Допустимы только значения X, C или число от 0 до 5'
-            return JsonResponse({'success': False, 'errors': errors})
-
-
         try:
             # Попытка получения объекта CreditStatement
             loan = CreditStatement.objects.get(number_of_the_loan_agreement=loan_id)
@@ -1014,8 +1004,16 @@ def add_new_credit_statement(request):
                 client = client
             )
             statement.save()
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        try:
+            pay = Payroll(
+                loan=CreditStatement.objects.get(number_of_the_loan_agreement=number_of_the_loan_agreement),
+                payment_date=formatted_date,
+                payment_status='C'
+            )
+            pay.save()
             return JsonResponse({'success': True})
-
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 

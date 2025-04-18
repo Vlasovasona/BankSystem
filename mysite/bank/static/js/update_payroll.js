@@ -34,7 +34,6 @@ $(document).ready(function() {
         // Собираем данные вручную
         const loan = $('#id_loan').val();
         const date = $('#id_payment_date').val();
-        const status = $('#id_payment_status').val();
 
         // Создаем объект для отправки
         const data = new URLSearchParams();
@@ -44,7 +43,6 @@ $(document).ready(function() {
         }
         data.append('my_field_loan', loan);
         data.append('my_field_payment_date', date);
-        data.append('my_field_payment_status', status);
 
         // Добавляем csrf-token
         data.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());

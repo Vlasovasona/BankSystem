@@ -1,4 +1,6 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
+import math
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
@@ -894,16 +896,54 @@ def add_new_payroll(request):
                 errors['date'] = "Для этого кредита в эту дату уже был внесен платеж!"
                 return JsonResponse({'success': False, 'errors': errors})
         except CreditStatement.DoesNotExist:
-            errors['loan'] = 'Зпись с таким номером договора не найдена'
+            errors['loan'] = 'Запись с таким номером договора не найдена'
             return JsonResponse({'success': False, 'errors': errors})
 
         try:
+            current_loan_pays = Payroll.objects.filter(loan=loan).latest('payment_date')
+            last_data = current_loan_pays.payment_date
+            create_data = loan.loan_opening_date
+            new_data = datetime.strptime(payment_date, '%Y-%m-%d').date()
+
+            # Извлекаем отдельные компоненты (день, месяц, год)
+            dd_new = new_data.day
+            mm_new = new_data.month
+            yy_new = new_data.year
+
+            dd_create = create_data.day
+            mm_create = create_data.month
+            yy_create = create_data.year
+
+            dd_last = last_data.day
+            mm_last = last_data.month
+            yy_last = last_data.year
+
+            # Проверяем условия:
+            if dd_new == dd_create and mm_last + 1 == mm_new and yy_new == yy_last:
+                payment_status = 'C'
+            else:
+                # Находим разницу между датами
+                delta = abs((new_data - last_data).days)
+                if 1 <= delta <= 29: payment_status = '0'
+                elif 30 <= delta <= 59: payment_status = '1'
+                elif 60 <= delta <= 89: payment_status = '2'
+                elif 90 <= delta <= 119: payment_status = '3'
+                elif 120 <= delta <= 149: payment_status = '4'
+                else: payment_status = '5'
+
             pay = Payroll(
                 loan = loan,
                 payment_date = payment_date,
                 payment_status = payment_status
             )
             pay.save()
+
+            count_of_pays = Payroll.objects.filter(loan=loan).count()
+            # автоматически считать статус погашения кредита для которого внесен новый платеж
+            if loan.term_month == count_of_pays:
+                loan.repayment_status = 1
+                loan.save()
+
             return JsonResponse({'success': True})
 
         except Exception as e:
@@ -1023,6 +1063,8 @@ def add_new_credit_statement(request):
             return JsonResponse({'success': False, 'errors': errors})
 
         try:
+            percent = loan_t.interest_rate
+            monthly_payment = math.ceil((int(credit_amount)*(percent/100+1.0))/int(term_month))
             statement = CreditStatement(
                 number_of_the_loan_agreement = number_of_the_loan_agreement,
                 credit_amount = credit_amount,

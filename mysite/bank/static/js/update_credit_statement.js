@@ -1,7 +1,7 @@
 $(document).ready(function() {
     // Получаем URL из HTML-атрибута или переменной
     var updateUrl = $('[data-update-url]').data('update-url');
-    var analysisUrl = $('[data-update-url]').data('update-url');
+    var analysisUrl = $('[data-analysis-url]').data('analysis-url');
     var csrftoken = $('[name=csrfmiddlewaretoken]').val();
 
     $('.delete-client').on('click', function(event) {
@@ -62,7 +62,8 @@ $(document).ready(function() {
     checkFields();
 
 
-    $('.analysis-button').on('click', function(event)) {
+    $('.analysis-button').on('click', function(event) {
+        console.log('я защел')
         event.preventDefault();
 
         const number_of_the_loan_agreement = $('#id_number_of_the_loan_agreement').val();
@@ -92,40 +93,46 @@ $(document).ready(function() {
         // Добавляем csrf-token
         data.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());
         // Отправка данных на сервер
-        fetch(updateUrl, {
+        console.log('я отправил')
+        fetch(analysisUrl, {
             method: 'POST',
-            body: data // отправляем данные
+            body: data
         })
-        .then(response => response.json()) // получаем JSON ответ
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+            return response.json(); // Only proceed to the next `.then()` if the response is OK
+        })
         .then(data => {
+            console.log('я в дате'); // This will be executed after the previous `.then()` resolves
             console.log('Server Response:', data);
             if (data && data.success) {
-                alert('Изменения успешно сохранены');
-                window.location.href = '/bank/credit_statement/';
+                alert('Система одобрила заявку. Она автоматически добавлена в ведомость');
+                // window.location.href = '/bank/credit_statement/';
             } else {
-                // Очистка предыдущих ошибок
+                // Handle errors as described
                 const errorElements = document.querySelectorAll('.error-message');
                 errorElements.forEach(element => {
-                    element.textContent = ''; // очищаем предыдущие сообщения об ошибках
+                    element.textContent = ''; // Clear previous error messages
                 });
 
                 if (data.errors) {
-                    // Обработка ошибок
                     for (const key in data.errors) {
                         const errorMessage = data.errors[key];
                         const errorElement = document.getElementById(`${key}-error`);
                         if (errorElement) {
-                            errorElement.textContent = errorMessage; // Устанавливаем текст ошибки
+                            errorElement.textContent = errorMessage; // Set the error message
                         }
                     }
                 } else {
-                    alert('Произошла ошибка при сохранении изменений: ' + (data.error || 'Неизвестная ошибка.'));
+                    alert(data.error);
                 }
             }
         })
         .catch(error => {
             console.error('Fetch Error:', error);
-            alert('Произошла ошибка при отправке данных на сервер.');
+            // alert('Произошла ошибка при отправке данных на сервер.');
         });
     });
 

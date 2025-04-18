@@ -75,4 +75,5 @@ urlpatterns = [
 
     # urls для "Заявки"
     path('application_page/', views.application_page, name='application_page'),
+    path('result/', views.analysis, name='analysis'),
 ]

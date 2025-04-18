@@ -1501,11 +1501,6 @@ def check_income_and_credit_value(month_income, credit_amount, term_month):
         return True
 
 
-
-
-
-
-
 def load_or_create_model():
     """ Загружает модель из файла или создаёт новую и сохраняет её. """
     try:
@@ -1740,35 +1735,24 @@ def analysis(request):
         # составление пандас элемента
         y = create_dataframe(client);
         # предсказание ML подели
-
-
-
+        prediction = predict_client(y)
         # если предсказано 0, то проверка соответствия выплаты, длительности выплат и ЗП
-        # иначе создаю новый объект Credit statement и добавляю его автоматически
+        if (int(client.month_income)*0.3 <= int(monthly_payment)) or (prediction == 0 and (check_income_and_credit_value(int(client.month_income), int(credit_amount), int(term_month)))):
+            try:
+                statement = CreditStatement(
+                    number_of_the_loan_agreement = number_of_the_loan_agreement,
+                    credit_amount = credit_amount,
+                    term_month = term_month,
+                    monthly_payment = monthly_payment,
+                    loan_opening_date = loan_opening_date,
+                    repayment_status = 1 if repayment_status.strip() == 'Да' else 0,
+                    loan_type = loan_t,
+                    client = client
+                )
+                statement.save()
+                return JsonResponse({'success': True})
 
-
-        try:
-            statement = CreditStatement(
-                number_of_the_loan_agreement = number_of_the_loan_agreement,
-                credit_amount = credit_amount,
-                term_month = term_month,
-                monthly_payment = monthly_payment,
-                loan_opening_date = loan_opening_date,
-                repayment_status = 1 if repayment_status.strip() == 'Да' else 0,
-                loan_type = loan_t,
-                client = client
-            )
-            statement.save()
-            return JsonResponse({'success': True})
-
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-
-
-
-    # pred = 0
-    # if (pred == 0 and
-    #         check_income_and_credit_value(month_income, credit_amount, term_month)):
-    #     add_new_credit_statement(request);
-    # else:
-    #     return
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)})
+        else:
+            return JsonResponse({'success': False, 'error': 'Отправленная на анализ кредитная заявка не одобрена системой. Все равно хотите сохранить заявку в системе?'})

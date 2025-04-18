@@ -13,6 +13,7 @@
     {% block content %}
         <div class="buttons">
             <div data-update-url="{% url 'bank:add_new_credit_statement' %}"></div>
+            <div data-analysis-url="{% url 'bank:analysis' %}"></div>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="{% static 'js/update_credit_statement.js' %}"></script>
             <button class="exit-button" onclick="window.location.href='{% url 'bank:clients_list' %}'">Выйти</button>

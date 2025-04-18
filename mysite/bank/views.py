@@ -1,4 +1,5 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Clients, CreditStatement, LoanTypes, Payroll, AuthUser
@@ -31,7 +32,22 @@ from reportlab.lib.units import inch
 import pandas as pd
 from datetime import datetime
 
+import joblib
+from django.conf import settings
 
+import warnings
+warnings.filterwarnings('ignore')
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import itertools
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+
+MODEL_FILEPATH = os.path.join(settings.BASE_DIR, 'bank','static', 'bank', 'datasets', 'final_model.joblib')
 
 class ClientListView(ListView):
     queryset = Clients.objects.order_by('id')
@@ -987,7 +1003,6 @@ def add_new_credit_statement(request):
                 errors['number'] = "Кредит с таким номером договора уже существует"
                 return JsonResponse({'success': False, 'errors': errors})
 
-
         if 'loanType' not in errors:
             try:
                 # Попытка получения объекта LoanType
@@ -1486,8 +1501,113 @@ def check_income_and_credit_value(month_income, credit_amount, term_month):
         return True
 
 
-# Функции для predict
 
+
+
+
+
+def load_or_create_model():
+    """ Загружает модель из файла или создаёт новую и сохраняет её. """
+    try:
+        # Пробуем загрузить существующую модель
+        final_model = joblib.load(MODEL_FILEPATH)
+    except FileNotFoundError:
+        print("Не нашел твой файл :(")
+        # Генерируем модель
+        final_model = train_and_save_model()
+        # Сохраняем модель на диск
+        joblib.dump(final_model, MODEL_FILEPATH)
+        print("Модель успешно сохранена!")
+    return final_model
+
+
+def train_and_save_model():
+    """ Тренировка и возврат готовой модели (этот код помещается внутрь функции predict_client()) """
+    DATA_PATH = os.path.join(settings.BASE_DIR, 'bank', 'static', 'bank', 'datasets', 'application_record.csv')
+    RECORD_PATH = os.path.join(settings.BASE_DIR, 'bank', 'static', 'bank', 'datasets', 'credit_record.csv')
+    # Читаем данные
+    data = pd.read_csv(DATA_PATH)
+    record = pd.read_csv(RECORD_PATH)
+
+    begin_month = pd.DataFrame(record.groupby(["ID"])["MONTHS_BALANCE"].agg(min))
+    begin_month = begin_month.rename(columns={'MONTHS_BALANCE': 'begin_month'})
+    new_data = pd.merge(data, begin_month, how="left", on="ID")
+
+    record['dep_value'] = 'No'
+    cpunt = record.groupby('ID')['STATUS'].size().reset_index(name='status_count')
+    cpunt['dep_value'] = cpunt['status_count'].apply(lambda x: 'Yes' if x > 10 else 'No')
+    result = cpunt[['ID', 'dep_value']]
+
+    new_data = pd.merge(new_data, cpunt, how='inner', on='ID')
+    new_data['target'] = new_data['dep_value']
+    new_data.loc[new_data['target'] == 'Yes', 'target'] = 1
+    new_data.loc[new_data['target'] == 'No', 'target'] = 0
+    cpunt['dep_value'].value_counts(normalize=True)
+
+    new_data.rename(
+        columns={'CODE_GENDER': 'sex', 'FLAG_OWN_CAR': 'flag_own_car', 'FLAG_OWN_REALTY': 'flag_own_property',
+                 'CNT_CHILDREN': 'count_children', 'AMT_INCOME_TOTAL': 'month_income',
+                 'NAME_EDUCATION_TYPE': 'education_type'}, inplace=True)
+    new_data.dropna()
+    new_data = new_data.mask(new_data == 'NULL').dropna()
+
+    new_data['sex'] = new_data['sex'].replace(['F', 'M'], [0, 1])
+    new_data['flag_own_car'] = new_data['flag_own_car'].replace(['N', 'Y'], [0, 1])
+    new_data['flag_own_property'] = new_data['flag_own_property'].replace(['N', 'Y'], [0, 1])
+    new_data['month_income'] = new_data['month_income'].astype(int)
+    new_data['education_type'] = new_data['education_type'].replace(
+        ['Secondary / secondary special', 'Higher education', 'Incomplete higher', 'Lower secondary',
+         'Academic degree'], [0, 1, 0, 1, 1])
+
+    new_data = new_data[['sex', 'flag_own_car', 'flag_own_property',
+                         'count_children', 'month_income', 'target',
+                         'education_type']]
+    Y = new_data['target'].astype(int)
+
+    for col in new_data.select_dtypes(include=[bool]):
+        new_data[col] = new_data[col].astype(int)
+    new_data = new_data.select_dtypes(exclude=[object])
+
+    X = new_data
+
+    np.random.seed(51)
+    X_train, X_test, y_train, y_test = train_test_split(X,
+                                                        Y,
+                                                        test_size=0.3,
+                                                        random_state=51,
+                                                        stratify=Y)
+
+    normalizer = preprocessing.StandardScaler()
+    X_real_norm_np = normalizer.fit_transform(X_train)
+    X_train = pd.DataFrame(data=X_real_norm_np, columns=X_test.columns)
+
+    X_real_norm_np = normalizer.transform(X_test)
+    X_test = pd.DataFrame(data=X_real_norm_np, columns=X_train.columns)
+
+    param_grid = {
+        'C': [0.1, 1, 10],  # Значения коэффициента регуляризации
+        'gamma': ['scale', 'auto', 0.1]  # Гамма с автоматическим выбором и вручную заданными значениями
+    }
+
+    # Инициализируем модель SVM с RBF-ядром
+    svc_rbf = SVC(kernel='rbf', class_weight='balanced')
+    # Используем GridSearchCV для нахождения лучших параметров
+    grid_search = GridSearchCV(svc_rbf, param_grid, cv=3, n_jobs=-1, verbose=1, scoring='accuracy')
+    grid_search.fit(X_train, y_train)
+    best_params = grid_search.best_params_
+
+    final_model = SVC(**best_params, kernel='rbf', class_weight='balanced')
+    final_model.fit(X_train, y_train)
+
+    return final_model
+
+
+def predict_client(y):
+    global final_model
+    # Загружаем модель из файла или создаём новую
+    final_model = load_or_create_model()
+    prediction = final_model.predict(y)
+    return prediction
 
 # Функция для формирования DataFrame из объекта клиента
 def create_dataframe(client):
@@ -1621,6 +1741,8 @@ def analysis(request):
         y = create_dataframe(client);
         # предсказание ML подели
 
+
+
         # если предсказано 0, то проверка соответствия выплаты, длительности выплат и ЗП
         # иначе создаю новый объект Credit statement и добавляю его автоматически
 
@@ -1644,9 +1766,9 @@ def analysis(request):
 
 
 
-    pred = 0
-    if (pred == 0 and
-            check_income_and_credit_value(month_income, credit_amount, term_month)):
-        add_new_credit_statement(request);
-    else:
-        return
+    # pred = 0
+    # if (pred == 0 and
+    #         check_income_and_credit_value(month_income, credit_amount, term_month)):
+    #     add_new_credit_statement(request);
+    # else:
+    #     return

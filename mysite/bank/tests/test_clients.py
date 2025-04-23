@@ -1,37 +1,14 @@
 import random
-
 from django.test import TestCase, RequestFactory, Client
 from django.urls import reverse
-from .models import Clients
-from .views import ClientListView, client_detail, get_object_or_404, check_clients_fields, search_clients
+# from mysite.bank.models import Clients
+# from mysite.bank.views import ClientListView, client_detail, get_object_or_404, check_clients_fields, search_clients
+from ..models import Clients  # Относительный импорт
+from ..views import ClientListView, client_detail, check_clients_fields, search_clients
 
-#     def test_reverse_client_detail(self):
-#         """Тестируем правильную генерацию URL для детализированного представления клиента"""
-#         expected_url = f'/bank/clients/{self.client.id}/'
-#         reversed_url = reverse('bank:client_detail', args=[self.client.id])
-#         self.assertEqual(reversed_url, expected_url)
-
-class BankViewsTests(TestCase):
+class TestClients(TestCase):
 
     def setUp(self):
-        # # Создаем экземпляр фабрики запросов
-        # self.factory = RequestFactory()
-        #
-        # # Создаем фиктивных пользователей-клиентов
-        # for i in range(30):
-        #     Clients.objects.create(surname=f'{i}',
-        #                            name=f'Клиент {i}',
-        #                            patronymic=f'{i}',
-        #                            phone_number=random.randint(80000,90000),
-        #                            age=i,
-        #                            sex=1,
-        #                            flag_own_car=1,
-        #                            flag_own_property=1,
-        #                            month_income=1,
-        #                            count_children=1,
-        #                            education_type=1,
-        #                            passport_serial_number=random.randint(80000,900000))
-
         self.client = Client()
         self.client1 = Clients.objects.create(
             surname='Иванов',
@@ -125,5 +102,3 @@ class BankViewsTests(TestCase):
         response = self.client.get(reverse('bank:search_clients'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'bank/clients/list.html')
-
-

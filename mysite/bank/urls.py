@@ -9,7 +9,7 @@ app_name = 'bank'
 urlpatterns = [
     # отображение всех таблиц из БД
     path('', views.ClientListView.as_view(), name='clients_list'),
-    path('c/<int:id>/', views.client_detail, name='client_detail'),
+    path('clients/<int:id>/', views.client_detail, name='client_detail'),
     path('clients/', views.ClientListView.as_view(), name='clients_list_select'),
     path('clients/search', views.search_clients, name='search_clients'),
 

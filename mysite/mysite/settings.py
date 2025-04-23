@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import pymysql
 import os
+import sys
 
 pymysql.install_as_MySQLdb()
 
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions', # фреймворк сеансов
     'django.contrib.messages', # фреймворк сообщений
     'django.contrib.staticfiles', # фреймворк управления статическими файлами
-    'bank.apps.BankConfig'
+    'bank.apps.BankConfig',
 ]
 
 
@@ -96,6 +97,14 @@ DATABASES = {
         'OPTIONS': {
             'sql_mode': 'STRICT_TRANS_TABLES',
         },
+    },
+    'testing': {  # Тестовая база данных
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'test_my_bank',
+        'USER': 'root',
+        'PASSWORD': 'new_password',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -145,3 +154,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'bank/static')]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if 'test' in sys.argv:
+    DATABASES['default']['NAME'] = 'test_my_bank'
+

@@ -88,7 +88,27 @@ class TestCreditTypes(TestCase):
         validate_loan_id(None, errors)
         self.assertIn('loan', errors)
 
-    def test_validate_date(self):
+    def test_validate_date_correct_data(self):
         errors = {}
         validate_date('2020-08-08', errors)
         self.assertEqual({}, errors)
+
+    def test_validate_date_incorrect_format(self):
+        errors = {}
+        validate_date('nj', errors)
+        self.assertIn('date', errors)
+
+    def test_validate_date_incorrect_year(self):
+        errors = {}
+        validate_date('1000-09-09', errors)
+        self.assertIn('date', errors)
+
+    def test_validate_date_incorrect_month(self):
+        errors = {}
+        validate_date('2020-99-09', errors)
+        self.assertIn('date', errors)
+
+    def test_validate_date_incorrect_date(self):
+        errors = {}
+        validate_date('2020-09-99', errors)
+        self.assertIn('date', errors)

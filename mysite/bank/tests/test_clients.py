@@ -83,6 +83,48 @@ class TestClients(TestCase):
                              errors)
         self.assertCountEqual(list(errors.keys()), fields)
 
+    def test_check_clients_none_fields(self):
+        """Тестирование проверки корректности введенных полей кликнта"""
+        errors = {}
+        fields = ['passport', 'surname', 'name', 'patronymic', 'phone',
+                  'age', 'sex', 'car', 'property', 'income', 'children',
+                  'education']
+        check_clients_fields('',
+                             '',
+                             '',
+                             '',
+                             '',
+                             None,
+                             None,
+                             None,
+                             None,
+                             None,
+                             None,
+                             None,
+                             errors)
+        self.assertCountEqual(list(errors.keys()), fields)
+
+    def test_check_clients_incorrect_age(self):
+        """Тестирование проверки корректности введенных полей кликнта"""
+        errors = {}
+        fields = ['passport', 'surname', 'name', 'patronymic', 'phone',
+                  'age', 'sex', 'car', 'property', 'income', 'children',
+                  'education']
+        check_clients_fields('',
+                             '',
+                             '',
+                             '',
+                             '',
+                             '123',
+                             None,
+                             None,
+                             None,
+                             None,
+                             None,
+                             None,
+                             errors)
+        self.assertCountEqual(list(errors.keys()), fields)
+
     def test_search_clients_with_valid_passport(self):
         """Тестирование поиска по номеру паспорта."""
         data = {'search_query': str(self.client1.passport_serial_number)}

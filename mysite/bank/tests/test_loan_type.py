@@ -55,3 +55,16 @@ class TestCreditTypes(TestCase):
         )
         self.assertCountEqual(list(errors.keys()), fields)
 
+    def test_check_clients_fields_none_values(self):
+        """Тестирование представления с существующим клиентом"""
+        errors = {}
+        check_loan_type(None,
+                             None,
+                             None,
+                             errors,
+        )
+        self.assertIn('credit_types', errors)
+        self.assertIn('percent', errors)
+
+
+

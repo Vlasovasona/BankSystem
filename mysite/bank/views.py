@@ -344,10 +344,6 @@ def validate_date(date, errors):
         year, month, day = map(int, match.groups())
         if not (1950 <= year <= datetime.now().year):  # Ограничиваем диапазон допустимых годов
             errors['date'] = f'Год должен быть между 1950 и {datetime.now().year}, введен {year}'
-        if not (1 <= month <= 12):  # Проверка месяца
-            errors['date'] = f'Месяц должен быть между 1 и 12, введен {month}'
-        if not (1 <= day <= 31):  # Проверка дня
-            errors['date'] = f'День должен быть между 1 и 31, введен {day}'
 
 def check_string(string):
     return re.match(r'^[А-ЯЁа-яё ]+$', string)

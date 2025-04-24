@@ -30,6 +30,7 @@ $(document).ready(function() {
             headers: {
                 'X-CSRFToken': csrftoken
             },
+            contentType: 'application/json'
             data: {
                 'ids': JSON.stringify(selectedIds), // Преобразуем массив в строку
             },

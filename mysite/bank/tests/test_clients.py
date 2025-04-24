@@ -1,20 +1,22 @@
 import random
-from django.test import TestCase, RequestFactory, Client
+from django.test import TestCase, Client
 from django.urls import reverse
-# from mysite.bank.models import Clients
-# from mysite.bank.views import ClientListView, client_detail, get_object_or_404, check_clients_fields, search_clients
+import json
+from urllib.parse import urlencode
 from ..models import Clients  # Относительный импорт
-from ..views import ClientListView, client_detail, check_clients_fields, search_clients
+from ..views import check_clients_fields
 
 class TestClients(TestCase):
 
     def setUp(self):
         self.client = Client()
         self.client1 = Clients.objects.create(
+            id=1,
             surname='Иванов',
             name='Иван',
             patronymic='Иванович',
             phone_number=89001234567,
+            adress='Москва',
             age=30,
             sex='Мужской',
             flag_own_car=0,
@@ -25,6 +27,7 @@ class TestClients(TestCase):
             passport_serial_number=1234567890
         )
         self.client2 = Clients.objects.create(
+            id=2,
             surname='Петров',
             name='Пётр',
             patronymic='Петрович',
@@ -35,9 +38,25 @@ class TestClients(TestCase):
             flag_own_property=0,
             month_income=60000,
             count_children=1,
-            education_type='Среднее',
+            education_type='Среднее специальное',
             passport_serial_number=9876543210
         )
+        self.client3 = Clients.objects.create(
+            id=3,
+            surname='Волков',
+            name='Евгений',
+            patronymic='Викторович',
+            phone_number=8900125678,
+            age=56,
+            sex='Мужской',
+            flag_own_car=0,
+            flag_own_property=0,
+            month_income=6,
+            count_children=0,
+            education_type='Среднее специальное',
+            passport_serial_number=9876599999
+        )
+        self.url = reverse('bank:update_client_view')
 
     def test_client_list_view(self):
         """Тестируем представление списка клиентов."""
@@ -144,3 +163,261 @@ class TestClients(TestCase):
         response = self.client.get(reverse('bank:search_clients'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'bank/clients/list.html')
+
+    def test_clients_add_detail_view(self):
+        """Тестируем представление окна добавления нового типа кредита."""
+        response = self.client.get(reverse('bank:client_add_detail'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'bank/clients/add_detail.html')
+
+    # def test_delete_clients_successfully(self):
+    #     # Данные для отправки в виде JSON (идентификаторы клиентов для удаления)
+    #     data = {
+    #         'ids': [self.client1.id, self.client2.id]
+    #     }
+    #
+    #     # Отправляем POST-запрос с данными в теле запроса
+    #     response = self.client.post(
+    #         reverse('bank:delete_clients'),
+    #         data=json.dumps(data, cls=DjangoJSONEncoder),
+    #         content_type='application/json'
+    #     )
+    #
+    #     # Проверяем успешность ответа
+    #     self.assertEqual(response.status_code, 200)
+    #     result = json.loads(response.content.decode())
+    #     self.assertTrue(result['success'])
+    #
+    #     # Проверяем, что записи были удалены
+    #     remaining_clients = list(Clients.objects.all())
+    #     self.assertIn(self.client3, remaining_clients)
+    #     self.assertNotIn(self.client1, remaining_clients)
+    #     self.assertNotIn(self.client2, remaining_clients)
+    #
+    # def test_missing_ids_in_request(self):
+    #     # Полностью пустые данные
+    #     empty_data = {}  # Пустой словарь
+    #
+    #     response = self.client.post(
+    #         reverse('bank:delete_clients'),
+    #         data=json.dumps(empty_data, cls=DjangoJSONEncoder),
+    #         content_type='application/json'
+    #     )
+    #
+    #     # Ожидается сообщение об отсутствии идентификаторов
+    #     self.assertEqual(response.status_code, 200)
+    #     result = json.loads(response.content.decode())
+    #     self.assertFalse(result['success'])
+    #     self.assertEqual(result['message'], 'Не найдены идентификаторы для удаления')
+
+    def test_valid_deletion(self):
+        """ Корректный запрос на удаление существующего клиента. """
+        response = self.client.post(reverse('bank:delete_single_client'),
+                                    data=json.dumps({"client_id": self.client1.id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(json.loads(response.content)['success'])
+        self.assertFalse(
+            Clients.objects.filter(id=self.client1.id).exists())  # Проверяем, что запись действительно удалена
+
+    def test_nonexistent_client(self):
+        """ Попытка удалить несуществующего клиента. """
+        non_existent_id = 999999  # ID, которого точно нет в БД
+        response = self.client.post(reverse('bank:delete_single_client'),
+                                    data=json.dumps({"client_id": non_existent_id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(json.loads(response.content)['error'], f"Клиента с ID {non_existent_id} не существует.")
+
+    def test_invalid_client_id_format(self):
+        """ Неверный формат идентификатора (нечисловое значение). """
+        bad_id = "abc"
+        response = self.client.post(reverse('bank:delete_single_client'),
+                                    data=json.dumps({"client_id": bad_id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], f"Передано неверное значение ID: {bad_id}.")
+
+    def test_missing_client_id_field(self):
+        """ Отсутствие параметра 'client_id'. """
+        response = self.client.post(reverse('bank:delete_single_client'),
+                                    data={},
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], "Не найден параметр 'client_id'.")
+
+    def test_bad_json_structure(self):
+        """ Некорректная структура JSON. """
+        malformed_json = {"invalid_key": "value"}
+        response = self.client.post(reverse('bank:delete_single_client'),
+                                    data=json.dumps(malformed_json),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], "Не найден параметр 'client_id'.")
+
+    def test_wrong_http_method(self):
+        """ Использование неправильного HTTP-метода (GET вместо POST). """
+        response = self.client.get(reverse('bank:delete_single_client'))
+
+        self.assertEqual(response.status_code, 405)
+        self.assertDictEqual(json.loads(response.content), {})
+
+    def tearDown(self):
+         Clients.objects.all().delete()
+
+    def test_update_client_successful(self):
+        """Корректное обновление данных клиента"""
+        new_data = {
+            'client_id': self.client1.pk,
+            'my_field_passport': '1234567891',
+            'my_field_surname': 'Петрова',
+            'my_field_name': 'Анна',
+            'my_field_patronymic': 'Павловна',
+            'my_field_address': 'парам',
+            'my_field_phone': '89997654321',
+            'my_field_age': '35',
+            'my_field_sex': 'Женский',
+            'my_field_flag_own_car': 'Нет',
+            'my_flag_own_property': 'Да',
+            'my_field_month_income': '60000',
+            'my_field_count_children': '1',
+            'my_field_education_type': 'Среднее специальное'
+        }
+
+        # Конвертируем данные в формат form/urlencoded
+        encoded_data = urlencode(new_data)
+
+        # Отправляем данные с correct Content-Type
+        response = self.client.post(reverse('bank:update_client_view'), encoded_data,
+                                    content_type='application/x-www-form-urlencoded')
+
+        updated_user = Clients.objects.get(pk=self.client1.pk)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(json.loads(response.content)['success'])
+        self.assertEqual(updated_user.passport_serial_number, int(new_data['my_field_passport']))
+        self.assertEqual(updated_user.surname, new_data['my_field_surname'])
+        self.assertEqual(updated_user.name, new_data['my_field_name'])
+        self.assertEqual(updated_user.patronymic, new_data['my_field_patronymic'])
+        self.assertEqual(updated_user.adress, new_data['my_field_address'])
+        self.assertEqual(updated_user.phone_number, int(new_data['my_field_phone']))
+        self.assertEqual(updated_user.age, int(new_data['my_field_age']))
+        self.assertEqual(updated_user.sex, new_data['my_field_sex'])
+        self.assertEqual(updated_user.flag_own_car, False)
+        self.assertEqual(updated_user.flag_own_property, True)
+        self.assertEqual(updated_user.month_income, float(new_data['my_field_month_income']))
+        self.assertEqual(updated_user.count_children, int(new_data['my_field_count_children']))
+        self.assertEqual(updated_user.education_type, new_data['my_field_education_type'])
+
+    def test_update_client_with_errors(self):
+        """Обновление клиента с некорректными данными"""
+        incorrect_data = {
+            'client_id': self.client1.pk,
+            'my_field_passport': '',
+            'my_field_surname': 'Петрова',
+            'my_field_name': 'Анна',
+            'my_field_patronymic': 'Павловна',
+            'my_field_adress': 'Санкт-Петербург, Невский проспект, д. 10',
+            'my_field_phone': '89997654321',
+            'my_field_age': 'abcd',  # Некорректный возраст
+            'my_field_sex': 'Женский',
+            'my_field_flag_own_car': 'Нет',
+            'my_flag_own_property': 'Да',
+            'my_field_month_income': '-10000',  # Негативный доход
+            'my_field_count_children': '1',
+            'my_field_education_type': 'Среднее специальное'
+        }
+
+        response = self.client.post(reverse('bank:update_client_view'), incorrect_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(errors)
+        self.assertIn('passport', errors.keys())  # Ошибка паспорта
+        self.assertIn('age', errors.keys())  # Ошибка возраста
+        self.assertIn('income', errors.keys())  # Ошибка дохода
+
+    def test_update_client_not_found(self):
+        """Попробуем обновить несуществующего клиента"""
+        wrong_id = 999999
+        data = {
+            'client_id': wrong_id,
+            'my_field_passport': '9876547210',
+            'my_field_surname': 'Петрова',
+            'my_field_name': 'Анна',
+            'my_field_patronymic': 'Павловна',
+            'my_field_adress': 'Санкт-Петербург, Невский проспект, д. 10',
+            'my_field_phone': '89997654321',
+            'my_field_age': '35',
+            'my_field_sex': 'Женский',
+            'my_field_flag_own_car': 'Нет',
+            'my_flag_own_property': 'Да',
+            'my_field_month_income': '60000',
+            'my_field_count_children': '1',
+            'my_field_education_type': 'Среднее специальное'
+        }
+
+        response = self.client.post(reverse('bank:update_client_view'), data)
+        response_content = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response_content['success'])
+        self.assertEqual(response_content['error'], f'Клиент {wrong_id} не найден.')
+
+    def test_update_client_with_duplicate_passport(self):
+        """Обновление клиента с дублирующимся номером паспорта"""
+        duplicate_data = {
+            'client_id': self.client1.pk,
+            'my_field_passport': '9876543210',  # Дублируется номер паспорта другого клиента
+            'my_field_surname': 'Иванова',
+            'my_field_name': 'Мария',
+            'my_field_patronymic': 'Владимировна',
+            'my_field_adress': 'Самара, ул. Мира, д. 15',
+            'my_field_phone': '89911122333',
+            'my_field_age': '30',
+            'my_field_sex': 'Женский',
+            'my_field_flag_own_car': 'Да',
+            'my_flag_own_property': 'Нет',
+            'my_field_month_income': '55000',
+            'my_field_count_children': '0',
+            'my_field_education_type': 'Среднее специальное'
+        }
+
+        response = self.client.post(reverse('bank:update_client_view'), duplicate_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('passport', errors.keys())
+        self.assertEqual(errors['passport'], 'Клиент с такими паспортными данными уже существует')
+
+    def test_update_client_without_required_field(self):
+        """Обновление клиента без обязательного поля"""
+        incomplete_data = {
+            'client_id': self.client1.pk,
+            'my_field_passport': '9876540000',
+            'my_field_surname': '',  # Обязательное поле пустое
+            'my_field_name': 'Анна',
+            'my_field_patronymic': 'Павловна',
+            'my_field_adress': 'Санкт-Петербург, Невский проспект, д. 10',
+            'my_field_phone': '+79997654321',
+            'my_field_age': '35',
+            'my_field_sex': 'Женский',
+            'my_field_flag_own_car': 'Нет',
+            'my_flag_own_property': 'Да',
+            'my_field_month_income': '60000',
+            'my_field_count_children': '1',
+            'my_field_education_type': 'Среднее специальное'
+        }
+
+        response = self.client.post(reverse('bank:update_client_view'), incomplete_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('surname', errors.keys())
+
+

@@ -1,4 +1,5 @@
 import datetime
+import json
 from django.test import TestCase, RequestFactory, Client
 from django.urls import reverse
 from ..models import CreditStatement, Clients, LoanTypes
@@ -76,3 +77,94 @@ class TestCreditTypes(TestCase):
             self.assertEqual(stmt.monthly_payment, 200)
             self.assertEqual(stmt.loan_type.registration_number, 32)
             self.assertEqual(stmt.client.surname, 'Иванов')
+
+    def test_check_credit_statement_none_values(self):
+        errors = {}
+        check_credit_statement(number_of_the_loan_agreement=None,
+                               credit_amount=None,
+                               term_month=None,
+                               loan_type=None,
+                               client_passport=None,
+                               errors=errors)
+        self.assertIn('number', errors)
+        self.assertIn('amount', errors)
+        self.assertIn('month', errors)
+        self.assertIn('loanType', errors)
+        self.assertIn('client', errors)
+
+    def test_check_credit_statement_incorrect_values(self):
+        errors = {}
+        check_credit_statement(number_of_the_loan_agreement='None',
+                               credit_amount='None',
+                               term_month='None',
+                               loan_type='None',
+                               client_passport='',
+                               errors=errors)
+        self.assertIn('number', errors)
+        self.assertIn('amount', errors)
+        self.assertIn('month', errors)
+        self.assertIn('loanType', errors)
+        self.assertIn('client', errors)
+
+    def test_credit_statement_add_detail_view(self):
+        """Тестируем представление окна добавления нового кредита."""
+        response = self.client.get(reverse('bank:credit_statement_add_detail'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'bank/creditStatement/add_detail.html')
+
+    def test_valid_deletion(self):
+        """ Корректный запрос на удаление существующего кредита. """
+        response = self.client.post(reverse('bank:delete_single_statement'),
+                                    data=json.dumps({"credit_state_id": self.statement.id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(json.loads(response.content)['success'])
+        self.assertFalse(
+            CreditStatement.objects.filter(id=self.statement.id).exists())  # Проверяем, что запись действительно удалена
+
+    def test_nonexistent_loan_type(self):
+        """ Попытка удалить несуществующего кредита. """
+        non_existent_id = 999999  # ID, которого точно нет в БД
+        response = self.client.post(reverse('bank:delete_single_statement'),
+                                    data=json.dumps({"credit_state_id": non_existent_id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(json.loads(response.content)['error'], f"Договора с ID {non_existent_id} не существует.")
+
+    def test_invalid_loan_type_id_format(self):
+        """ Неверный формат идентификатора (нечисловое значение). """
+        bad_id = "abc"
+        response = self.client.post(reverse('bank:delete_single_statement'),
+                                    data=json.dumps({"credit_state_id": bad_id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], f"Передано неверное значение ID: {bad_id}.")
+
+    def test_missing_loan_type_id_field(self):
+        """ Отсутствие параметра 'loan_id'. """
+        response = self.client.post(reverse('bank:delete_single_statement'),
+                                    data={},
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], "Не найден параметр 'credit_state_id'.")
+
+    def test_bad_json_structure(self):
+        """ Некорректная структура JSON. """
+        malformed_json = {"invalid_key": "value"}
+        response = self.client.post(reverse('bank:delete_single_statement'),
+                                    data=json.dumps(malformed_json),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], "Не найден параметр 'credit_state_id'.")
+
+    def test_wrong_http_method(self):
+        """ Использование неправильного HTTP-метода (GET вместо POST). """
+        response = self.client.get(reverse('bank:delete_single_statement'))
+
+        self.assertEqual(response.status_code, 405)
+        self.assertDictEqual(json.loads(response.content), {})

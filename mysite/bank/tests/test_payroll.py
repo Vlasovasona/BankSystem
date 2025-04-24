@@ -1,10 +1,11 @@
 import datetime
+import json
 from django.test import TestCase, RequestFactory, Client
 from django.urls import reverse
 from ..models import CreditStatement, Clients, LoanTypes, Payroll
 from ..views import (PayrollListView, payroll_detail, check_credit_and_payment_exists,
                      update_repayment_status_after_input_new_pay, validate_loan_id,
-                     validate_date)
+                     validate_date, calculate_payment_status)
 
 class TestCreditTypes(TestCase):
     def setUp(self):
@@ -83,9 +84,14 @@ class TestCreditTypes(TestCase):
             self.assertEqual(stmt.payment_date, datetime.date(2026, 1, 9))
             self.assertEqual(stmt.payment_status, '0')
 
-    def test_validate_loan_id(self):
+    def test_validate_loan_id_none_data(self):
         errors = {}
         validate_loan_id(None, errors)
+        self.assertIn('loan', errors)
+
+    def test_validate_loan_id_incorrect_data(self):
+        errors = {}
+        validate_loan_id('None', errors)
         self.assertIn('loan', errors)
 
     def test_validate_date_correct_data(self):
@@ -112,3 +118,157 @@ class TestCreditTypes(TestCase):
         errors = {}
         validate_date('2020-09-99', errors)
         self.assertIn('date', errors)
+
+    def test_calculate_payment_status_correct_data(self):
+        new_data = datetime.date(2025, 4, 24)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('C', payment_status)
+
+    def test_calculate_payment_status_error_data_is_exist(self):
+        new_data = datetime.date(2025, 4, 24)
+        last_data = datetime.date(2025, 4, 24)
+        create_data = datetime.date(2025, 3, 24)
+
+        with self.assertRaises(ValueError) as context:
+            calculate_payment_status(
+                new_data=new_data,
+                last_data=last_data,
+                create_data=create_data
+            )
+
+        self.assertEqual(str(context.exception), 'По этому кредиту уже была выплата в этом месяце.')
+
+    def test_calculate_payment_status_zero(self):
+        new_data = datetime.date(2025, 4, 29)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('0', payment_status)
+
+    def test_calculate_payment_status_one(self):
+        new_data = datetime.date(2025, 5, 29)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('1', payment_status)
+
+    def test_calculate_payment_status_two(self):
+        new_data = datetime.date(2025, 6, 29)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('2', payment_status)
+
+    def test_calculate_payment_status_three(self):
+        new_data = datetime.date(2025, 7, 29)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('3', payment_status)
+
+    def test_calculate_payment_status_four(self):
+        new_data = datetime.date(2025, 8, 29)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('4', payment_status)
+
+    def test_calculate_payment_status_five(self):
+        new_data = datetime.date(2026, 8, 9)
+        last_data = datetime.date(2025, 3, 24)
+        create_data = datetime.date(2025, 2, 24)
+
+        payment_status = calculate_payment_status(new_data=new_data,
+                                                  last_data=last_data,
+                                                  create_data=create_data)
+
+        self.assertEqual('5', payment_status)
+
+    def test_payroll_add_detail_view(self):
+        """Тестируем представление окна добавления нового платежа."""
+        response = self.client.get(reverse('bank:payroll_add_detail'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'bank/payroll/add_detail.html')
+
+    def test_valid_deletion(self):
+        """ Корректный запрос на удаление существующего платежа. """
+        response = self.client.post(reverse('bank:delete_single_payroll'),
+                                    data=json.dumps({"pay_id": self.payroll.id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(json.loads(response.content)['success'])
+        self.assertFalse(
+            Payroll.objects.filter(id=self.payroll.id).exists())  # Проверяем, что запись действительно удалена
+
+    def test_nonexistent_loan_type(self):
+        """ Попытка удалить несуществующего платежа. """
+        non_existent_id = 999999  # ID, которого точно нет в БД
+        response = self.client.post(reverse('bank:delete_single_payroll'),
+                                    data=json.dumps({"pay_id": non_existent_id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(json.loads(response.content)['error'], f"Платежа с ID {non_existent_id} не существует.")
+
+    def test_invalid_loan_type_id_format(self):
+        """ Неверный формат идентификатора (нечисловое значение). """
+        bad_id = "abc"
+        response = self.client.post(reverse('bank:delete_single_payroll'),
+                                    data=json.dumps({"pay_id": bad_id}),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], f"Передано неверное значение ID: {bad_id}.")
+
+    def test_missing_loan_type_id_field(self):
+        """ Отсутствие параметра 'loan_id'. """
+        response = self.client.post(reverse('bank:delete_single_payroll'),
+                                    data={},
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], "Не найден параметр 'pay_id'.")
+
+    def test_bad_json_structure(self):
+        """ Некорректная структура JSON. """
+        malformed_json = {"invalid_key": "value"}
+        response = self.client.post(reverse('bank:delete_single_payroll'),
+                                    data=json.dumps(malformed_json),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], "Не найден параметр 'pay_id'.")
+
+    def test_wrong_http_method(self):
+        """ Использование неправильного HTTP-метода (GET вместо POST). """
+        response = self.client.get(reverse('bank:delete_single_payroll'))
+
+        self.assertEqual(response.status_code, 405)
+        self.assertDictEqual(json.loads(response.content), {})

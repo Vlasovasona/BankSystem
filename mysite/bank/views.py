@@ -1,7 +1,6 @@
 # Вся логика приложения описывается здесь. Каждый обработчик получает HTTP-запрос, обрабатывает его и возвращает ответ
 import math
 from datetime import date
-from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Clients, CreditStatement, LoanTypes, Payroll, AuthUser
@@ -9,29 +8,22 @@ from django.views.generic import ListView
 from django.db.models import Q
 from django.http import JsonResponse
 import json
-from threading import Thread
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import  AuthenticationForm
 from .forms import CustomUserCreationForm
 import re
+from django.views.decorators.http import require_http_methods
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
-from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, TableStyle
 from reportlab.lib.pagesizes import landscape, letter
-from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from reportlab.platypus.tables import LongTable
-from django.http import FileResponse, HttpResponse
+from django.http import  HttpResponse
 import os
 import tempfile
-import seaborn as sb
 from reportlab.platypus import Image
-import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
-import pandas as pd
 from datetime import datetime
 
 import joblib
@@ -182,6 +174,29 @@ def delete_clients(request):
 
         return JsonResponse({'success': True})
 
+# def delete_clients(request):
+#     """Осуществление удаления списка клиентов у которых активирован чекбокс."""
+#     if request.method == 'POST' and request.body:
+#         return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+#         try:
+#             # Читаем JSON из тела запроса
+#             data = json.loads(request.body)
+#             # Извлекаем список идентификаторов
+#             ids = data.get('ids', [])
+#
+#             if not ids:
+#                 return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
+#
+#             # Удаляем пользователей с указанными ID
+#             Clients.objects.filter(id__in=ids).delete()
+#
+#             return JsonResponse({'success': True})
+#
+#         except json.JSONDecodeError:
+#             return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
+#     else:
+#         return JsonResponse({'success': False, 'message': 'Метод запроса должен быть POST и содержать тело'})
+
 def delete_single_client(request):
     if request.method == 'POST':
         # Десериализация JSON тела запроса
@@ -228,10 +243,9 @@ def delete_single_statement(request):
 
 def delete_single_loan_type(request):
     if request.method == 'POST':
-        # Десериализация JSON тела запроса
         try:
             data = json.loads(request.body)
-            loan_type_id = data.get('credit_type_id')  # Теперь получаем client_id из десериализованных данных
+            loan_type_id = data.get('credit_type_id')
         except json.JSONDecodeError:
             return JsonResponse({'error': "Ошибка разбора JSON."}, status=400)
 
@@ -478,7 +492,6 @@ def check_credit_statement(number_of_the_loan_agreement, credit_amount, term_mon
 
     if not check_input_not_null(loan_type):
         errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
-        return JsonResponse({'success': False, 'errors': errors})
     elif not loan_type.isdigit() or int(loan_type) <= 0:
         errors['loanType'] = 'Регистр. номер типа кредита должен быть числовым положительным значением'
 
@@ -500,7 +513,7 @@ def update_client_view(request):
         surname = request.POST.get('my_field_surname')
         name = request.POST.get('my_field_name')
         patronymic = request.POST.get('my_field_patronymic')
-        adress = request.POST.get('my_field_adress')
+        adress = request.POST.get('my_field_address')
         phone_number = request.POST.get('my_field_phone')
         age = request.POST.get('my_field_age')
         sex = request.POST.get('my_field_sex')
@@ -518,17 +531,18 @@ def update_client_view(request):
         try:
             client = Clients.objects.get(pk=client_id)
             if client.passport_serial_number != int(passport):
-                if Clients.objects.get(passport_serial_number=passport):
+                if Clients.objects.filter(passport_serial_number=passport).exists():
                     errors['passport'] = 'Клиент с такими паспортными данными уже существует'
                     return JsonResponse({'errors': errors})
                 else:
                     client.passport_serial_number = passport
+
             # Обновляем поля
 
             client.surname = surname
             client.name = name
             client.patronymic = patronymic
-            client.address = adress
+            client.adress = adress
             client.phone_number = phone_number
             client.age = age
             client.sex = sex
@@ -564,9 +578,9 @@ def update_loan_type(request):
             credit_type = LoanTypes.objects.get(pk=credit_type_id)
             # Обновляем поля
             if credit_type.registration_number != int(registration_number):
-                if LoanTypes.objects.get(registration_number=registration_number):
-                    return JsonResponse({'success': False,
-                                         'error': f'Тип кредита с регистрационным номером {registration_number} уже существует.'})
+                if LoanTypes.objects.filter(registration_number=registration_number).exists():
+                    errors['credit_types'] = f'Тип кредита с регистрационным номером {registration_number} уже существует.'
+                    return JsonResponse({'errors': errors})
                 else:
                     credit_type.registration_number = registration_number
 
@@ -702,16 +716,16 @@ def calculate_payment_status(new_data, last_data, create_data):
         raise ValueError(f'По этому кредиту уже была выплата в этом месяце.')
     else:
         # Найдем разницу между датами
-        delta = abs((new_data - last_data).days)
-        if 1 <= delta <= 29:
+        delta = math.ceil(abs((new_data - last_data).days)//30)
+        if delta == 1:
             payment_status = '0'
-        elif 30 <= delta <= 59:
+        elif delta == 2:
             payment_status = '1'
-        elif 60 <= delta <= 89:
+        elif delta == 3:
             payment_status = '2'
-        elif 90 <= delta <= 119:
+        elif delta == 4:
             payment_status = '3'
-        elif 120 <= delta <= 149:
+        elif delta == 5:
             payment_status = '4'
         else:
             payment_status = '5'

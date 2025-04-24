@@ -5,23 +5,42 @@ from ..models import CreditStatement, Clients, LoanTypes
 from ..views import CreditTypesListView, credit_statement_detail, check_credit_statement
 
 class TestCreditTypes(TestCase):
-
     def setUp(self):
         # Создаем клиентский объект
         self.client = Client()
 
-        self.client1 = Clients.objects.get(pk=1)
-        self.type1 = LoanTypes.objects.get(pk=1)
+        self.client1 = Clients.objects.create(
+            id=1,
+            surname='Иванов',
+            name='Иван',
+            patronymic='Иванович',
+            phone_number=89001234567,
+            age=30,
+            sex='Мужской',
+            flag_own_car=0,
+            flag_own_property=1,
+            month_income=50000,
+            count_children=2,
+            education_type='Высшее',
+            passport_serial_number=1234567890
+        )
+        self.type1 = LoanTypes.objects.create(
+            id=1,
+            registration_number=32,
+            name_of_the_type='Ипотечный',
+            interest_rate=20.5
+        )
         # Создаем объект кредитной ведомости (CreditStatement)
         self.statement = CreditStatement.objects.create(
+            id=1,
             number_of_the_loan_agreement=12,
             credit_amount=1000,
             term_month=12,
             monthly_payment=200,
             loan_opening_date=datetime.date(2025, 12, 9),
             repayment_status=False,
-            loan_type=self.type1,
-            client=self.client1
+            client=self.client1,
+            loan_type=self.type1
         )
 
     def test_credit_statement_list_view(self):
@@ -38,7 +57,7 @@ class TestCreditTypes(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'bank/creditStatement/detail.html')
-        self.assertEqual(response.context['credit_statement'], valid_type)
+        self.assertEqual(response.context['credit_statement_item'], valid_type)
 
     def test_credit_statement_detail_view_invalid_id(self):
         """Тестируем представление с несуществующей ведомостью."""
@@ -55,5 +74,5 @@ class TestCreditTypes(TestCase):
             self.assertEqual(stmt.credit_amount, 1000)
             self.assertEqual(stmt.term_month, 12)
             self.assertEqual(stmt.monthly_payment, 200)
-            self.assertEqual(stmt.loan_type.registration_number, 67)
+            self.assertEqual(stmt.loan_type.registration_number, 32)
             self.assertEqual(stmt.client.surname, 'Иванов')

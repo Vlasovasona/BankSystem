@@ -342,8 +342,8 @@ def validate_date(date, errors):
         errors['date'] = 'Дата должна быть в формате ГГГГ-ММ-ДД'
     else:
         year, month, day = map(int, match.groups())
-        if not (1950 <= year <= 2025):  # Ограничиваем диапазон допустимых годов
-            errors['date'] = f'Год должен быть между 1950 и 2025, введен {year}'
+        if not (1950 <= year <= datetime.now().year):  # Ограничиваем диапазон допустимых годов
+            errors['date'] = f'Год должен быть между 1950 и {datetime.now().year}, введен {year}'
         if not (1 <= month <= 12):  # Проверка месяца
             errors['date'] = f'Месяц должен быть между 1 и 12, введен {month}'
         if not (1 <= day <= 31):  # Проверка дня

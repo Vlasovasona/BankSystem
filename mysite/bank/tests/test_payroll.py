@@ -329,22 +329,6 @@ class TestCreditTypes(TestCase):
         self.assertIn('loan', errors.keys())
         self.assertIn('date', errors.keys())
 
-    # def test_update_pay_not_found(self):
-    #     """Попробуем обновить несуществующий платеж"""
-    #     data = {
-    #         'pay_id': self.payroll.pk,
-    #         'my_field_loan': '9999',
-    #         'my_field_payment_date': '2024-05-09'
-    #     }
-    #
-    #     response = self.client.post(reverse('bank:update-payroll'), data)
-    #     response_content = json.loads(response.content)
-    #
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertFalse(response_content['success'])
-    #     self.assertEqual(response_content['error'], 'Запись с таким номером договора не найдена')
-
-
     def test_update_pay_with_duplicate_fields(self):
         """Обновление платежа с дублирующимся"""
         duplicate_data = {
@@ -360,20 +344,40 @@ class TestCreditTypes(TestCase):
         self.assertIn('date', errors.keys())
         self.assertEqual(errors['date'],  "Для этого кредита в эту дату уже был внесен платеж!")
 
-    # def test_update_pay_without_required_field(self):
-    #     """Обновление платежа без обязательного поля"""
-    #     incomplete_data = {
-    #         'pay_id': self.payroll.id,
-    #         'my_field_loan': str(self.statement.number_of_the_loan_agreement),
-    #         'my_field_payment_date': '2026-01-09'
-    #     }
-    #
-    #     response = self.client.post(reverse('bank:update-payroll'), incomplete_data)
-    #     errors = json.loads(response.content)['errors']
-    #
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn('surname', errors.keys())
+    def test_add_new_pay_successfully(self):
+        """Проверяем успешное добавление нового платежа"""
+        data = {
+            'my_field_loan': str(self.statement.number_of_the_loan_agreement),
+            'my_field_payment_date': '2025-06-09'
+        }
+        response = self.client.post(reverse('bank:add_new_payroll'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertIsNotNone(Payroll.objects.filter(payment_date=datetime.date(2025, 6, 9),
+                                                    loan=self.statement))
 
+    def test_add_existing_pay(self):
+        """Проверяем невозможность добавить существующий платеж"""
+        data = {
+            'my_field_loan': str(self.statement.number_of_the_loan_agreement),
+            'my_field_payment_date': '2025-01-09'
+        }
+        response = self.client.post(reverse('bank:add_new_payroll'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('date', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['date'], "Для этого кредита в эту дату уже был внесен платеж!")
+
+    def test_empty_required_field(self):
+        """Проверяем попытку отправки формы с отсутствующими обязательными полями"""
+        data = {
+            'my_field_loan': '',
+            'my_field_payment_date': '2025-06-09'
+        }
+        response = self.client.post(reverse('bank:add_new_payroll'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('loan', response.json()['errors'])
 
 
 

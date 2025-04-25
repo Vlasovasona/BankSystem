@@ -170,46 +170,6 @@ class TestClients(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'bank/clients/add_detail.html')
 
-    # def test_delete_clients_successfully(self):
-    #     # Данные для отправки в виде JSON (идентификаторы клиентов для удаления)
-    #     data = {
-    #         'ids': [self.client1.id, self.client2.id]
-    #     }
-    #
-    #     # Отправляем POST-запрос с данными в теле запроса
-    #     response = self.client.post(
-    #         reverse('bank:delete_clients'),
-    #         data=json.dumps(data, cls=DjangoJSONEncoder),
-    #         content_type='application/json'
-    #     )
-    #
-    #     # Проверяем успешность ответа
-    #     self.assertEqual(response.status_code, 200)
-    #     result = json.loads(response.content.decode())
-    #     self.assertTrue(result['success'])
-    #
-    #     # Проверяем, что записи были удалены
-    #     remaining_clients = list(Clients.objects.all())
-    #     self.assertIn(self.client3, remaining_clients)
-    #     self.assertNotIn(self.client1, remaining_clients)
-    #     self.assertNotIn(self.client2, remaining_clients)
-    #
-    # def test_missing_ids_in_request(self):
-    #     # Полностью пустые данные
-    #     empty_data = {}  # Пустой словарь
-    #
-    #     response = self.client.post(
-    #         reverse('bank:delete_clients'),
-    #         data=json.dumps(empty_data, cls=DjangoJSONEncoder),
-    #         content_type='application/json'
-    #     )
-    #
-    #     # Ожидается сообщение об отсутствии идентификаторов
-    #     self.assertEqual(response.status_code, 200)
-    #     result = json.loads(response.content.decode())
-    #     self.assertFalse(result['success'])
-    #     self.assertEqual(result['message'], 'Не найдены идентификаторы для удаления')
-
     def test_valid_deletion(self):
         """ Корректный запрос на удаление существующего клиента. """
         response = self.client.post(reverse('bank:delete_single_client'),
@@ -420,4 +380,69 @@ class TestClients(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('surname', errors.keys())
 
+    def test_add_new_client_successfully(self):
+        """Проверяем успешное добавление нового клиента"""
+        data = {
+            'my_field_passport': '9876543290',
+            'my_field_surname': 'Петров',
+            'my_field_name': 'Петр',
+            'my_field_patronymic': 'Петрович',
+            'my_field_adress': 'Санкт-Петербург',
+            'my_field_phone': '89001234568',
+            'my_field_age': '35',
+            'my_field_sex': 'Мужской',
+            'my_field_flag_own_car': 'Да',
+            'my_flag_own_property': 'Нет',
+            'my_field_month_income': '60000',
+            'my_field_count_children': '1',
+            'my_field_education_type': 'Среднее специальное'
+        }
+        response = self.client.post(reverse('bank:add_new_client'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertIsNotNone(Clients.objects.get(passport_serial_number='9876543210'))
 
+    def test_add_existing_client(self):
+        """Проверяем невозможность добавить клиента с уже существующими паспортными данными"""
+        data = {
+            'my_field_passport': '1234567890',  # Этот номер паспорта уже занят
+            'my_field_surname': 'Иванов',
+            'my_field_name': 'Иван',
+            'my_field_patronymic': 'Иванович',
+            'my_field_adress': 'Москва',
+            'my_field_phone': '89001234567',
+            'my_field_age': '30',
+            'my_field_sex': 'Мужской',
+            'my_field_flag_own_car': 'Нет',
+            'my_flag_own_property': 'Да',
+            'my_field_month_income': '50000',
+            'my_field_count_children': '2',
+            'my_field_education_type': 'Высшее'
+        }
+        response = self.client.post(reverse('bank:add_new_client'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('passport', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['passport'], 'Клиент с такими паспортными данными уже существует')
+
+    def test_empty_required_field(self):
+        """Проверяем попытку отправки формы с отсутствующими обязательными полями"""
+        data = {
+            'my_field_passport': '',  # Поле обязательно!
+            'my_field_surname': 'Петров',
+            'my_field_name': 'Петр',
+            'my_field_patronymic': 'Петрович',
+            'my_field_adress': 'Санкт-Петербург',
+            'my_field_phone': '89001234568',
+            'my_field_age': '35',
+            'my_field_sex': 'Мужской',
+            'my_field_flag_own_car': 'Да',
+            'my_flag_own_property': 'Нет',
+            'my_field_month_income': '60000',
+            'my_field_count_children': '1',
+            'my_field_education_type': 'Среднее специальное'
+        }
+        response = self.client.post(reverse('bank:add_new_client'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('passport', response.json()['errors'])

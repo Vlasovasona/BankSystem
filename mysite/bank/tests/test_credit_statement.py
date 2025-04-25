@@ -168,3 +168,185 @@ class TestCreditTypes(TestCase):
 
         self.assertEqual(response.status_code, 405)
         self.assertDictEqual(json.loads(response.content), {})
+
+    def test_update_statement_successful(self):
+        """Корректное обновление данных ведомости"""
+        new_data = {
+            'credit_state_id': self.statement.pk,
+            'my_field_number_of_the_loan_agreement': str(self.statement.number_of_the_loan_agreement),
+            'my_field_credit_amount': '10000',
+            'my_term_month': '12',
+            'my_field_loan_type': str(self.type1.registration_number),
+            'my_field_client': str(self.client1.passport_serial_number),
+        }
+
+        # Отправляем данные с correct Content-Type
+        response = self.client.post(reverse('bank:update-credit-statement'), new_data)
+
+        updated_statement = CreditStatement.objects.get(pk=self.statement.pk)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(json.loads(response.content)['success'])
+        self.assertEqual(updated_statement.number_of_the_loan_agreement, int(new_data['my_field_number_of_the_loan_agreement']))
+        self.assertEqual(updated_statement.credit_amount, int(new_data['my_field_credit_amount']))
+        self.assertEqual(updated_statement.term_month, int(new_data['my_term_month']))
+        self.assertEqual(updated_statement.repayment_status, False)
+        self.assertEqual(updated_statement.loan_type, self.type1)
+        self.assertEqual(updated_statement.client, self.client1)
+
+
+    def test_update_statement_with_errors(self):
+        """Обновление кредита с некорректными данными"""
+        incorrect_data = {
+            'credit_state_id': self.statement.pk,
+            'my_field_number_of_the_loan_agreement': str(self.statement.number_of_the_loan_agreement),
+            'my_field_credit_amount': '',
+            'my_term_month': '',
+            'my_field_loan_type': str(self.type1.registration_number),
+            'my_field_client': str(self.client1.passport_serial_number),
+        }
+
+        response = self.client.post(reverse('bank:update-credit-statement'), incorrect_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(errors)
+        self.assertIn('amount', errors.keys())
+        self.assertIn('month', errors.keys())
+
+    def test_update_statement_with_not_existing_type(self):
+        """Обновление платежа с некорректным типом кредита"""
+        incorrect_type = '11000'
+        duplicate_data = {
+            'credit_state_id': self.statement.pk,
+            'my_field_number_of_the_loan_agreement': str(self.statement.number_of_the_loan_agreement),
+            'my_field_credit_amount': '123',
+            'my_term_month': '123',
+            'my_field_loan_type': incorrect_type,
+            'my_field_client': str(self.client1.passport_serial_number),
+        }
+
+        response = self.client.post(reverse('bank:update-credit-statement'), duplicate_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('loanType', errors.keys())
+        self.assertEqual(errors['loanType'],  f'Тип кредита с регистрационным номером {incorrect_type} не найден.')
+
+    def test_add_credit_statement_successfully(self):
+        """Проверка успешного добавления кредитного договора"""
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '100000',
+            'my_term_month': '12',
+            'my_field_loan_type': '32',
+            'my_field_client': '1234567890'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertIsNotNone(CreditStatement.objects.get(number_of_the_loan_agreement=1000))
+
+    def test_add_existing_credit_statement(self):
+        """Проверка невозможности добавить договор с уже существующим номером"""
+        # Создаем первый контракт
+        first_contract = CreditStatement.objects.create(
+            number_of_the_loan_agreement=1000,
+            credit_amount=100000,
+            term_month=12,
+            monthly_payment=10000,
+            loan_opening_date=datetime.date.today(),
+            repayment_status=0,
+            loan_type=self.type1,
+            client=self.client1
+        )
+
+        # Пробуем создать второй контракт с тем же номером
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '100000',
+            'my_term_month': '12',
+            'my_field_loan_type': '32',
+            'my_field_client': '1234567890'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('number', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['number'], 'Кредит с таким номером договора уже существует')
+
+    def test_add_without_client(self):
+        """Проверка попытки добавления контракта без существующего клиента"""
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '100000',
+            'my_term_month': '12',
+            'my_field_loan_type': '32',
+            'my_field_client': '1234567891'  # Неверный паспорт
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('client', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['client'], 'Клиент с паспортными данными 1234567891 не найден.')
+
+    def test_add_without_loan_type(self):
+        """Проверка попытки добавления контракта без существующего типа кредита"""
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '100000',
+            'my_term_month': '12',
+            'my_field_loan_type': '33',  # Тип кредита с таким регистром не существует
+            'my_field_client': '1234567890'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('loanType', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['loanType'], 'Тип кредита с регистрационным номером 33 не найден.')
+
+    def test_add_with_negative_values(self):
+        """Проверка добавления контракта с отрицательными значениями суммы кредита или срока"""
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '-100000',  # Отрицательная сумма кредита
+            'my_term_month': '12',
+            'my_field_loan_type': '32',
+            'my_field_client': '1234567890'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('amount', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['amount'], 'Сумма кредита должна быть числовым положительным значением')
+
+    def test_add_zero_credit_amount(self):
+        """Проверка добавления контракта с нулевым значением суммы кредита"""
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '0',  # Сумма кредита равна нулю
+            'my_term_month': '12',
+            'my_field_loan_type': '32',
+            'my_field_client': '1234567890'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('amount', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['amount'], 'Сумма кредита должна быть числовым положительным значением')
+
+    def test_add_zero_term_month(self):
+        """Проверка добавления контракта с нулевым сроком кредита"""
+        data = {
+            'my_field_number_of_the_loan_agreement': '1000',
+            'my_field_credit_amount': '100000',
+            'my_term_month': '0',  # Срок кредита равен нулю
+            'my_field_loan_type': '32',
+            'my_field_client': '1234567890'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_statement'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('month', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['month'],
+                         'Длительность выплат должна быть числовым положительным значением')

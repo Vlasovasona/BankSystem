@@ -220,7 +220,41 @@ class TestCreditTypes(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('credit_types', errors.keys())
 
+    def test_add_new_type_successfully(self):
+        """Проверяем успешное добавление нового типа кредита"""
+        data = {
+            'my_field_credit_type_code': '333',
+            'my_field_credit_type_name': 'Валютный',
+            'my_field_credit_percent': '9.5'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_type'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertIsNotNone(LoanTypes.objects.filter(registration_number=int(data['my_field_credit_type_code'])))
 
+    def test_add_existing_type(self):
+        """Проверяем невозможность добавить типе кредита с существующим регистрационным номером"""
+        data = {
+            'my_field_credit_type_code': str(self.type1.registration_number),
+            'my_field_credit_type_name': 'Валютный',
+            'my_field_credit_percent': '9.5'
+        }
+        response = self.client.post(reverse('bank:add_new_credit_type'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('credit_types', response.json()['errors'])
+        self.assertEqual(response.json()['errors']['credit_types'], 'Тип кредита с таким регистрационным номером уже существует!')
 
+    def test_empty_required_field(self):
+        """Проверяем попытку отправки формы с отсутствующими обязательными полями"""
+        data = {
+            'my_field_credit_type_code': str(self.type1.registration_number),
+            'my_field_credit_type_name': 'Валютный',
+            'my_field_credit_percent': ''
+        }
+        response = self.client.post(reverse('bank:add_new_credit_type'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('percent', response.json()['errors'])
 
 

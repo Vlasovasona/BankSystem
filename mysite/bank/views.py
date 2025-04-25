@@ -670,13 +670,10 @@ def update_payroll(request):
         # Автоматическое обновление статуса закрытия кредита если был внесен последний платеж
         update_repayment_status_after_input_new_pay(loan)
 
-        return {'success': True}
+        return JsonResponse({'success': True})
 
-    except CreditStatement.DoesNotExist:
-        error_message = f'Запись в ведомости с номером договора {loan_id} не найдена.'
-        return {'success': False, 'error': error_message}
     except Exception as e:
-        return {'success': False, 'error': str(e)}
+        return JsonResponse({'success': False, 'error': str(e)})
 
 # Функция проверки поля номер договора
 def validate_loan_id(loan_id, errors):

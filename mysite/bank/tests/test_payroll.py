@@ -1,5 +1,6 @@
 import datetime
 import json
+from urllib.parse import urlencode
 from django.test import TestCase, RequestFactory, Client
 from django.urls import reverse
 from ..models import CreditStatement, Clients, LoanTypes, Payroll
@@ -38,7 +39,7 @@ class TestCreditTypes(TestCase):
             id=1,
             number_of_the_loan_agreement=12,
             credit_amount=1000,
-            term_month=12,
+            term_month=1,
             monthly_payment=200,
             loan_opening_date=datetime.date(2025, 12, 9),
             repayment_status=False,
@@ -48,7 +49,7 @@ class TestCreditTypes(TestCase):
         self.payroll = Payroll.objects.create(
             id=1,
             loan = self.statement,
-            payment_date=datetime.date(2026, 1, 9),
+            payment_date=datetime.date(2025, 1, 9),
             payment_status=0
         )
 
@@ -81,7 +82,7 @@ class TestCreditTypes(TestCase):
         for stmt in pays:
             self.assertEqual(stmt.id, 1)
             self.assertEqual(stmt.loan.number_of_the_loan_agreement, 12)
-            self.assertEqual(stmt.payment_date, datetime.date(2026, 1, 9))
+            self.assertEqual(stmt.payment_date, datetime.date(2025, 1, 9))
             self.assertEqual(stmt.payment_status, '0')
 
     def test_validate_loan_id_none_data(self):
@@ -272,3 +273,111 @@ class TestCreditTypes(TestCase):
 
         self.assertEqual(response.status_code, 405)
         self.assertDictEqual(json.loads(response.content), {})
+
+    def test_update_repayment_status_after_input_new_pay(self):
+        update_repayment_status_after_input_new_pay(self.statement)
+        self.assertEqual(self.statement.repayment_status, 1)
+
+    def test_check_credit_and_payment_exists(self):
+        success, errors = check_credit_and_payment_exists(self.statement.number_of_the_loan_agreement,
+                                        self.payroll.payment_date)
+
+        self.assertEqual(success, False)
+        self.assertIn('date', errors)
+        self.assertEqual(errors['date'], "Для этого кредита в эту дату уже был внесен платеж!")
+
+    def test_check_credit_and_payment_exists_incorrect_number_of_the_agreement(self):
+        success, errors = check_credit_and_payment_exists(self.statement.id,
+                                        self.payroll.payment_date)
+
+        self.assertEqual(success, False)
+        self.assertIn('loan', errors)
+        self.assertEqual(errors['loan'], 'Запись с таким номером договора не найдена')
+
+    def test_update_pay_successful(self):
+        """Корректное обновление данных платежа"""
+        new_data = {
+            'pay_id': self.payroll.pk,
+            'my_field_loan': str(self.statement.number_of_the_loan_agreement),
+            'my_field_payment_date': '2025-05-09'
+        }
+
+        # Отправляем данные с correct Content-Type
+        response = self.client.post(reverse('bank:update-payroll'), new_data)
+
+        updated_pay = Payroll.objects.get(pk=self.payroll.pk)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(json.loads(response.content)['success'])
+        self.assertEqual(updated_pay.loan.number_of_the_loan_agreement, int(new_data['my_field_loan']))
+        self.assertEqual(updated_pay.payment_status, '3')
+        self.assertEqual(updated_pay.payment_date, datetime.date(2025, 5, 9))
+
+    def test_update_pay_with_errors(self):
+        """Обновление платежа с некорректными данными"""
+        incorrect_data = {
+            'pay_id': self.payroll.pk,
+            'my_field_loan': '',
+            'my_field_payment_date': '1000-05-09'
+        }
+
+        response = self.client.post(reverse('bank:update-payroll'), incorrect_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(errors)
+        self.assertIn('loan', errors.keys())
+        self.assertIn('date', errors.keys())
+
+    # def test_update_pay_not_found(self):
+    #     """Попробуем обновить несуществующий платеж"""
+    #     data = {
+    #         'pay_id': self.payroll.pk,
+    #         'my_field_loan': '9999',
+    #         'my_field_payment_date': '2024-05-09'
+    #     }
+    #
+    #     response = self.client.post(reverse('bank:update-payroll'), data)
+    #     response_content = json.loads(response.content)
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertFalse(response_content['success'])
+    #     self.assertEqual(response_content['error'], 'Запись с таким номером договора не найдена')
+
+
+    def test_update_pay_with_duplicate_fields(self):
+        """Обновление платежа с дублирующимся"""
+        duplicate_data = {
+            'pay_id': self.payroll.id,
+            'my_field_loan': str(self.statement.number_of_the_loan_agreement),
+            'my_field_payment_date': '2025-01-09'
+        }
+
+        response = self.client.post(reverse('bank:update-payroll'), duplicate_data)
+        errors = json.loads(response.content)['errors']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('date', errors.keys())
+        self.assertEqual(errors['date'],  "Для этого кредита в эту дату уже был внесен платеж!")
+
+    # def test_update_pay_without_required_field(self):
+    #     """Обновление платежа без обязательного поля"""
+    #     incomplete_data = {
+    #         'pay_id': self.payroll.id,
+    #         'my_field_loan': str(self.statement.number_of_the_loan_agreement),
+    #         'my_field_payment_date': '2026-01-09'
+    #     }
+    #
+    #     response = self.client.post(reverse('bank:update-payroll'), incomplete_data)
+    #     errors = json.loads(response.content)['errors']
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertIn('surname', errors.keys())
+
+
+
+
+
+
+
+

@@ -1049,7 +1049,6 @@ def add_new_user(request):
     context = {'form': form}
     return render(request, 'bank/registrationPage.html', context)
 
-@csrf_protect
 def register_view(request):
     """Осуществление регистрации нового юзера."""
     if request.method == 'POST':
@@ -1063,7 +1062,6 @@ def register_view(request):
     context = {'form': form}
     return render(request, 'bank/registrationPage.html', context)
 
-@csrf_protect
 def login_view(request):
     """Осуществление авторизации юзера."""
     if request.method == 'POST':
@@ -1393,7 +1391,6 @@ def generate_chart_image(st, grouped_data, labels, title):
         # Создаем обычный круговой график
         patches, texts, autotexts = plt.pie(
             grouped_data.values,  # Значения секторов
-            colors=sns.color_palette("pastel"),
             autopct='%1.1f%%',  # Формат процентов
             labels=labels,  # Подписи секторов
             startangle=90,  # Угол начала вращения (график начинается сверху)
@@ -1405,7 +1402,6 @@ def generate_chart_image(st, grouped_data, labels, title):
         fig = plt.gcf()
         fig.gca().add_artist(centre_circle)
 
-        # Скрываем подпись внизу (так как там ничего нет)
         plt.axis('equal')  # Равенство масштаба по обеим осям
         plt.title(title)
         plt.ylabel('')

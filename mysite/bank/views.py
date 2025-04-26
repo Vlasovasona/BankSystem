@@ -8,6 +8,7 @@ from django.views.generic import ListView
 from django.db.models import Q
 from django.http import JsonResponse
 import json
+from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import  AuthenticationForm
 from .forms import CustomUserCreationForm
 import re
@@ -21,6 +22,7 @@ from reportlab.platypus.tables import LongTable
 from django.http import  HttpResponse
 import os
 import tempfile
+import seaborn as sns
 from reportlab.platypus import Image
 import matplotlib.ticker as mtick
 from reportlab.lib.units import inch
@@ -34,8 +36,6 @@ warnings.filterwarnings('ignore')
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-import itertools
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.model_selection import GridSearchCV
@@ -50,6 +50,7 @@ class ClientListView(ListView):
     template_name = 'bank/clients/list.html'
 
 # Обязательно в параметрах указывать необходимы минимум для распознавания кортежа (в данном случае id)
+@csrf_protect
 def client_detail(request, id):
     """Представление подробной информации о конкретном клиенте.
     :param request: HTTP-запрос.
@@ -67,6 +68,7 @@ class CreditTypesListView(ListView):
     paginate_by = 25
     template_name = 'bank/creditTypes/list.html'
 
+@csrf_protect
 def credit_type_detail(request, id):
     """Представление подробной информации о конкретном кредите.
     :param request: HTTP-запрос.
@@ -84,6 +86,7 @@ class CreditStatementListView(ListView):
     paginate_by = 25
     template_name = 'bank/creditStatement/list.html'
 
+@csrf_protect
 def credit_statement_detail(request, id):
     """Представление подробной информации о конкретном кредите.
     :param request: HTTP-запрос.
@@ -101,6 +104,7 @@ class PayrollListView(ListView):
     paginate_by = 25
     template_name = 'bank/payroll/list.html'
 
+@csrf_protect
 def payroll_detail(request, id):
     """Представление подробной информации о конкретном кредите.
     :param request: HTTP-запрос.
@@ -114,24 +118,28 @@ def payroll_detail(request, id):
 
 # Маршрутизация на отдельные представления для добавления сущностей в БД
 
+@csrf_protect
 def client_add_detail(request):
     """Представление подробной информации о конкретном клиенте.
     :param request: HTTP-запрос.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали клиента. """
     return render(request, 'bank/clients/add_detail.html')
 
+@csrf_protect
 def credit_types_add_detail(request):
     """Представление подробной информации о конкретном типе кредита.
     :param request: HTTP-запрос.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали типа кредита. """
     return render(request, 'bank/creditTypes/add_detail.html')
 
+@csrf_protect
 def credit_statement_add_detail(request):
     """Представление подробной информации о конкретном кредитном договоре.
     :param request: HTTP-запрос.
     :return: Возвращает HTML-шаблон с контекстом, содержащим детали кредитного договора. """
     return render(request, 'bank/creditStatement/add_detail.html')
 
+@csrf_protect
 def payroll_add_detail(request):
     """Представление подробной информации о конкретном платеже.
     :param request: HTTP-запрос.
@@ -140,6 +148,7 @@ def payroll_add_detail(request):
 
 # Блок методов с дополнительными запросами к БД
 
+@csrf_protect
 def search_clients(request):
     """Использование поисковой строки для поиска клиента по паспортным данным.
         :param request: HTTP-запрос.
@@ -154,6 +163,7 @@ def search_clients(request):
 
 # Группа методов для удаления записей из базы данных
 
+@csrf_protect
 def delete_clients(request):
     """Осуществление удаления списка клиентов у которых активирован чекбокс."""
     if request.method == 'POST':
@@ -197,6 +207,7 @@ def delete_clients(request):
 #     else:
 #         return JsonResponse({'success': False, 'message': 'Метод запроса должен быть POST и содержать тело'})
 
+@csrf_protect
 def delete_single_client(request):
     if request.method == 'POST':
         # Десериализация JSON тела запроса
@@ -219,6 +230,7 @@ def delete_single_client(request):
             return JsonResponse({'error': "Не найден параметр 'client_id'."}, status=400)
     return JsonResponse({}, status=405)
 
+@csrf_protect
 def delete_single_statement(request):
     if request.method == 'POST':
         # Десериализация JSON тела запроса
@@ -241,6 +253,7 @@ def delete_single_statement(request):
             return JsonResponse({'error': "Не найден параметр 'credit_state_id'."}, status=400)
     return JsonResponse({}, status=405)
 
+@csrf_protect
 def delete_single_loan_type(request):
     if request.method == 'POST':
         try:
@@ -262,6 +275,7 @@ def delete_single_loan_type(request):
             return JsonResponse({'error': "Не найден параметр 'loan_type_id'."}, status=400)
     return JsonResponse({}, status=405)
 
+@csrf_protect
 def delete_single_payroll(request):
     if request.method == 'POST':
         # Десериализация JSON тела запроса
@@ -284,6 +298,7 @@ def delete_single_payroll(request):
             return JsonResponse({'error': "Не найден параметр 'pay_id'."}, status=400)
     return JsonResponse({}, status=405)
 
+@csrf_protect
 def delete_credit_type(request):
     """Осуществление удаления списка типов кредита у которых активирован чекбокс."""
     if request.method == 'POST':
@@ -304,6 +319,7 @@ def delete_credit_type(request):
 
         return JsonResponse({'success': True})
 
+@csrf_protect
 def delete_credit_statement(request):
     """Осуществление удаления списка кредитных договоров у которых активирован чекбокс."""
     if request.method == 'POST':
@@ -324,6 +340,7 @@ def delete_credit_statement(request):
 
         return JsonResponse({'success': True})
 
+@csrf_protect
 def delete_payroll(request):
     """Осуществление удаления списка платежей у которых активирован чекбокс."""
     if request.method == 'POST':
@@ -345,6 +362,7 @@ def delete_payroll(request):
         return JsonResponse({'success': True})
 
 # Валидация отдельных значений форм
+
 
 def validate_date(date, errors):
     """ Проверяет правильность формата даты
@@ -501,6 +519,7 @@ def check_credit_statement(number_of_the_loan_agreement, credit_amount, term_mon
         errors['client'] = 'Серия и номер паспорта должны быть числовым положительным значением'
 
 # Методы для редактирования записей в БД
+@csrf_protect
 def update_client_view(request):
     """Осуществление изменение клиента в БД."""
     if request.method == 'POST':
@@ -559,6 +578,7 @@ def update_client_view(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def update_loan_type(request):
     """Осуществление изменение типа кредита в БД."""
     if request.method == 'POST':
@@ -594,6 +614,7 @@ def update_loan_type(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def update_repayment_status_after_input_new_pay(loan):
     # Автоматически обновляем статус погашения кредита
     count_of_pays = Payroll.objects.filter(loan=loan).count()
@@ -601,6 +622,7 @@ def update_repayment_status_after_input_new_pay(loan):
         loan.repayment_status = 1
         loan.save()
 
+@csrf_protect
 def check_credit_and_payment_exists(loan_id, payment_date):
     """ Проверяет наличие кредитного соглашения и дублирование платежей по указанному договору и дате.
     :param loan_id: Номер договора кредита
@@ -620,6 +642,7 @@ def check_credit_and_payment_exists(loan_id, payment_date):
         errors['loan'] = 'Запись с таким номером договора не найдена'
         return False, errors
 
+@csrf_protect
 def update_payroll(request):
     """ Основной контроллер обработки изменения платежей в базе данных """
     if request.method != 'POST':
@@ -676,6 +699,7 @@ def update_payroll(request):
         return JsonResponse({'success': False, 'error': str(e)})
 
 # Функция проверки поля номер договора
+
 def validate_loan_id(loan_id, errors):
     """ Проверяет валидность поля номер договора
     :param loan_id: Строковое значение номера договора
@@ -728,6 +752,7 @@ def calculate_payment_status(new_data, last_data, create_data):
             payment_status = '5'
     return payment_status
 
+@csrf_protect
 def update_credit_statement(request):
     """Осуществление изменение кредитного договора в БД."""
     if request.method == 'POST':
@@ -796,6 +821,7 @@ def update_credit_statement(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def add_new_client(request):
     """Осуществление добавления клиента в БД."""
     if request.method == 'POST':
@@ -857,6 +883,7 @@ def is_positive_number(value):
     except ValueError:
         return False
 
+@csrf_protect
 def add_new_loan_type(request):
     """Осуществление добавления типа кредита в БД."""
     if request.method == 'POST':
@@ -887,6 +914,7 @@ def add_new_loan_type(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def add_new_payroll(request):
     """Осуществление добавления платежа в БД."""
     if request.method == 'POST':
@@ -936,6 +964,7 @@ def add_new_payroll(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def add_new_credit_statement(request):
     """Осуществление добавления кредитного договора в БД."""
     if request.method == 'POST':
@@ -1005,6 +1034,7 @@ def add_new_credit_statement(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def add_new_user(request):
     """Осуществление регистрации нового юзера."""
     if request.method == 'POST':
@@ -1019,6 +1049,7 @@ def add_new_user(request):
     context = {'form': form}
     return render(request, 'bank/registrationPage.html', context)
 
+@csrf_protect
 def register_view(request):
     """Осуществление регистрации нового юзера."""
     if request.method == 'POST':
@@ -1032,6 +1063,7 @@ def register_view(request):
     context = {'form': form}
     return render(request, 'bank/registrationPage.html', context)
 
+@csrf_protect
 def login_view(request):
     """Осуществление авторизации юзера."""
     if request.method == 'POST':
@@ -1051,11 +1083,13 @@ def login_view(request):
     context = {'form': form}
     return render(request, 'bank/login_start_page.html', context)
 
+@csrf_protect
 def logout_view(request):
     """Осуществление выхода из аккаунта текущего юзера."""
     logout(request)
     return redirect('home')
 
+@csrf_protect
 def personal_account(request):
     """Осуществление перехода в ЛК с автоматическим определением прав юзера."""
     context = {
@@ -1066,6 +1100,7 @@ def personal_account(request):
     else:
         return render(request, 'bank/accounts/regular.html', context)
 
+@csrf_protect
 def delete_users(request):
     """Осуществление удаления списка юзеров у которых активирован чекбокс."""
     if request.method == 'POST':
@@ -1092,6 +1127,7 @@ class UsersListView(ListView):
     paginate_by = 10
     template_name = 'bank/accounts/admin_capabilities/users_list.html'
 
+@csrf_protect
 def user_detail(request, username):
     user = get_object_or_404(AuthUser, username=username)
     context = {
@@ -1099,6 +1135,7 @@ def user_detail(request, username):
     }
     return render(request, 'bank/accounts/admin_capabilities/users_detail.html', context)
 
+@csrf_protect
 def update_user(request):
     """Осуществление изменение платежа в БД."""
     if request.method == 'POST':
@@ -1133,6 +1170,7 @@ def update_user(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+@csrf_protect
 def delete_single_user(request):
     if request.method == 'POST':
         # Десериализация JSON тела запроса
@@ -1159,7 +1197,7 @@ def delete_single_user(request):
 def show_reports_main_page(request):
     return render(request, 'bank/left_menu/reports/report_main_page.html')
 
-
+@csrf_protect
 def create_report(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -1347,11 +1385,28 @@ matplotlib.use('Agg')
 
 def generate_chart_image(st, grouped_data, labels, title):
     if st == '1':
-        plt.figure(figsize=(9, 6))
+        plt.figure(figsize=(9, 7))
         # Обеспечиваем, что grouped_data и labels не пустые
         if grouped_data.empty or len(labels) == 0:
             return None
-        grouped_data.plot(kind='pie', autopct='%1.1f%%', labels=labels)
+
+        # Создаем обычный круговой график
+        patches, texts, autotexts = plt.pie(
+            grouped_data.values,  # Значения секторов
+            colors=sns.color_palette("pastel"),
+            autopct='%1.1f%%',  # Формат процентов
+            labels=labels,  # Подписи секторов
+            startangle=90,  # Угол начала вращения (график начинается сверху)
+            pctdistance=0.85  # Расстояние от центра для процента (для удобства размещения текста)
+        )
+
+        # Устанавливаем белую область посередине (получится эффект "пончика")
+        centre_circle = plt.Circle((0, 0), 0.70, fc='white')
+        fig = plt.gcf()
+        fig.gca().add_artist(centre_circle)
+
+        # Скрываем подпись внизу (так как там ничего нет)
+        plt.axis('equal')  # Равенство масштаба по обеим осям
         plt.title(title)
         plt.ylabel('')
     elif st == '2':
@@ -1454,7 +1509,7 @@ def help_page(request):
     return render(request, 'bank/help_page.html')
 
 # Заявки
-
+@csrf_protect
 def application_page(request):
     return render(request, 'bank/left_menu/applications/application_page.html')
 
@@ -1582,6 +1637,7 @@ def create_dataframe(client):
     df['education_type'] = df['education_type'].replace(['Среднее специальное', 'Высшее'], [0, 1])
     return df
 
+@csrf_protect
 def analysis(request):
     if request.method == 'POST':
         # Получаем данные

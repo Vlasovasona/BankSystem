@@ -578,7 +578,6 @@ def update_client_view(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-@csrf_protect
 def update_loan_type(request):
     """Осуществление изменение типа кредита в БД."""
     if request.method == 'POST':
@@ -614,7 +613,6 @@ def update_loan_type(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-@csrf_protect
 def update_repayment_status_after_input_new_pay(loan):
     # Автоматически обновляем статус погашения кредита
     count_of_pays = Payroll.objects.filter(loan=loan).count()
@@ -622,7 +620,6 @@ def update_repayment_status_after_input_new_pay(loan):
         loan.repayment_status = 1
         loan.save()
 
-@csrf_protect
 def check_credit_and_payment_exists(loan_id, payment_date):
     """ Проверяет наличие кредитного соглашения и дублирование платежей по указанному договору и дате.
     :param loan_id: Номер договора кредита
@@ -642,7 +639,6 @@ def check_credit_and_payment_exists(loan_id, payment_date):
         errors['loan'] = 'Запись с таким номером договора не найдена'
         return False, errors
 
-@csrf_protect
 def update_payroll(request):
     """ Основной контроллер обработки изменения платежей в базе данных """
     if request.method != 'POST':
@@ -752,7 +748,6 @@ def calculate_payment_status(new_data, last_data, create_data):
             payment_status = '5'
     return payment_status
 
-@csrf_protect
 def update_credit_statement(request):
     """Осуществление изменение кредитного договора в БД."""
     if request.method == 'POST':
@@ -821,7 +816,6 @@ def update_credit_statement(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-@csrf_protect
 def add_new_client(request):
     """Осуществление добавления клиента в БД."""
     if request.method == 'POST':
@@ -883,7 +877,6 @@ def is_positive_number(value):
     except ValueError:
         return False
 
-@csrf_protect
 def add_new_loan_type(request):
     """Осуществление добавления типа кредита в БД."""
     if request.method == 'POST':
@@ -914,7 +907,6 @@ def add_new_loan_type(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-@csrf_protect
 def add_new_payroll(request):
     """Осуществление добавления платежа в БД."""
     if request.method == 'POST':
@@ -964,7 +956,6 @@ def add_new_payroll(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-@csrf_protect
 def add_new_credit_statement(request):
     """Осуществление добавления кредитного договора в БД."""
     if request.method == 'POST':
@@ -1074,7 +1065,7 @@ def login_view(request):
                 login(request, user)
                 return redirect('/bank/clients/')  # Переадресация после успешного входа
         else:
-            print("Ошибка при входе")
+            return JsonResponse({'success': False, 'errors': 'Ошибка при входе'})
     else:
         form = AuthenticationForm()
 
@@ -1639,48 +1630,13 @@ def analysis(request):
         # Получаем данные
         errors = {}
         number_of_the_loan_agreement = request.POST.get('my_field_number_of_the_loan_agreement')
-        if not isinstance(number_of_the_loan_agreement, str):
-            errors['number'] = 'Номер кредитного договора обязателен для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not number_of_the_loan_agreement.isdigit() or int(number_of_the_loan_agreement) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['number'] = 'Номер кредитного договора должен быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
         credit_amount = request.POST.get('my_field_credit_amount')
-        if not isinstance(credit_amount, str):
-            errors['amount'] = 'Сумма кредита обязательная для заполнения'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not credit_amount.isdigit() or int(credit_amount) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['amount'] = 'Сумма кредита должна быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
         term_month = request.POST.get('my_term_month')
-        if not isinstance(term_month, str):
-            errors['month'] = 'Длительность выплат обязательна для заполнения'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not term_month.isdigit() or int(term_month) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['month'] = 'Длительность выплат должна быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
         loan_type = request.POST.get('my_field_loan_type')
-        if not isinstance(loan_type, str):
-            errors['loanType'] = 'Регистр. номер типа кредита обязателен для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not loan_type.isdigit() or int(loan_type) <= 0:
-            # Если введено не число, сообщаем об ошибке
-            errors['loanType'] = 'Регистр. номер типа кредита должен быть числовым положительным значением'
-            return JsonResponse({'success': False, 'errors': errors})
-
         client_passport = request.POST.get('my_field_client')
-        if not isinstance(client_passport, str):
-            errors['client'] = 'Паспорт клиента обязателен для заполнения.'
-            return JsonResponse({'success': False, 'errors': errors})
-        elif not client_passport.isdigit() or int(client_passport) <= 0 or not re.match(r'\d{10}', client_passport):
-            errors['client'] = 'Серия и номер паспорта должны быть числовым положительным значением, состоящим из 10 цифр'
-            return JsonResponse({'success': False, 'errors': errors})
+
+        check_credit_statement(number_of_the_loan_agreement, credit_amount, term_month, loan_type, client_passport,
+                               errors)
 
         if 'number' not in errors:
             if CreditStatement.objects.filter(number_of_the_loan_agreement=int(number_of_the_loan_agreement)).exists():

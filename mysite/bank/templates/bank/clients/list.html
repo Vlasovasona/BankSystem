@@ -12,6 +12,7 @@
 </head>
 <body>
     {% block content %}
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"/>
     <div data-delete-url="{% url 'bank:delete_clients' %}"></div>
         <div class="buttons-table-choose">
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -163,13 +163,11 @@ def search_clients(request):
 
 # Группа методов для удаления записей из базы данных
 
-@csrf_protect
 def delete_clients(request):
     """Осуществление удаления списка клиентов у которых активирован чекбокс."""
     if request.method == 'POST':
         # Получение списка идентификаторов из POST-запроса
         ids_json = request.POST.get('ids', None)
-
         # Преобразование JSON-строки в список идентификаторов
         if ids_json:
             try:
@@ -181,7 +179,6 @@ def delete_clients(request):
 
         # Удаление записей из базы данных
         Clients.objects.filter(id__in=ids).delete()
-
         return JsonResponse({'success': True})
 
 # def delete_clients(request):

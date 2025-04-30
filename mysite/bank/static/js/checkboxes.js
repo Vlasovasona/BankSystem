@@ -14,7 +14,7 @@ $(document).ready(function() {
         $('.delete-button').prop('disabled', !isChecked);
     });
 
-    // Обработчик нажатия на кнопку удаления
+        // Обработчик нажатия на кнопку удаления
     $('.delete-button').click(function(e) {
         e.preventDefault();
 
@@ -25,21 +25,19 @@ $(document).ready(function() {
 
         // Отправляем данные на сервер
         $.ajax({
-            url: deleteUrl, // Используем переменную с URL
+            url: deleteUrl,   // Используем переменную с URL
             type: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken
             },
-            contentType: 'application/json'
-            data: {
-                'ids': JSON.stringify(selectedIds), // Преобразуем массив в строку
-            },
+            contentType: 'application/json',  // Правильное размещение свойства contentType
+            data: JSON.stringify({ 'ids': selectedIds }),  // Прямо сериализуем весь объект целиком
             success: function(response) {
                 // Удаляем строки с отмеченными чекбоксами из DOM
                 $('input[name="table-checkbox"]:checked').closest('tr').remove();
             },
             error: function(error) {
-                console.log(error);
+                console.error("Ошибка:", error);  // Лучше выводить ошибку в консоль таким образом
             }
         });
     });

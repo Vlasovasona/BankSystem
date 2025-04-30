@@ -532,7 +532,7 @@ def update_client_view(request):
         surname = request.POST.get('my_field_surname')
         name = request.POST.get('my_field_name')
         patronymic = request.POST.get('my_field_patronymic')
-        adress = request.POST.get('my_field_address')
+        adress = request.POST.get('my_field_adress')
         phone_number = request.POST.get('my_field_phone')
         age = request.POST.get('my_field_age')
         sex = request.POST.get('my_field_sex')
@@ -1193,12 +1193,13 @@ def create_report(request):
         selected_tables = data.get('tables', [])
 
         try:
+            DATA_PATH = os.path.join(settings.BASE_DIR, 'bank', 'static', 'bank', 'fonts', 'arial3.ttf')
             # Создание временного файла для хранения PDF
             with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
                 temp_filename = temp_file.name
                 pdfmetrics.registerFont(
                     TTFont('Arial',
-                           'C:/Users/sofav/PycharmProjects/PythonProject/mysite/bank/static/bank/fonts/arial3.ttf'))
+                           DATA_PATH))
 
                 styles = getSampleStyleSheet()
 

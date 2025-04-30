@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectedTables.push(checkbox.value);
             });
 
+            if (selectedTables.length === 0) {
+                alert("Ошибка: Не отмечено ни одного элемента!");
+                return; // Прекращаем дальнейшее выполнение обработки формы
+            }
+
             // Отправляем данные на сервер методом POST
             const response = await fetch(updateUrl, {
                 method: 'POST',

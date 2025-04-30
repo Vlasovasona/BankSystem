@@ -36,7 +36,7 @@ $(document).ready(function() {
         const surname = $('#id_surname').val();
         const name = $('#id_name').val();
         const patronymic = $('#id_patronymic').val();
-        const address = $('#id_address').val();
+        const address = $('#id_adress').val();
         const phoneNumber = $('#id_phone').val();
         const age = $('#id_age').val();
         const sex = $('#id_sex').val();
@@ -58,7 +58,7 @@ $(document).ready(function() {
         data.append('my_field_surname', surname);
         data.append('my_field_name', name);
         data.append('my_field_patronymic', patronymic);
-        data.append('my_field_address', address);
+        data.append('my_field_adress', address);
         data.append('my_field_phone', phoneNumber);
         data.append('my_field_age', age);
         data.append('my_field_sex', sex);

@@ -26,14 +26,14 @@
         <div class="field-container">
             <label for="id_credit_amount">Сумма кредита:</label>
             <input type="text" name="my_field_credit_amount" id="id_credit_amount"
-                value="{{ credit_statement_item.credit_amount }}" required>
+                value="{{ credit_statement_item.credit_amount }}" readonly required>
             <span class="error-message" id="amount-error"></span>
         </div>
 
         <div class="field-container">
             <label for="id_term_month">Срок кредита (мес.):</label>
             <input type="text" name="my_term_month" id="id_term_month"
-                value="{{ credit_statement_item.term_month }}" required>
+                value="{{ credit_statement_item.term_month }}" readonly required>
             <span class="error-message" id="month-error"></span>
         </div>
 
@@ -61,14 +61,14 @@
         <div class="field-container">
             <label for="id_loan_type">Тип кредита:</label>
             <input type="text" name="my_field_loan_type" id="id_loan_type"
-                   value="{{ credit_statement_item.loan_type.registration_number }}" required>
+                   value="{{ credit_statement_item.loan_type.registration_number }}" readonly required>
             <span class="error-message" id="loanType-error"></span>
         </div>
 
         <div class="field-container">
             <label for="id_client">Клиент:</label>
             <input type="text" name="my_field_client" id="id_client"
-                value="{{ credit_statement_item.client.passport_serial_number }}" required>
+                value="{{ credit_statement_item.client.passport_serial_number }}" readonly required>
             <span class="error-message" id="client-error"></span>
         </div>
 
@@ -76,7 +76,7 @@
             <div data-update-url="{% url 'bank:update-credit-statement' %}"></div>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="{% static 'js/update_credit_statement.js' %}"></script>
-            <button type="submit" class="save_button">Сохранить изменения</button>
+<!--            <button type="submit" class="save_button">Сохранить изменения</button>-->
             <button type="submit" class="delete-client">Удалить запись</button>
         </div>
     </form>

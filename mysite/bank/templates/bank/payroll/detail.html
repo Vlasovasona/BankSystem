@@ -28,7 +28,7 @@
         <div class="field-container">
             <label for="id_payment_date">Дата платежа:</label>
             <input type="text" name="my_field_payment_date" id="id_payment_date"
-                   value="{{ pay.payment_date|date:"Y-m-d" }}" required>
+                   value="{{ pay.payment_date|date:"Y-m-d" }}" readonly required>
             <span class="error-message" id="date-error"></span>
         </div>
 
@@ -43,7 +43,7 @@
             <div data-update-url="{% url 'bank:update-payroll' %}"></div>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="{% static 'js/update_payroll.js' %}"></script>
-            <button type="submit" class="save_button">Сохранить изменения</button>
+<!--            <button type="submit" class="save_button">Сохранить изменения</button>-->
             <button type="submit" class="delete-client">Удалить запись</button>
         </div>
 

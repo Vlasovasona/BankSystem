@@ -8,7 +8,7 @@ app_name = 'bank'
 
 urlpatterns = [
     # отображение всех таблиц из БД
-    path('', views.ClientListView.as_view(), name='clients_list'),
+    path('', views.login_view, name='clients_list'),
     path('clients/<int:id>/', views.client_detail, name='client_detail'),
     path('clients/', views.ClientListView.as_view(), name='clients_list_select'),
     path('clients/search', views.search_clients, name='search_clients'),
@@ -76,4 +76,7 @@ urlpatterns = [
     # urls для "Заявки"
     path('application_page/', views.application_page, name='application_page'),
     path('result/', views.analysis, name='analysis'),
+    path('application_clients/', views.autocomplete_clients, name='autocomplete_clients'),
+    path('application_types/', views.autocomplete_type, name='autocomplete_type'),
+    path('create_number/', views.create_number, name='create_number'),
 ]

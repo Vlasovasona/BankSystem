@@ -5,14 +5,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Clients, CreditStatement, LoanTypes, Payroll, AuthUser
 from django.views.generic import ListView
+import hashlib
 from django.db.models import Q
+from django.views.decorators.http import require_GET
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import  AuthenticationForm
 from .forms import CustomUserCreationForm
 import re
-from django.views.decorators.http import require_http_methods
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -180,29 +181,6 @@ def delete_clients(request):
         # Удаление записей из базы данных
         Clients.objects.filter(id__in=ids).delete()
         return JsonResponse({'success': True})
-
-# def delete_clients(request):
-#     """Осуществление удаления списка клиентов у которых активирован чекбокс."""
-#     if request.method == 'POST' and request.body:
-#         return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
-#         try:
-#             # Читаем JSON из тела запроса
-#             data = json.loads(request.body)
-#             # Извлекаем список идентификаторов
-#             ids = data.get('ids', [])
-#
-#             if not ids:
-#                 return JsonResponse({'success': False, 'message': 'Не найдены идентификаторы для удаления'})
-#
-#             # Удаляем пользователей с указанными ID
-#             Clients.objects.filter(id__in=ids).delete()
-#
-#             return JsonResponse({'success': True})
-#
-#         except json.JSONDecodeError:
-#             return JsonResponse({'success': False, 'message': 'Ошибка декодирования JSON'})
-#     else:
-#         return JsonResponse({'success': False, 'message': 'Метод запроса должен быть POST и содержать тело'})
 
 @csrf_protect
 def delete_single_client(request):
@@ -1510,7 +1488,7 @@ def load_or_create_model():
         # Пробуем загрузить существующую модель
         final_model = joblib.load(MODEL_FILEPATH)
     except FileNotFoundError:
-        print("Не нашел твой файл :(")
+        print("Не нашел твой файл")
         # Генерируем модель
         final_model = train_and_save_model()
         # Сохраняем модель на диск
@@ -1698,3 +1676,54 @@ def analysis(request):
 
         else:
             return JsonResponse({'success': False, 'error': 'Отправленная на анализ кредитная заявка не одобрена системой. Все равно хотите сохранить заявку в системе?'})
+
+def autocomplete_clients(request):
+    q = request.GET.get('q', '')
+    results = []
+    # Выполняем поиск по полям "surname", "name", "patronymic" и "passport"
+    matching_clients = Clients.objects.filter(
+        Q(surname__icontains=q) |
+        Q(name__icontains=q) |
+        Q(patronymic__icontains=q) |
+        Q(passport_serial_number__icontains=q)
+    )[:10]
+
+    for client in matching_clients[:10]:  # Ограничиваем количество результатов
+        results.append({
+            'surname': client.surname,
+            'name': client.name,
+            'patronymic': client.patronymic,
+            'passport': client.passport_serial_number
+        })
+
+    return JsonResponse({'clients': results})
+
+def autocomplete_type(request):
+    q = request.GET.get('q', '')
+    results = []
+    matching_types = LoanTypes.objects.filter(
+        Q(name_of_the_type__icontains=q) |
+        Q(registration_number__icontains=q)
+    )[:10]
+
+    for loan_type in matching_types[:10]:
+        results.append({
+            'name': loan_type.name_of_the_type,
+            'registration_number': loan_type.registration_number
+        })
+
+    return JsonResponse({'types': results})
+
+def create_number(request):
+    client = request.GET.get('my_field_client', '')
+    loan_type = request.GET.get('my_field_loan_type', '')
+
+    current_date = date.today().strftime('%Y%m%d')
+
+    hashed_client = int(hashlib.md5(str(client).encode()).hexdigest(), 16)
+    hashed_loan_type = int(hashlib.md5(str(loan_type).encode()).hexdigest(), 16)
+    hashed_current_date = int(hashlib.md5(current_date.encode()).hexdigest(), 16)
+
+    unique_key = hashed_client + hashed_loan_type * 10 ** len(str(hashed_client)) + hashed_current_date * 10 ** (
+                len(str(hashed_client)) + len(str(hashed_loan_type)))
+    return JsonResponse({'number_of_agreement': f"{unique_key % (10 ** 10)}"})

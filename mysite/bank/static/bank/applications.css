@@ -118,3 +118,31 @@ input[type="text"] { /* Увеличенные размеры полей вво�
     padding: 20px;
     height: 100vh;
 }
+
+
+#suggestions-list, #suggestions-list_type {
+    display: block;
+    background: #fff;
+    border: 1px solid #ccc;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100px;
+    position: absolute;
+    z-index: 1000;
+}
+
+#suggestions-list li, #suggestions-list_type li {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#suggestions-list li:hover {
+    background-color: #f0f0f0;
+}
+
+#suggestions-list_type li:hover {
+    background-color: #f0f0f0;
+}
